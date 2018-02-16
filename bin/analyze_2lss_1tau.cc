@@ -745,8 +745,6 @@ int main(int argc, char* argv[])
   std::vector<std::string> mvaInputVariables_2HTTSort = {
     "BDTtt", "BDTttV", "mvaOutput_hadTopTaggerWithKinFit", "mvaOutput_Hj_tagger", "unfittedHadTop_pt"};
   std::string mvaFileName_noHTT_2HTT ="tthAnalysis/HiggsToTauTau/data/2lss_1tau_opt1/2lss_1tau_XGB_JointBDT_noHTT_2HTT.pkl";
-  //('max data Joint/TT/TTV', 0.75491208, 0.81014323, 0.99629968)
-  //('min data Joint/TT/TTV', 0.026170442, 0.0066790595, 0.022887703)
   XGBInterface mva_2lss_noHTT_2HTT(mvaFileName_noHTT_2HTT, mvaInputVariables_2HTTSort);
 
   ///////
