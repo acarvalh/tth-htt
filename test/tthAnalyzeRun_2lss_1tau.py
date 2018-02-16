@@ -70,8 +70,8 @@ elif mode == "forBDTtraining_beforeAddMEM":
     from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_prodNtuples_2016_FastSim import samples_2016
   else:
     from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016_FastSim import samples_2016
-  hadTau_selection         = "dR03mvaMedium" ## "dR03mvaVTight"
-  hadTau_selection_relaxed = "dR03mvaMedium" ## "dR03mvaLoose"
+  hadTau_selection         = "dR03mvaMedium"
+  hadTau_selection_relaxed = "dR03mvaMedium"
   applyFakeRateWeights = "2lepton"
 elif mode == "forBDTtraining_afterAddMEM":
   # the samples used here are derived from production Ntuples anyways, since the possible number of
@@ -79,7 +79,7 @@ elif mode == "forBDTtraining_afterAddMEM":
   from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016_FastSim_addMEM_2lss1tau import samples_2016
   changeBranchNames        = True
   MEMbranch                = 'memObjects_2lss_1tau_lepLoose_tauTight_dR03mvaMedium'
-  hadTau_selection         = "dR03mvaMedium"  ## "dR03mvaVTight"
+  hadTau_selection         = "dR03mvaMedium"
   hadTau_selection_relaxed = "dR03mvaMedium"
   applyFakeRateWeights =  "2lepton"
 
@@ -171,11 +171,6 @@ if __name__ == '__main__':
     if is_last_resubmission:
       continue
     logging.info("Job submission #%i:" % (idx_job_resubmission + 1))
-
-
-
-
-
     analysis = analyzeConfig_2lss_1tau(
       configDir                 = configDir,
       outputDir                 = outputDir,
@@ -298,7 +293,11 @@ if __name__ == '__main__':
     )
 
     if mode.find("forBDTtraining") != -1:
-      analysis.set_BDT_training(hadTau_selection_relaxed, hadTauFakeRateWeight_inputFileName)
+      # "dR03mvaMedium" # "dR03mvaTight" # "dR03mvaVTight" # "dR03mvaLoose" #
+      if hadTau_selection_relaxed=="dR03mvaVVLoose" : hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016_vvLoosePresel.root"
+      elif hadTau_selection_relaxed=="dR03mvaVLoose" : hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016_vLoosePresel.root"
+      else : hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016.root"
+        analysis.set_BDT_training(hadTau_selection_relaxed, hadTauFakeRateWeight_inputFileName)
 
     job_statistics = analysis.create()
     for job_type, num_jobs in job_statistics.items():
