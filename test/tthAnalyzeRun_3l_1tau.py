@@ -19,12 +19,12 @@ from tthAnalysis.HiggsToTauTau.jobTools import query_yes_no
 #--------------------------------------------------------------------------------
 
 # python tthAnalyzeRun_3l_1tau.py --version "3l_1tau_2018Feb13_BDT_mMEM_LLepVVLTau" --mode "forBDTtraining_beforeAddMEM" --use_prod_ntuples
-# /home/acaan/ttHAnalysis/2016/3l_1tau_2018Feb13_BDT_mMEM_LLepVLTau
 # E.g. to run: python tthAnalyzeRun_3l_1tau.py --version "2017Oct24" --mode "VHbb" --use_prod_ntuples
 from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--version ", type="string", dest="version", help="Name of output reository with results\n Trees will be stored in /hdfs/local/USER/ttHAnalysis/2016/VERSION/", default='dumb')
 parser.add_option("--mode", type="string", dest="mode", help="Set the mode flag, read the script for options", default="VHbb")
+parser.add_option("--tauWP", type="string", dest="tauWP", help="Set the mode flag, read the script for options", default="VHbb")
 parser.add_option("--ERA", type="string", dest="ERA", help="Era of data", default='2016')
 parser.add_option("--use_prod_ntuples", action="store_true", dest="use_prod_ntuples", help="Production flag", default=False)
 (options, args) = parser.parse_args()
@@ -43,13 +43,13 @@ hadTau_selection_relaxed           = None
 changeBranchNames                  = use_prod_ntuples
 applyFakeRateWeights               = None
 MEMbranch                          = ''
-hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016.root" #
+hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016.root"
 
 # Karl: temporarily disable other modes until we've proper Ntuples
-if mode not in ["VHbb", "forBDTtraining_beforeAddMEM"]:
+if "afterAddMEM" in mode : #not in ["VHbb", "forBDTtraining_beforeAddMEM"]:
   raise ValueError("No Ntuples with MEM entries, yet!")
 
-if use_prod_ntuples and mode not in ["VHbb", "forBDTtraining_beforeAddMEM"]:
+if "afterAddMEM" in mode : #if use_prod_ntuples and mode not in ["VHbb", "forBDTtraining_beforeAddMEM"]:
   raise ValueError("No production Ntuples for %s" % mode)
 
 if use_prod_ntuples and ERA == "2015":
@@ -84,9 +84,14 @@ elif mode == "addMEM":
   applyFakeRateWeights = "3lepton"
   MEMbranch            = 'memObjects_2lss_1tau_lepFakeable_tauTight_dR03mvaMedium'
 elif mode.find("forBDTtraining") != -1 :
-  applyFakeRateWeights     = "3lepton" #"4L"
+  applyFakeRateWeights     = "3lepton"
   hadTau_selection         = "dR03mvaVTight"
-  hadTau_selection_relaxed = "dR03mvaVVLoose"
+  hadTau_selection_relaxed = options.tauWP #"dR03mvaTight"
+  # python tthAnalyzeRun_3l_1tau.py --version "3l_1tau_2018Feb18_VHbb_trees_TLepVLTau" --mode "forBDTtraining_beforeAddMEM" --use_prod_ntuples --tauWP "dR03mvaTight"
+  # "dR03mvaMedium" # "dR03mvaTight" # "dR03mvaVTight" # "dR03mvaLoose" #
+  if hadTau_selection_relaxed=="dR03mvaVVLoose" : hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016_vvLoosePresel.root"
+  elif hadTau_selection_relaxed=="dR03mvaVLoose" : hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016_vLoosePresel.root"
+  else : hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016.root"
   if mode == "forBDTtraining_beforeAddMEM":
       if use_prod_ntuples:
         from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_prodNtuples_2016_FastSim import samples_2016
@@ -237,12 +242,13 @@ if __name__ == '__main__':
       logging.info(" #jobs of type '%s' = %i" % (job_type, num_jobs))
     job_statistics_summary[idx_job_resubmission] = job_statistics
 
-    if idx_job_resubmission == 0:
-      run_analysis = query_yes_no("Start jobs ?")
-    if run_analysis:
-      analysis.run()
-    else:
-      sys.exit(0)
+    #if idx_job_resubmission == 0:
+    #  run_analysis = query_yes_no("Start jobs ?")
+    #if run_analysis:
+    #  analysis.run()
+    #else:
+    #  sys.exit(0)
+    analysis.run()
 
     if job_statistics['analyze'] == 0:
       is_last_resubmission = True
