@@ -24,30 +24,6 @@ EvtHistManager_2lss_1tau::EvtHistManager_2lss_1tau(const edm::ParameterSet& cfg)
     << "Invalid Configuration parameter 'era' = " << era_string << " !!\n";
 }
 
-/*
-void EvtHistManager_2lss_1tau::LoadMaps(int nstart, int ntarget)
-{
-  const Int_t  nbinsTarget[9]={5,6,7,8,9,10};
-  const Int_t  nbinsStart[3]={15,20};
-  std::string binOptSource="/hdfs/local/acaan/ttHAnalysis/2016/2lss_1tau_opt1";
-  std::string binOptSourceEndTrue="bins_relLepIDTrue_CumulativeBins.root";
-  std::string binOptSourceEndFalse="bins_relLepIDFalse_CumulativeBins.root";
-  /////////////////////////////////////////
-  for (int nbinsStartN=0 ; nbinsStartN<nstart ; nbinsStartN++ ) {
-    for (int nbinsTargetN=0 ; nbinsTargetN<ntarget ; nbinsTargetN++ ) {
-      std::cout<< binOptSource << "/bin_opt/oldVarA_from"<<nbinsStart[nbinsStartN]<<"_to_"<<nbinsTarget[nbinsTargetN]<< binOptSourceEndFalse<<std::endl;
-      std::stringstream BDT_mapping_oldVarA_name;
-      BDT_mapping_oldVarA_name << binOptSource << "/bin_opt/oldVarA_from"<<nbinsStart[nbinsStartN]<<"_to_"<<nbinsTarget[nbinsTargetN]<< binOptSourceEndFalse;
-      std::cout<<"loaded histogram " <<std::endl;
-      TH2* dumb_oldVarA= loadTH2(TFile::Open(BDT_mapping_oldVarA_name.str().c_str()), "hTargetBinning");
-      std::cout<<"pushing " <<std::endl;
-      oldVarA_.push_back(dumb_oldVarA);
-      std::cout<<"loaded file "<<BDT_mapping_oldVarA_name.str() <<std::endl;
-   }
-  }
-}
-*/
-
 void EvtHistManager_2lss_1tau::bookHistogramsMap(TFileDirectory& dir , int nbinsStart, int nbinsTarget)
 {
   std::string label[4]={"oldVarA","HTT","HTTMEM","noHTT"};
@@ -129,14 +105,21 @@ void EvtHistManager_2lss_1tau::bookHistograms(TFileDirectory& dir)
   histogram_mvaOutput_2lss_noHTT_ttV_= book1D(dir, "mvaOutput_2lss_noHTT_ttV", "mvaOutput_2lss_noHTT_ttV", 600, 0., +1.);
   histogram_mvaOutput_2lss_HTTMEM_tt_= book1D(dir, "mvaOutput_2lss_HTTMEM_tt", "mvaOutput_2lss_HTTMEM_tt",    600, 0., +1.);
   histogram_mvaOutput_2lss_HTTMEM_ttV_= book1D(dir, "mvaOutput_2lss_HTTMEM_ttV", "mvaOutput_2lss_HTTMEM_ttV", 600, 0., +1.);
+
+  histogram_mvaOutput_2lss_HTTMEM_SUM_M_= book1D(dir, "mvaOutput_2lss_HTTMEM_SUM_M", "mvaOutput_2lss_HTTMEM_SUM_M", 600, 0., +1.);
+  histogram_mvaOutput_2lss_HTTMEM_SUM_T_= book1D(dir, "mvaOutput_2lss_HTTMEM_SUM_T", "mvaOutput_2lss_HTTMEM_SUM_T", 600, 0., +1.);
+
   histogram_mvaOutput_2lss_HTT_LepID_tt_= book1D(dir, "mvaOutput_2lss_HTT_LepID_tt", "mvaOutput_2lss_HTT_LepID_tt", 600, 0., +1.);
 
-  //hist_oldVar_from20_to_12_ = book1D(dir, "oldVar_from20_to_12", "oldVar_from20_to_12", 12, -0.5, 12+0.5);
-  //hist_oldVar_from20_to_7_ = book1D(dir, "oldVar_from20_to_7", "oldVar_from20_to_7", 7, -0.5, 7+0.5);
+  histogram_mvaOutput_2lss_HTTMEM_1B_M_= book1D(dir, "mvaOutput_2lss_HTTMEM_1B_M", "mvaOutput_2lss_HTTMEM_1B_M", 600, 0., +1.);
+  histogram_mvaOutput_2lss_HTTMEM_1B_T_= book1D(dir, "mvaOutput_2lss_HTTMEM_1B_T", "mvaOutput_2lss_HTTMEM_1B_T", 600, 0., +1.);
 
-  histogram_mvaOutput_2lss_HTTMEM_1B_= book1D(dir, "mvaOutput_2lss_HTTMEM_1B", "mvaOutput_2lss_HTTMEM_1B", 600, 0., +1.);
-  histogram_mvaOutput_2lss_HTT_1B_= book1D(dir, "mvaOutput_2lss_HTT_1B", "mvaOutput_2lss_HTT_1B",    600, 0., +1.);
-  histogram_mvaOutput_2lss_noHTT_1B_= book1D(dir, "mvaOutput_2lss_noHTT_1B", "mvaOutput_2lss_noHTT_1B",          600, 0., +1.);
+  histogram_mvaOutput_2lss_HTT_1B_M_= book1D(dir, "mvaOutput_2lss_HTT_1B_M", "mvaOutput_2lss_HTT_1B_M",    600, 0., +1.);
+  histogram_mvaOutput_2lss_HTT_1B_T_= book1D(dir, "mvaOutput_2lss_HTT_1B_T", "mvaOutput_2lss_HTT_1B_T",    600, 0., +1.);
+
+  histogram_mvaOutput_2lss_noHTT_1B_M_= book1D(dir, "mvaOutput_2lss_noHTT_1B_M", "mvaOutput_2lss_noHTT_1B_M",          600, 0., +1.);
+  histogram_mvaOutput_2lss_noHTT_1B_T_= book1D(dir, "mvaOutput_2lss_noHTT_1B_T", "mvaOutput_2lss_noHTT_1B_T",          600, 0., +1.);
+
   histogram_mvaOutput_2lss_oldVarA_1B_= book1D(dir, "mvaOutput_2lss_oldVarA_1B", "mvaOutput_2lss_oldVarA_1B",    600, 0., +1.);
   histogram_mvaOutput_2lss_oldVarA_2MEM_= book1D(dir, "mvaOutput_2lss_oldVarA_2MEM", "mvaOutput_2lss_oldVarA_2MEM", 600, 0., +1.);
   histogram_mvaOutput_2lss_noHTT_2MEM_= book1D(dir, "mvaOutput_2lss_noHTT_2MEM", "mvaOutput_2lss_noHTT_2MEM",    600, 0., +1.);
@@ -151,11 +134,6 @@ void EvtHistManager_2lss_1tau::fillHistograms(
       std::vector<const RecoJet*>::size_type numJets,
       std::vector<const RecoJet*>::size_type numBJets_loose,
       std::vector<const RecoJet*>::size_type numBJets_medium,
-      //std::vector<TH2*>* oldVarA,
-      //std::vector<TH2*>* HTT,
-      //std::vector<TH2*>* noHTT,
-      //std::vector<TH2*>* HTTMEM,
-      //int sel,
       double evtWeight,
       double mvaOutput_2lss_ttV,
       double mvaOutput_2lss_ttbar,
@@ -173,14 +151,6 @@ void EvtHistManager_2lss_1tau::fillHistograms(
       double memOutput_LR, //const MEMOutput_2lss_1tau* memOutput_2lss_1tau,
       double memDiscr,
       // XGB training 1D
-      double mvaOutput_2lss_oldVarA_tt,
-      double mvaOutput_2lss_oldVarA_ttV,
-      double mvaOutput_2lss_noHTT_tt,
-      double mvaOutput_2lss_noHTT_ttV,
-      double mvaOutput_2lss_HTT_tt,
-      double mvaOutput_2lss_HTTMEM_tt,
-      double mvaOutput_2lss_HTTMEM_ttV,
-      double mvaOutput_2lss_HTT_LepID_tt,
       // 2D mapppings [nstart][ntarget]
       /*
       Double_t  (&oldVarA_2D)[2][6],
@@ -193,9 +163,22 @@ void EvtHistManager_2lss_1tau::fillHistograms(
       //double  HTTMEM_2D[2][6],
       //double  noHTT_2D[2][6],
       // XGB training, joint
-      double mvaOutput_2lss_HTTMEM_1B,
-      double mvaOutput_2lss_HTT_1B,
-      double mvaOutput_2lss_noHTT_1B,
+      double mvaOutput_2lss_oldVarA_tt,
+      double mvaOutput_2lss_oldVarA_ttV,
+      double mvaOutput_2lss_noHTT_tt,
+      double mvaOutput_2lss_noHTT_ttV,
+      double mvaOutput_2lss_HTT_tt,
+      double mvaOutput_2lss_HTTMEM_tt,
+      double mvaOutput_2lss_HTTMEM_ttV,
+      double mvaOutput_2lss_HTTMEM_SUM_M,
+      double mvaOutput_2lss_HTTMEM_SUM_T,
+      double mvaOutput_2lss_HTT_LepID_tt,
+      double mvaOutput_2lss_HTTMEM_1B_M,
+      double mvaOutput_2lss_HTTMEM_1B_T,
+      double mvaOutput_2lss_HTT_1B_M,
+      double mvaOutput_2lss_HTT_1B_T,
+      double mvaOutput_2lss_noHTT_1B_M,
+      double mvaOutput_2lss_noHTT_1B_T,
       double mvaOutput_2lss_oldVarA_1B,
       double mvaOutput_2lss_oldVarA_2MEM,
       double mvaOutput_2lss_noHTT_2MEM,
@@ -238,64 +221,34 @@ void EvtHistManager_2lss_1tau::fillHistograms(
 
   fillWithOverFlow(histogram_mvaOutput_2lss_oldVarA_tt_, mvaOutput_2lss_oldVarA_tt, evtWeight, evtWeightErr);
   fillWithOverFlow(histogram_mvaOutput_2lss_oldVarA_ttV_, mvaOutput_2lss_oldVarA_ttV, evtWeight, evtWeightErr);
+
   fillWithOverFlow(histogram_mvaOutput_2lss_HTT_tt_, mvaOutput_2lss_HTT_tt, evtWeight, evtWeightErr);
   fillWithOverFlow(histogram_mvaOutput_2lss_noHTT_tt_, mvaOutput_2lss_noHTT_tt, evtWeight, evtWeightErr);
   fillWithOverFlow(histogram_mvaOutput_2lss_noHTT_ttV_, mvaOutput_2lss_noHTT_ttV, evtWeight, evtWeightErr);
   fillWithOverFlow(histogram_mvaOutput_2lss_HTT_LepID_tt_, mvaOutput_2lss_HTT_LepID_tt, evtWeight, evtWeightErr);
+
   fillWithOverFlow(histogram_mvaOutput_2lss_HTTMEM_tt_, mvaOutput_2lss_HTTMEM_tt, evtWeight, evtWeightErr);
   fillWithOverFlow(histogram_mvaOutput_2lss_HTTMEM_ttV_, mvaOutput_2lss_HTTMEM_ttV, evtWeight, evtWeightErr);
+  fillWithOverFlow(histogram_mvaOutput_2lss_HTTMEM_SUM_M_, mvaOutput_2lss_HTTMEM_SUM_M, evtWeight, evtWeightErr);
+  fillWithOverFlow(histogram_mvaOutput_2lss_HTTMEM_SUM_T_, mvaOutput_2lss_HTTMEM_SUM_T, evtWeight, evtWeightErr);
 
   //fillWithOverFlow(hist_oldVar_from20_to_12_, oldVar_from20_to_12, evtWeight, evtWeightErr);
   //fillWithOverFlow(hist_oldVar_from20_to_7_, oldVar_from20_to_7, evtWeight, evtWeightErr);
 
-  /*
-  for (int nbinsStartN=0 ; nbinsStartN<2 ; nbinsStartN++ ) {
-    for (int nbinsTargetN=0 ; nbinsTargetN<6 ; nbinsTargetN++ ) {
-      //std::cout<<"internal filling histos "<<HTT_2D[nbinsStartN][nbinsTargetN]<<" "<< noHTT_2D[nbinsStartN][nbinsTargetN]<<std::endl;
-      fillWithOverFlow(hist_oldVarA_2D_[nbinsStartN][nbinsTargetN], oldVarA_2D[nbinsStartN][nbinsTargetN], evtWeight, evtWeightErr);
-      fillWithOverFlow(hist_HTT_2D_[nbinsStartN][nbinsTargetN], HTT_2D[nbinsStartN][nbinsTargetN], evtWeight, evtWeightErr);
-      fillWithOverFlow(hist_noHTT_2D_[nbinsStartN][nbinsTargetN], noHTT_2D[nbinsStartN][nbinsTargetN], evtWeight, evtWeightErr);
-      fillWithOverFlow(hist_HTTMEM_2D_[nbinsStartN][nbinsTargetN], HTTMEM_2D[nbinsStartN][nbinsTargetN], evtWeight, evtWeightErr);
-    }
-  }
-  */
+  fillWithOverFlow(histogram_mvaOutput_2lss_HTTMEM_1B_M_, mvaOutput_2lss_HTTMEM_1B_M, evtWeight, evtWeightErr);
+  fillWithOverFlow(histogram_mvaOutput_2lss_HTTMEM_1B_T_, mvaOutput_2lss_HTTMEM_1B_T, evtWeight, evtWeightErr);
 
-  fillWithOverFlow(histogram_mvaOutput_2lss_HTTMEM_1B_, mvaOutput_2lss_HTTMEM_1B, evtWeight, evtWeightErr);
-  fillWithOverFlow(histogram_mvaOutput_2lss_HTT_1B_, mvaOutput_2lss_HTT_1B, evtWeight, evtWeightErr);
-  fillWithOverFlow(histogram_mvaOutput_2lss_noHTT_1B_, mvaOutput_2lss_noHTT_1B, evtWeight, evtWeightErr);
+  fillWithOverFlow(histogram_mvaOutput_2lss_HTT_1B_M_, mvaOutput_2lss_HTT_1B_M, evtWeight, evtWeightErr);
+  fillWithOverFlow(histogram_mvaOutput_2lss_HTT_1B_T_, mvaOutput_2lss_HTT_1B_T, evtWeight, evtWeightErr);
+
+  fillWithOverFlow(histogram_mvaOutput_2lss_noHTT_1B_M_, mvaOutput_2lss_noHTT_1B_M, evtWeight, evtWeightErr);
+  fillWithOverFlow(histogram_mvaOutput_2lss_noHTT_1B_T_, mvaOutput_2lss_noHTT_1B_T, evtWeight, evtWeightErr);
+
   fillWithOverFlow(histogram_mvaOutput_2lss_oldVarA_1B_, mvaOutput_2lss_oldVarA_1B, evtWeight, evtWeightErr);
   fillWithOverFlow(histogram_mvaOutput_2lss_oldVarA_2MEM_, mvaOutput_2lss_oldVarA_2MEM, evtWeight, evtWeightErr);
   fillWithOverFlow(histogram_mvaOutput_2lss_noHTT_2MEM_, mvaOutput_2lss_noHTT_2MEM, evtWeight, evtWeightErr);
   fillWithOverFlow(histogram_mvaOutput_2lss_noHTT_2HTT_, mvaOutput_2lss_noHTT_2HTT, evtWeight, evtWeightErr);
 
-  ///* DO 2D
-  //if (sel==1)  std::cout<<"filling with 2D maps"<<std::endl;
-  /*
-  int countHist2=0;
-  for (int nbinsStartN=0 ; nbinsStartN<nstart ; nbinsStartN++ ) {
-    for (int nbinsTargetN=0 ; nbinsTargetN<ntarget ; nbinsTargetN++ ) {
-      // in root the bin number starts at 1, while the getSF_from_TH2 starts from zero
-      fillWithOverFlow(hist_oldVarA_2D_.at(countHist2),
-        getSF_from_TH2(oldVarA->at(countHist2),mvaOutput_2lss_oldVarA_tt, mvaOutput_2lss_oldVarA_ttV), evtWeight, evtWeightErr);
-      fillWithOverFlow(hist_HTT_2D_.at(countHist2),
-        getSF_from_TH2(HTT->at(countHist2), mvaOutput_2lss_HTT_tt, mvaOutput_2lss_noHTT_ttV), evtWeight, evtWeightErr);
-      fillWithOverFlow(hist_noHTT_2D_.at(countHist2),
-        getSF_from_TH2(noHTT->at(countHist2), mvaOutput_2lss_noHTT_tt, mvaOutput_2lss_noHTT_ttV), evtWeight, evtWeightErr);
-      fillWithOverFlow(hist_HTTMEM_2D_.at(countHist2),
-        getSF_from_TH2(HTTMEM->at(countHist2), mvaOutput_2lss_HTTMEM_tt, mvaOutput_2lss_HTTMEM_ttV), evtWeight, evtWeightErr);
-      ////////////////////////////////
-      //hist_oldVarA_2D_.at(countHist2)->AddBinContent(
-      //                  getSF_from_TH2(oldVarA->at(countHist2),mvaOutput_2lss_oldVarA_tt, mvaOutput_2lss_oldVarA_ttV)+1, evtWeight);
-      //hist_HTT_2D_.at(countHist2)->AddBinContent(
-      //                  getSF_from_TH2(HTT->at(countHist2), mvaOutput_2lss_HTT_tt, mvaOutput_2lss_noHTT_ttV)+1, evtWeight);
-      //hist_noHTT_2D_.at(countHist2)->AddBinContent(
-      //                  getSF_from_TH2(noHTT->at(countHist2), mvaOutput_2lss_noHTT_tt, mvaOutput_2lss_noHTT_ttV)+1, evtWeight);
-      //hist_HTTMEM_2D_.at(countHist2)->AddBinContent(
-      //                  getSF_from_TH2(HTTMEM->at(countHist2), mvaOutput_2lss_HTTMEM_tt, mvaOutput_2lss_HTTMEM_ttV)+1, evtWeight);
-      countHist2++;
-    }
-  }
-  */
 
   /*
   double mTauTauVisSF = ( mTauTauVis1 > 0. && mTauTauVis2 > 0. ) ? 0.5 : 1.;

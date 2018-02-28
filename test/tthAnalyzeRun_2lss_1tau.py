@@ -58,17 +58,17 @@ if mode == "VHbb":
   else:
     from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2015 import samples_2015
     from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016 import samples_2016
-  hadTau_selection     = "dR03mvaMedium"
+  hadTau_selection     = options.tauWP #"dR03mvaTight" #"dR03mvaMedium"
   applyFakeRateWeights = "2lepton"
 elif mode == "addMEM":
   from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016_2lss1tau_addMEM import samples_2016
   changeBranchNames    = True
   MEMbranch                = 'memObjects_2lss_1tau_lepFakeable_tauTight_dR03mvaMedium' #'memObjects_2lss_1tau_lepLoose_tauTight_dR03mvaMedium'
-  hadTau_selection     = "dR03mvaMedium"
+  hadTau_selection     = options.tauWP #"dR03mvaMedium" #"dR03mvaTight" #
   applyFakeRateWeights = "2lepton"
 elif mode.find("forBDTtraining") != -1 :
-  hadTau_selection         = "dR03mvaMedium"
-  hadTau_selection_relaxed = options.tauWP #"dR03mvaMedium"
+  hadTau_selection         = "dR03mvaVTight" #"dR03mvaMedium" #"dR03mvaVTight" ## the file with FR is done wrt VTight
+  hadTau_selection_relaxed = options.tauWP #"dR03mvaLoose" #"dR03mvaMedium" #"dR03mvaVTight" #"dR03mvaVTight" # #
   applyFakeRateWeights = "2lepton"
   if mode == "forBDTtraining_beforeAddMEM":
     if use_prod_ntuples:
@@ -82,40 +82,18 @@ elif mode.find("forBDTtraining") != -1 :
     changeBranchNames        = True
     MEMbranch                = 'memObjects_2lss_1tau_lepLoose_tauTight_dR03mvaMedium'
   elif mode == "forBDTtraining_VHbb":
-    # the samples used here are derived from production Ntuples anyways, since the possible number of
-    # MEM scores per event is computed only at the production Ntuple step
-    from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_prodNtuples_2016 import samples_2016
-    #from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016_2lss1tau_addMEM import samples_2016
-    #changeBranchNames        = True
-    #MEMbranch                = 'memObjects_2lss_1tau_lepFakeable_tauTight_dR03mvaMedium' #'memObjects_2lss_1tau_lepLoose_tauTight_dR03mvaMedium'
+    from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016_2lss1tau_addMEM import samples_2016
+    changeBranchNames    = True
+    MEMbranch                = 'memObjects_2lss_1tau_lepFakeable_tauTight_dR03mvaMedium'
+    for sample_name, sample_info in samples_2016.items():
+        if "Run2016" in sample_name : sample_info["use_it"] = False
   # "dR03mvaMedium" # "dR03mvaTight" # "dR03mvaVTight" # "dR03mvaLoose" #
-  if hadTau_selection_relaxed=="dR03mvaVVLoose" : hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016_vvLoosePresel.root"
-  elif hadTau_selection_relaxed=="dR03mvaVLoose" : hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016_vLoosePresel.root"
-  else : hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016.root"
-
-  for sample_name, sample_info in samples_2016.items():
-    if sample_info['process_name_specific'] in [
-      'TTTo2L2Nu_fastsim_p1',
-      'TTTo2L2Nu_fastsim_p2',
-      'TTTo2L2Nu_fastsim_p3',
-      'TTToSemilepton_fastsim_p1',
-      'TTToSemilepton_fastsim_p2',
-      'TTToSemilepton_fastsim_p3',
-      'TTWJetsToLNu_fastsim',
-      'TTZToLLNuNu_fastsim',
-      'WZTo3LNu_fastsim',
-      'ttHToNonbb_fastsim_p1',
-      'ttHToNonbb_fastsim_p2',
-      'ttHToNonbb_fastsim_p3',
-    ]:
-      sample_info["use_it"] = True
-    else:
-      sample_info["use_it"] = False
-      hadTau_selection         = "dR03mvaMedium"  ## "dR03mvaVTight"
-      hadTau_selection_relaxed = "dR03mvaLoose" #"dR03mvaMedium"
-      applyFakeRateWeights =  "3L" #"2lepton"
 else:
   raise ValueError("Invalid Configuration parameter 'mode' = %s !!" % mode)
+
+if hadTau_selection_relaxed=="dR03mvaVVLoose" : hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016_vvLoosePresel.root"
+elif hadTau_selection_relaxed=="dR03mvaVLoose" : hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016_vLoosePresel.root"
+else : hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016.root"
 
 if mode == "VHbb" or mode == "addMEM" :
   for sample_name, sample_info in samples_2016.items():
@@ -166,10 +144,10 @@ if __name__ == '__main__':
       hist_noHTT.append("noHTT_from"+str(nbinsStart[nbinsStartN])+"_to_"+str(nbinsTarget[nbinsTargetN]))
       hist_HTTMEM.append("HTTMEM_from"+str(nbinsStart[nbinsStartN])+"_to_"+str(nbinsTarget[nbinsTargetN]))
       hist_oldVarA.append("oldVarA_from"+str(nbinsStart[nbinsStartN])+"_to_"+str(nbinsTarget[nbinsTargetN]))
-  print list(hist_HTT)
-  print list(hist_noHTT)
-  print list(hist_HTTMEM)
-  print list(hist_oldVarA)
+  #print list(hist_HTT)
+  #print list(hist_noHTT)
+  #print list(hist_HTTMEM)
+  #print list(hist_oldVarA)
 
   for idx_job_resubmission in range(max_job_resubmission):
     if is_last_resubmission:
@@ -282,16 +260,21 @@ if __name__ == '__main__':
         "mvaOutput_2lss_HTT_tt",
         "mvaOutput_2lss_HTTMEM_tt",
         "mvaOutput_2lss_HTTMEM_ttV",
+        "mvaOutput_2lss_HTTMEM_SUM_M",
+        "mvaOutput_2lss_HTTMEM_SUM_T",
         "mvaOutput_2lss_HTT_LepID_tt",
         #
-        "mvaOutput_2lss_HTTMEM_1B",
-        "mvaOutput_2lss_HTT_1B",
-        "mvaOutput_2lss_noHTT_1B",
+        "mvaOutput_2lss_HTTMEM_1B_M",
+        "mvaOutput_2lss_HTTMEM_1B_T",
+        "mvaOutput_2lss_HTT_1B_M",
+        "mvaOutput_2lss_HTT_1B_T",
+        "mvaOutput_2lss_noHTT_1B_M",
+        "mvaOutput_2lss_noHTT_1B_T",
         "mvaOutput_2lss_oldVarA_1B",
         "mvaOutput_2lss_oldVarA_2MEM",
         "mvaOutput_2lss_noHTT_2MEM",
         "mvaOutput_2lss_noHTT_2HTT"
-      ] + list(hist_HTTMEM) + list(hist_oldVarA)  + list(hist_HTT) +list(hist_noHTT),
+      ], #+ list(hist_HTTMEM) + list(hist_oldVarA)  + list(hist_HTT) +list(hist_noHTT),
       select_rle_output         = True,
       verbose                   = idx_job_resubmission > 0,
     )
@@ -304,13 +287,13 @@ if __name__ == '__main__':
       logging.info(" #jobs of type '%s' = %i" % (job_type, num_jobs))
     job_statistics_summary[idx_job_resubmission] = job_statistics
 
-    #if idx_job_resubmission == 0:
-    #  run_analysis = query_yes_no("Start jobs ?")
-    #if run_analysis:
-    #  analysis.run()
-    #else:
-    #  sys.exit(0)
-    analysis.run()
+    if idx_job_resubmission == 0:
+      run_analysis = query_yes_no("Start jobs ?")
+    if run_analysis:
+      analysis.run()
+    else:
+      sys.exit(0)
+    #analysis.run()
 
     if job_statistics['analyze'] == 0:
       is_last_resubmission = True
