@@ -53,6 +53,8 @@ class EvtHistManager_1l_2tau
     //////////////
     double mvaOutput_sum_HTT,
     double mvaOutput_sum_noHTT,
+    double mvaOutput_sum_HTT_T,
+    double mvaOutput_sum_noHTT_VT,
     /////////////
     double mvaOutput_ttbar_HTT,
     double mvaOutput_ttbar_noHTT,
@@ -61,6 +63,10 @@ class EvtHistManager_1l_2tau
     double mvaOutput_ttbar_OldVar,
     double mvaOutput_1B_HTT,
     double mvaOutput_1B_noHTT,
+    double mvaOutput_1B_HTT_T,
+    double mvaOutput_1B_noHTT_T,
+    double mvaOutput_1B_HTT_VT,
+    double mvaOutput_1B_noHTT_VT,
     /////////////
     double evtWeight);
 
@@ -88,82 +94,27 @@ class EvtHistManager_1l_2tau
 
   /////////////
   TH1* histogram_mvaOutput_ttbar_HTT_;
-  TH1* histogram_mvaOutput_ttbar_HTT_4bins_;
-  TH1* histogram_mvaOutput_ttbar_HTT_5bins_;
-  TH1* histogram_mvaOutput_ttbar_HTT_6bins_;
-  TH1* histogram_mvaOutput_ttbar_HTT_7bins_;
-  TH1* histogram_mvaOutput_ttbar_HTT_8bins_;
-  TH1* histogram_mvaOutput_ttbar_HTT_9bins_;
-  TH1* histogram_mvaOutput_ttbar_HTT_10bins_;
-  TH1* histogram_mvaOutput_ttbar_HTT_11bins_;
-  TH1* histogram_mvaOutput_ttbar_HTT_12bins_;
-  TH1* histogram_mvaOutput_ttbar_HTT_14bins_;
-
   TH1* histogram_mvaOutput_ttbar_noHTT_;
-  TH1* histogram_mvaOutput_ttbar_noHTT_4bins_;
-  TH1* histogram_mvaOutput_ttbar_noHTT_5bins_;
-  TH1* histogram_mvaOutput_ttbar_noHTT_6bins_;
-  TH1* histogram_mvaOutput_ttbar_noHTT_7bins_;
-  TH1* histogram_mvaOutput_ttbar_noHTT_8bins_;
-  TH1* histogram_mvaOutput_ttbar_noHTT_9bins_;
-  TH1* histogram_mvaOutput_ttbar_noHTT_10bins_;
-  TH1* histogram_mvaOutput_ttbar_noHTT_11bins_;
-  TH1* histogram_mvaOutput_ttbar_noHTT_15bins_;
-  TH1* histogram_mvaOutput_ttbar_noHTT_16bins_;
 
   /////////////
   TH1* histogram_mvaOutput_sum_HTT_;
-  TH1* histogram_mvaOutput_sum_HTT_4bins_;
-  TH1* histogram_mvaOutput_sum_HTT_5bins_;
-  TH1* histogram_mvaOutput_sum_HTT_6bins_;
-  TH1* histogram_mvaOutput_sum_HTT_7bins_;
-  TH1* histogram_mvaOutput_sum_HTT_8bins_;
-  TH1* histogram_mvaOutput_sum_HTT_9bins_;
-  TH1* histogram_mvaOutput_sum_HTT_10bins_;
-  TH1* histogram_mvaOutput_sum_HTT_11bins_;
-  TH1* histogram_mvaOutput_sum_HTT_12bins_;
-  TH1* histogram_mvaOutput_sum_HTT_14bins_;
-
   TH1* histogram_mvaOutput_sum_noHTT_;
-  TH1* histogram_mvaOutput_sum_noHTT_4bins_;
-  TH1* histogram_mvaOutput_sum_noHTT_5bins_;
-  TH1* histogram_mvaOutput_sum_noHTT_6bins_;
-  TH1* histogram_mvaOutput_sum_noHTT_7bins_;
-  TH1* histogram_mvaOutput_sum_noHTT_8bins_;
-  TH1* histogram_mvaOutput_sum_noHTT_9bins_;
-  TH1* histogram_mvaOutput_sum_noHTT_10bins_;
-  TH1* histogram_mvaOutput_sum_noHTT_11bins_;
-  TH1* histogram_mvaOutput_sum_noHTT_15bins_;
-  TH1* histogram_mvaOutput_sum_noHTT_16bins_;
 
+  TH1* histogram_mvaOutput_sum_HTT_T_;
+  TH1* histogram_mvaOutput_sum_noHTT_VT_;
 
   TH1* histogram_mvaOutput_ttV_noHTT_;
   TH1* histogram_mvaOutput_ttV_HTT_;
   TH1* histogram_mvaOutput_ttbar_OldVar_;
 
   TH1* histogram_mvaOutput_1B_HTT_;
-  TH1* histogram_mvaOutput_1B_HTT_4bins_;
-  TH1* histogram_mvaOutput_1B_HTT_5bins_;
-  TH1* histogram_mvaOutput_1B_HTT_6bins_;
-  TH1* histogram_mvaOutput_1B_HTT_7bins_;
-  TH1* histogram_mvaOutput_1B_HTT_8bins_;
-  TH1* histogram_mvaOutput_1B_HTT_9bins_;
-  TH1* histogram_mvaOutput_1B_HTT_10bins_;
-  TH1* histogram_mvaOutput_1B_HTT_11bins_;
-  TH1* histogram_mvaOutput_1B_HTT_12bins_;
-  TH1* histogram_mvaOutput_1B_HTT_14bins_;
-
   TH1* histogram_mvaOutput_1B_noHTT_;
-  TH1* histogram_mvaOutput_1B_noHTT_4bins_;
-  TH1* histogram_mvaOutput_1B_noHTT_5bins_;
-  TH1* histogram_mvaOutput_1B_noHTT_6bins_;
-  TH1* histogram_mvaOutput_1B_noHTT_7bins_;
-  TH1* histogram_mvaOutput_1B_noHTT_8bins_;
-  TH1* histogram_mvaOutput_1B_noHTT_9bins_;
-  TH1* histogram_mvaOutput_1B_noHTT_10bins_;
-  TH1* histogram_mvaOutput_1B_noHTT_11bins_;
-  TH1* histogram_mvaOutput_1B_noHTT_15bins_;
-  TH1* histogram_mvaOutput_1B_noHTT_16bins_;
+
+  TH1* histogram_mvaOutput_1B_HTT_T_;
+  TH1* histogram_mvaOutput_1B_noHTT_T_;
+
+  TH1* histogram_mvaOutput_1B_HTT_VT_;
+  TH1* histogram_mvaOutput_1B_noHTT_VT_;
   /////////////
 
   TH1* histogram_mvaOutput_1l_2tau_ttV_;

@@ -82,27 +82,20 @@ class EvtHistManager_2lss_1tau
     double mvaOutput_2lss_HTT_tt,
     double mvaOutput_2lss_HTTMEM_tt,
     double mvaOutput_2lss_HTTMEM_ttV,
+    double mvaOutput_2lss_HTTMEM_SUM_M,
+    double mvaOutput_2lss_HTTMEM_SUM_T,
     double mvaOutput_2lss_HTT_LepID_tt,
-    // 2D mapppings [nstart][ntarget]
-    /*
-    Double_t  (&oldVarA_2D)[2][6],
-    Double_t  (&HTT_2D)[2][6],
-    Double_t  (&HTTMEM_2D)[2][6],
-    Double_t  (&noHTT_2D)[2][6],
-    */
-    //double  oldVarA_2D[2][6],
-    //double  HTT_2D[2][6],
-    //double  HTTMEM_2D[2][6],
-    //double  noHTT_2D[2][6],
-    // XGB training, joint
-    double mvaOutput_2lss_HTTMEM_1B,
-    double mvaOutput_2lss_HTT_1B,
-    double mvaOutput_2lss_noHTT_1B,
+    double mvaOutput_2lss_HTTMEM_1B_M,
+    double mvaOutput_2lss_HTTMEM_1B_T,
+    double mvaOutput_2lss_HTT_1B_M,
+    double mvaOutput_2lss_HTT_1B_T,
+    double mvaOutput_2lss_noHTT_1B_M,
+    double mvaOutput_2lss_noHTT_1B_T,
     double mvaOutput_2lss_oldVarA_1B,
     double mvaOutput_2lss_oldVarA_2MEM,
     double mvaOutput_2lss_noHTT_2MEM,
     double mvaOutput_2lss_noHTT_2HTT
-        );
+    );
 
   const TH1* getHistogram_EventCounter() const { return histogram_EventCounter_; }
 
@@ -180,10 +173,20 @@ class EvtHistManager_2lss_1tau
   //TH1* hist_HTTMEM_2D_[2][6];
   //TH1* hist_oldVarA_2D_[2][6];
 
-  TH1* histogram_mvaOutput_2lss_HTTMEM_1B_;
-  TH1* histogram_mvaOutput_2lss_HTT_1B_;
-  TH1* histogram_mvaOutput_2lss_noHTT_1B_;
+  TH1* histogram_mvaOutput_2lss_HTTMEM_SUM_T_;
+  TH1* histogram_mvaOutput_2lss_HTTMEM_SUM_M_;
+
+  TH1* histogram_mvaOutput_2lss_HTTMEM_1B_T_;
+  TH1* histogram_mvaOutput_2lss_HTTMEM_1B_M_;
+
+  TH1* histogram_mvaOutput_2lss_HTT_1B_T_;
+  TH1* histogram_mvaOutput_2lss_HTT_1B_M_;
+
+  TH1* histogram_mvaOutput_2lss_noHTT_1B_T_;
+  TH1* histogram_mvaOutput_2lss_noHTT_1B_M_;
+
   TH1* histogram_mvaOutput_2lss_oldVarA_1B_;
+
   TH1* histogram_mvaOutput_2lss_oldVarA_2MEM_;
   TH1* histogram_mvaOutput_2lss_noHTT_2MEM_;
   TH1* histogram_mvaOutput_2lss_noHTT_2HTT_;

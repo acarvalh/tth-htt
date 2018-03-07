@@ -8,19 +8,23 @@ from tthAnalysis.HiggsToTauTau.jobTools import query_yes_no
 #   'VHbb'                        : to run the analysis directly on the VHbb Ntuples
 #                                   (to e.g. produce the RLE files to run the tthProdNtuple and ttHAddMEM steps)
 #   'addMEM'                      : to run the analysis on the Ntuples with MEM variables added
-#   'forBDTtraining_beforeAddMEM' : to run the analysis with a relaxed event selection,
+#   'forBDTtraining_beforeAddMEM' : to run the analysis with a relaxed event selection in fastsim,
 #                                   to increase the BDT training statistics
-#   'forBDTtraining_afterAddMEM'  : to run the analysis on the Ntuples with MEM variables added, and
+#   'forBDTtraining_afterAddMEM'  : to run the analysis on the fastsim Ntuples with MEM variables added, and
+#                                   with a relaxed event selection, to increase the BDT training statistics
+#   'forBDTtraining_VHbb_beforeAddMEM' : to run the analysis on fullsim with a relaxed event selection,
+#                                   to increase the BDT training statistics
+#   'forBDTtraining_VHbb_afterAddMEM'  : to run the analysis on the fullsim Ntuples with MEM variables added, and
 #                                   with a relaxed event selection, to increase the BDT training statistics
 #--------------------------------------------------------------------------------
 
 # python tthAnalyzeRun_3l_1tau.py --version "3l_1tau_2018Feb13_BDT_mMEM_LLepVVLTau" --mode "forBDTtraining_beforeAddMEM" --use_prod_ntuples
-# /home/acaan/ttHAnalysis/2016/3l_1tau_2018Feb13_BDT_mMEM_LLepVLTau
 # E.g. to run: python tthAnalyzeRun_3l_1tau.py --version "2017Oct24" --mode "VHbb" --use_prod_ntuples
 from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--version ", type="string", dest="version", help="Name of output reository with results\n Trees will be stored in /hdfs/local/USER/ttHAnalysis/2016/VERSION/", default='dumb')
 parser.add_option("--mode", type="string", dest="mode", help="Set the mode flag, read the script for options", default="VHbb")
+parser.add_option("--tauWP", type="string", dest="tauWP", help="Set the mode flag, read the script for options", default="VHbb")
 parser.add_option("--ERA", type="string", dest="ERA", help="Era of data", default='2016')
 parser.add_option("--use_prod_ntuples", action="store_true", dest="use_prod_ntuples", help="Production flag", default=False)
 (options, args) = parser.parse_args()
@@ -39,13 +43,13 @@ hadTau_selection_relaxed           = None
 changeBranchNames                  = use_prod_ntuples
 applyFakeRateWeights               = None
 MEMbranch                          = ''
-hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016_vLoosePresel.root" # "tthAnalysis/HiggsToTauTau/data/FR_tau_2016.root" #
+hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016.root"
 
 # Karl: temporarily disable other modes until we've proper Ntuples
-if mode not in ["VHbb", "forBDTtraining_beforeAddMEM"]:
+if "afterAddMEM" in mode : #not in ["VHbb", "forBDTtraining_beforeAddMEM"]:
   raise ValueError("No Ntuples with MEM entries, yet!")
 
-if use_prod_ntuples and mode not in ["VHbb", "forBDTtraining_beforeAddMEM"]:
+if "afterAddMEM" in mode : #if use_prod_ntuples and mode not in ["VHbb", "forBDTtraining_beforeAddMEM"]:
   raise ValueError("No production Ntuples for %s" % mode)
 
 if use_prod_ntuples and ERA == "2015":
@@ -60,7 +64,6 @@ if mode == "VHbb":
   else:
     from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2015 import samples_2015
     from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016 import samples_2016
-
   for sample_name, sample_info in samples_2016.items():
     if sample_name in [
       "/Tau/Run2016B-23Sep2016-v3/MINIAOD",
@@ -72,7 +75,6 @@ if mode == "VHbb":
       "/Tau/Run2016H-PromptReco-v2/MINIAOD",
       "/Tau/Run2016H-PromptReco-v3/MINIAOD"]:
       sample_info["use_it"] = False
-
   hadTau_selection = "dR03mvaMedium"
   applyFakeRateWeights = "3lepton"
 elif mode == "addMEM":
@@ -81,21 +83,34 @@ elif mode == "addMEM":
   changeBranchNames    = True
   applyFakeRateWeights = "3lepton"
   MEMbranch            = 'memObjects_2lss_1tau_lepFakeable_tauTight_dR03mvaMedium'
-elif mode == "forBDTtraining_beforeAddMEM":
-  if use_prod_ntuples:
-    from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_prodNtuples_2016_FastSim import samples_2016
-  else:
-    from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016_FastSim import samples_2016
-  applyFakeRateWeights     = "4L"
+elif mode.find("forBDTtraining") != -1 :
+  applyFakeRateWeights     = "3lepton"
   hadTau_selection         = "dR03mvaVTight"
-  hadTau_selection_relaxed = "dR03mvaVVLoose"
-elif mode == "forBDTtraining_afterAddMEM":
-  from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016_3l1tau_addMEM_forBDTtraining import samples_2016
-  changeBranchNames        = True
-  applyFakeRateWeights     = "4L"
-  hadTau_selection         = "dR03mvaVTight"
-  hadTau_selection_relaxed = "dR03mvaVLoose"
-  MEMbranch                = 'memObjects_2lss_1tau_lepLoose_tauTight_dR03mvaVVLoose'
+  hadTau_selection_relaxed = options.tauWP #"dR03mvaTight"
+  # python tthAnalyzeRun_3l_1tau.py --version "3l_1tau_2018Feb18_VHbb_trees_TLepVLTau" --mode "forBDTtraining_beforeAddMEM" --use_prod_ntuples --tauWP "dR03mvaTight"
+  # "dR03mvaMedium" # "dR03mvaTight" # "dR03mvaVTight" # "dR03mvaLoose" #
+  if hadTau_selection_relaxed=="dR03mvaVVLoose" : hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016_vvLoosePresel.root"
+  elif hadTau_selection_relaxed=="dR03mvaVLoose" : hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016_vLoosePresel.root"
+  else : hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016.root"
+  if mode == "forBDTtraining_beforeAddMEM":
+      if use_prod_ntuples:
+        from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_prodNtuples_2016_FastSim import samples_2016
+      else:
+        from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016_FastSim import samples_2016
+  if mode == "forBDTtraining_VHbb_beforeAddMEM":
+      if use_prod_ntuples:
+        from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_prodNtuples_2016 import samples_2016
+      else:
+        from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2015 import samples_2015
+        from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016 import samples_2016
+  if mode == "forBDTtraining_afterAddMEM":
+      from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016_3l1tau_addMEM_forBDTtraining import samples_2016
+      changeBranchNames        = True
+      MEMbranch                = 'memObjects_2lss_1tau_lepLoose_tauTight_dR03mvaVVLoose'
+  if mode == "forBDTtraining_VHbb_afterAddMEM":
+      from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016_3l1tau_addMEM import samples_2016
+      changeBranchNames    = True
+      MEMbranch            = 'memObjects_2lss_1tau_lepFakeable_tauTight_dR03mvaMedium'
 else:
   raise ValueError("Invalid Configuration parameter 'mode' = %s !!" % mode)
 
@@ -216,6 +231,10 @@ if __name__ == '__main__':
     )
 
     if mode.find("forBDTtraining") != -1:
+      # "dR03mvaMedium" # "dR03mvaTight" # "dR03mvaVTight" # "dR03mvaLoose" #
+      if hadTau_selection_relaxed=="dR03mvaVVLoose" : hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016_vvLoosePresel.root"
+      elif hadTau_selection_relaxed=="dR03mvaVLoose" : hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016_vLoosePresel.root"
+      else : hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016.root"
       analysis.set_BDT_training(hadTau_selection_relaxed, hadTauFakeRateWeight_inputFileName)
 
     job_statistics = analysis.create()
@@ -223,12 +242,13 @@ if __name__ == '__main__':
       logging.info(" #jobs of type '%s' = %i" % (job_type, num_jobs))
     job_statistics_summary[idx_job_resubmission] = job_statistics
 
-    if idx_job_resubmission == 0:
-      run_analysis = query_yes_no("Start jobs ?")
-    if run_analysis:
-      analysis.run()
-    else:
-      sys.exit(0)
+    #if idx_job_resubmission == 0:
+    #  run_analysis = query_yes_no("Start jobs ?")
+    #if run_analysis:
+    #  analysis.run()
+    #else:
+    #  sys.exit(0)
+    analysis.run()
 
     if job_statistics['analyze'] == 0:
       is_last_resubmission = True

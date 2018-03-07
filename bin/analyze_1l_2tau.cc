@@ -94,7 +94,7 @@
 // 1l_2tau_opt1
 // 1l_2tau/1l_2tau_XGB_oldVar_evtLevelTTV_TTH_8Var.pkl
 
-
+bool do2D=false;
 
 typedef math::PtEtaPhiMLorentzVector LV;
 typedef std::vector<std::string> vstring;
@@ -612,6 +612,7 @@ int main(int argc, char* argv[])
   //TH2* oldVarA[nstart][ntarget];
   std::vector<TH2*> HTT;
   std::vector<TH2*> noHTT;
+  if (do2D) {
   // this could be inside EvtHistManager, but we would need to load this 6 times (the numbers this class is called
   for (unsigned int nbinsStartN=0 ; nbinsStartN<nstart ; nbinsStartN++ ) {
     for (unsigned int nbinsTargetN=0 ; nbinsTargetN<ntarget ; nbinsTargetN++ ) {
@@ -625,6 +626,7 @@ int main(int argc, char* argv[])
       noHTT.push_back (loadTH2(TFile::Open(BDT_mapping_noHTT_name.str().c_str()), "hTargetBinning"));
       std::cout<<"loaded file "<<BDT_mapping_noHTT_name.str() <<std::endl;
     }
+  }
   }
   //*/
 
@@ -866,10 +868,22 @@ int main(int argc, char* argv[])
   std::string mvaFileName_HTT_1B ="tthAnalysis/HiggsToTauTau/data/1l_2tau_opt1/1l_2tau_XGB_JointBDT_HTT_1B.pkl";
   XGBInterface mva_2lss_HTT_1B(mvaFileName_HTT_1B, mvaInputVariables_1BSort);
 
+  std::string mvaFileName_noHTT_1B_T ="tthAnalysis/HiggsToTauTau/data/1l_2tau_opt1/1l_2tau_XGB_JointBDT_noHTT_1B_T.pkl";
+  XGBInterface mva_2lss_noHTT_1B_T(mvaFileName_noHTT_1B_T, mvaInputVariables_1BSort);
+  std::string mvaFileName_HTT_1B_T ="tthAnalysis/HiggsToTauTau/data/1l_2tau_opt1/1l_2tau_XGB_JointBDT_HTT_1B_T.pkl";
+  XGBInterface mva_2lss_HTT_1B_T(mvaFileName_HTT_1B_T, mvaInputVariables_1BSort);
+
+  std::string mvaFileName_noHTT_1B_VT ="tthAnalysis/HiggsToTauTau/data/1l_2tau_opt1/1l_2tau_XGB_JointBDT_noHTT_1B_VT.pkl";
+  XGBInterface mva_2lss_noHTT_1B_VT(mvaFileName_noHTT_1B_VT, mvaInputVariables_1BSort);
+  std::string mvaFileName_HTT_1B_VT ="tthAnalysis/HiggsToTauTau/data/1l_2tau_opt1/1l_2tau_XGB_JointBDT_HTT_1B_VT.pkl";
+  XGBInterface mva_2lss_HTT_1B_VT(mvaFileName_HTT_1B_VT, mvaInputVariables_1BSort);
+
   //////////////////////
   // SUM-BDT
   // 1l_2tau_XGB_HTT_evtLevelSUM_TTH_18Var*pkl*
   std::string mvaFileName_HTT_sum ="tthAnalysis/HiggsToTauTau/data/1l_2tau_opt1/1l_2tau_XGB_HTT_evtLevelSUM_TTH_18Var.pkl";
+  std::string mvaFileName_HTT_sum_T ="tthAnalysis/HiggsToTauTau/data/1l_2tau_opt1/1l_2tau_XGB_HTT_evtLevelSUM_TTH_T_18Var.pkl";
+  std::string mvaFileName_HTT_sum_VT ="tthAnalysis/HiggsToTauTau/data/1l_2tau_opt1/1l_2tau_XGB_HTT_evtLevelSUM_TTH_VT_18Var.pkl";
   std::cout<<mvaFileName_HTT_sum<<std::endl;
   std::vector<std::string> mvaInputVariables_HTT_sumSort={
     "avg_dr_jet", "dr_taus", "ptmiss", "lep_conePt", "mT_lep", "mTauTauVis", "mindr_lep_jet",
@@ -878,9 +892,13 @@ int main(int argc, char* argv[])
     "tau2_pt", "mvaOutput_hadTopTaggerWithKinFit", "HadTop_pt", "mvaOutput_Hj_tagger"
   };
   XGBInterface mva_HTT_sum(mvaFileName_HTT_sum, mvaInputVariables_HTT_sumSort);
+  XGBInterface mva_HTT_sum_T(mvaFileName_HTT_sum, mvaInputVariables_HTT_sumSort);
+  XGBInterface mva_HTT_sum_VT(mvaFileName_HTT_sum, mvaInputVariables_HTT_sumSort);
 
   // 1l_2tau_XGB_noHTT_evtLevelSUM_TTH_16Var*pkl*
   std::string mvaFileName_noHTT_sum ="tthAnalysis/HiggsToTauTau/data/1l_2tau_opt1/1l_2tau_XGB_noHTT_evtLevelSUM_TTH_16Var.pkl";
+  std::string mvaFileName_noHTT_sum_T ="tthAnalysis/HiggsToTauTau/data/1l_2tau_opt1/1l_2tau_XGB_noHTT_evtLevelSUM_TTH_T_16Var.pkl";
+  std::string mvaFileName_noHTT_sum_VT ="tthAnalysis/HiggsToTauTau/data/1l_2tau_opt1/1l_2tau_XGB_noHTT_evtLevelSUM_TTH_VT_16Var.pkl";
   std::cout<<mvaFileName_noHTT_sum<<std::endl;
   std::vector<std::string> mvaInputVariables_noHTT_sumSort={
     "avg_dr_jet", "dr_taus", "ptmiss", "lep_conePt", "mT_lep", "mTauTauVis", "mindr_lep_jet", "mindr_tau1_jet",
@@ -888,6 +906,8 @@ int main(int argc, char* argv[])
     "costS_tau", "nBJetLoose", "tau1_pt", "tau2_pt"
   };
   XGBInterface mva_noHTT_sum(mvaFileName_noHTT_sum, mvaInputVariables_noHTT_sumSort);
+  XGBInterface mva_noHTT_sum_T(mvaFileName_noHTT_sum, mvaInputVariables_noHTT_sumSort);
+  XGBInterface mva_noHTT_sum_VT(mvaFileName_noHTT_sum, mvaInputVariables_noHTT_sumSort);
 
 
   //--- open output file containing run:lumi:event numbers of events passing final event selection criteria
@@ -1069,10 +1089,12 @@ int main(int argc, char* argv[])
       selHistManager->evt_->bookHistograms(fs);
 
       ///* DO 2D
+      if (do2D) {
       for (int nbinsStartN=0 ; nbinsStartN<nstart ; nbinsStartN++ ) {
         for (int nbinsTargetN=0 ; nbinsTargetN<ntarget ; nbinsTargetN++ ) {
           selHistManager->evt_->bookHistogramsMap(fs,nbinsStart[nbinsStartN],nbinsTarget[nbinsTargetN]);
         }
+      }
       }
       //*/
 
@@ -1093,10 +1115,12 @@ int main(int argc, char* argv[])
           ));
           selHistManager -> evt_in_decayModes_[decayMode_evt] -> bookHistograms(fs);
           ///* DO 2D
+          if (do2D) {
           for (int nbinsStartN=0 ; nbinsStartN<nstart ; nbinsStartN++ ) {
             for (int nbinsTargetN=0 ; nbinsTargetN<ntarget ; nbinsTargetN++ ) {
               selHistManager->evt_in_decayModes_[decayMode_evt]->bookHistogramsMap(fs,nbinsStart[nbinsStartN],nbinsTarget[nbinsTargetN]);
             }
+          }
           }
           //*/
         }
@@ -1676,6 +1700,7 @@ int main(int argc, char* argv[])
       mTauTauVis_presel,
       -1.,-1.,
       -1., -1.,  -1.,  -1., -1.,-1.0,-1.0,
+      -1., -1.,-1., -1.,-1., -1.,
       1.);
 
 	//--- apply final event selection
@@ -2296,11 +2321,15 @@ int main(int argc, char* argv[])
     mvaInputVariables_HTT_1B["BDTtt"]=mvaOutput_ttV_HTT;
     mvaInputVariables_HTT_1B["BDTttV"]=mvaOutput_ttbar_HTT;
     double mvaOutput_1B_HTT =mva_2lss_HTT_1B(mvaInputVariables_HTT_1B);
+    double mvaOutput_1B_HTT_T =mva_2lss_HTT_1B_T(mvaInputVariables_HTT_1B);
+    double mvaOutput_1B_HTT_VT =mva_2lss_HTT_1B_VT(mvaInputVariables_HTT_1B);
     //std::cout<<"filling BDTs noHTT_1B"<<std::endl;
     std::map<std::string, double> mvaInputVariables_noHTT_1B;
     mvaInputVariables_noHTT_1B["BDTtt"]=mvaOutput_ttV_noHTT;
     mvaInputVariables_noHTT_1B["BDTttV"]=mvaOutput_ttbar_noHTT;
     double mvaOutput_1B_noHTT =mva_2lss_noHTT_1B(mvaInputVariables_noHTT_1B);
+    double mvaOutput_1B_noHTT_T =mva_2lss_noHTT_1B_T(mvaInputVariables_noHTT_1B);
+    double mvaOutput_1B_noHTT_VT =mva_2lss_noHTT_1B_VT(mvaInputVariables_noHTT_1B);
 
     std::map<std::string, double> mvaInputsHTT_sum;
     mvaInputsHTT_sum["avg_dr_jet"]             = comp_avg_dr_jet(selJets);
@@ -2322,16 +2351,8 @@ int main(int argc, char* argv[])
     mvaInputsHTT_sum["HadTop_pt"]               = fittedHadTopP4.pt();
     mvaInputsHTT_sum["mvaOutput_Hj_tagger"]     = mvaOutput_Hj_tagger;
     double mvaOutput_sum_HTT = mva_HTT_sum(mvaInputsHTT_sum);
-
-    // 1l_2tau_XGB_noHTT_evtLevelSUM_TTH_16Var*pkl*
-    std::string mvaFileName_noHTT_sum ="tthAnalysis/HiggsToTauTau/data/1l_2tau_opt1/1l_2tau_XGB_noHTT_evtLevelSUM_TTH_16Var.pkl";
-    std::cout<<mvaFileName_noHTT_sum<<std::endl;
-    std::vector<std::string> mvaInputVariables_noHTT_sumSort={
-      "avg_dr_jet", "dr_taus", "ptmiss", "lep_conePt", "mT_lep", "mTauTauVis", "mindr_lep_jet", "mindr_tau1_jet",
-      "mindr_tau2_jet", "nJet", "dr_lep_tau_ss", "dr_lep_tau_lead",
-      "costS_tau", "nBJetLoose", "tau1_pt", "tau2_pt"
-    };
-    XGBInterface mva_noHTT_sum(mvaFileName_noHTT_sum, mvaInputVariables_noHTT_sumSort);
+    double mvaOutput_sum_HTT_T = mva_HTT_sum_T(mvaInputsHTT_sum);
+    double mvaOutput_sum_HTT_VT = mva_HTT_sum_VT(mvaInputsHTT_sum);
 
     std::map<std::string, double> mvaInputsnoHTT_sum;
     mvaInputsnoHTT_sum["avg_dr_jet"]             = comp_avg_dr_jet(selJets);
@@ -2351,6 +2372,8 @@ int main(int argc, char* argv[])
     mvaInputsnoHTT_sum["tau1_pt"]                = selHadTau_lead->pt();
     mvaInputsnoHTT_sum["tau2_pt"]                = selHadTau_sublead->pt();
     double mvaOutput_sum_noHTT = mva_noHTT_sum(mvaInputsnoHTT_sum);
+    double mvaOutput_sum_noHTT_T = mva_noHTT_sum_T(mvaInputsnoHTT_sum);
+    double mvaOutput_sum_noHTT_VT = mva_noHTT_sum_VT(mvaInputsnoHTT_sum);
 
 
 //--- fill histograms with events passing final selection
@@ -2391,6 +2414,10 @@ int main(int argc, char* argv[])
       //////////////
       mvaOutput_sum_HTT,
       mvaOutput_sum_noHTT,
+      mvaOutput_sum_HTT_T,
+      mvaOutput_sum_noHTT_T,
+      mvaOutput_sum_HTT_VT,
+      mvaOutput_sum_noHTT_VT,
       /////////////
       mvaOutput_ttbar_HTT,
       mvaOutput_ttbar_noHTT,
@@ -2399,11 +2426,16 @@ int main(int argc, char* argv[])
       mvaOutput_ttbar_OldVar,
       mvaOutput_1B_HTT,
       mvaOutput_1B_noHTT,
+      mvaOutput_1B_HTT_T,
+      mvaOutput_1B_noHTT_T,
+      mvaOutput_1B_HTT_VT,
+      mvaOutput_1B_noHTT_VT,
       /////////////
       evtWeight);
     ///* DO 2D
     //std::cout<<"filling with 2D maps"<<std::endl;
     ///*
+    if (do2D) {
     int countHist=0;
     for (int nbinsStartN=0 ; nbinsStartN<nstart ; nbinsStartN++ ) {
       for (int nbinsTargetN=0 ; nbinsTargetN<ntarget ; nbinsTargetN++ ) {
@@ -2417,6 +2449,7 @@ int main(int argc, char* argv[])
                                                   );
         countHist++;
       }
+    }
     }
     //*/
     if( isSignal ) {
@@ -2442,6 +2475,10 @@ int main(int argc, char* argv[])
           //////////////
           mvaOutput_sum_HTT,
           mvaOutput_sum_noHTT,
+          mvaOutput_sum_HTT_T,
+          mvaOutput_sum_noHTT_T,
+          mvaOutput_sum_HTT_VT,
+          mvaOutput_sum_noHTT_VT,
           /////////////
           mvaOutput_ttbar_HTT,
           mvaOutput_ttbar_noHTT,
@@ -2450,11 +2487,16 @@ int main(int argc, char* argv[])
           mvaOutput_ttbar_OldVar,
           mvaOutput_1B_HTT,
           mvaOutput_1B_noHTT,
+          mvaOutput_1B_HTT_T,
+          mvaOutput_1B_noHTT_T,
+          mvaOutput_1B_HTT_VT,
+          mvaOutput_1B_noHTT_VT,
           /////////////
           evtWeight
         );
         ///*
         // DO 2D
+        if (do2D) {
         //std::cout<<"filling with 2D maps"<<std::endl;
         int countHist2=0;
         for (int nbinsStartN=0 ; nbinsStartN<nstart ; nbinsStartN++ ) {
@@ -2469,6 +2511,7 @@ int main(int argc, char* argv[])
                                                     );
             countHist2++;
           }
+      }
       }
       //*/
 
@@ -2514,6 +2557,10 @@ int main(int argc, char* argv[])
       //////////////
       mvaOutput_sum_HTT,
       mvaOutput_sum_noHTT,
+      mvaOutput_sum_HTT_T,
+      mvaOutput_sum_noHTT_T,
+      mvaOutput_sum_HTT_VT,
+      mvaOutput_sum_noHTT_VT,
       /////////////
       mvaOutput_ttbar_HTT,
       mvaOutput_ttbar_noHTT,
@@ -2522,6 +2569,10 @@ int main(int argc, char* argv[])
       mvaOutput_ttbar_OldVar,
       mvaOutput_1B_HTT,
       mvaOutput_1B_noHTT,
+      mvaOutput_1B_HTT_T,
+      mvaOutput_1B_noHTT_T,
+      mvaOutput_1B_HTT_VT,
+      mvaOutput_1B_noHTT_VT,
       /////////////
       evtWeight);
 

@@ -197,7 +197,7 @@ class analyzeConfig_2lss_1tau(analyzeConfig):
     if jobOptions['hadTau_selection'].find("mcClosure") != -1:
       lines.append("process.analyze_2lss_1tau.hadTauFakeRateWeight.applyFitFunction_lead = cms.bool(False)")
       lines.append("process.analyze_2lss_1tau.hadTauFakeRateWeight.applyFitFunction_sublead = cms.bool(False)")
-    if jobOptions['hadTau_selection'].find("Tight") != -1 and self.applyFakeRateWeights not in [ "3L", "1tau" ] : # and not self.isBDTtraining: Xanda: we are using the same tau ID of analysis selections for BDT training as well
+    if jobOptions['hadTau_selection'].find("Tight") != -1  and not self.isBDTtraining: #: Xanda: we are using the same tau ID of analysis selections for BDT training as well
       lines.append("process.analyze_2lss_1tau.hadTauFakeRateWeight.applyGraph_lead = cms.bool(False)")
       lines.append("process.analyze_2lss_1tau.hadTauFakeRateWeight.applyFitFunction_lead = cms.bool(True)")
       lines.append("process.analyze_2lss_1tau.hadTauFakeRateWeight.applyGraph_sublead = cms.bool(False)")
@@ -362,10 +362,10 @@ class analyzeConfig_2lss_1tau(analyzeConfig):
         hadTau_selection = "|".join([ hadTau_selection, self.hadTau_selection_part2 ])
 
       if lepton_and_hadTau_selection == "forBDTtraining":
-        lepton_selection = "Loose" # "Tight" ## "Fakeable" ## Xanda
-        if not self.applyFakeRateWeights == "2lepton":
-            hadTau_selection = "Tight|%s" % self.hadTau_selection_relaxed
-            # hadTau ID it is the same level of analysis if applyFakeRateWeights == "2lepton"
+        lepton_selection = "Tight" #  "Loose" #       # "Fakeable" ## Xanda
+        #if not self.applyFakeRateWeights == "2lepton":
+        hadTau_selection = "Tight|%s" % self.hadTau_selection_relaxed
+        # hadTau ID it is the same level of analysis if applyFakeRateWeights == "2lepton"
 
       for lepton_and_hadTau_frWeight in self.lepton_and_hadTau_frWeights:
         if lepton_and_hadTau_frWeight == "enabled" and not lepton_and_hadTau_selection.startswith("Fakeable"):
@@ -441,7 +441,7 @@ class analyzeConfig_2lss_1tau(analyzeConfig):
                     'hadTau_selection' : hadTau_selection,
                     'apply_hadTauGenMatching' : self.apply_hadTauGenMatching,
                     'chargeSumSelection' : chargeSumSelection,
-                    'applyFakeRateWeights' : self.applyFakeRateWeights if not (lepton_selection == "Tight" and hadTau_selection.find("Tight") != -1) else "disabled",
+                    'applyFakeRateWeights' : self.applyFakeRateWeights if self.isBDTtraining or not (lepton_selection == "Tight" and hadTau_selection.find("Tight") != -1) else "disabled",
                     ##'use_HIP_mitigation_mediumMuonId' : sample_info["use_HIP_mitigation_mediumMuonId"],
                     'use_HIP_mitigation_mediumMuonId' : True,
                     'is_mc' : is_mc,

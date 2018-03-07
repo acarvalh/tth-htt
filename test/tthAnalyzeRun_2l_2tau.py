@@ -7,7 +7,9 @@ from tthAnalysis.HiggsToTauTau.jobTools import query_yes_no
 #--------------------------------------------------------------------------------
 # NOTE: set mode flag to
 #   'VHbb'           : to run the analysis on the VHbb Ntuples, with the nominal event selection
-#   'forBDTtraining' : to run the analysis on the VHbb Ntuples, with a relaxed event selection,
+#   'forBDTtraining' : to run the analysis on the Fastsim Ntuples, with a relaxed event selection,
+#                      to increase the BDT training statistics
+#   'forBDTtraining_VHbb' : to run the analysis on the VHbb Ntuples, with a relaxed event selection,
 #                      to increase the BDT training statistics
 #--------------------------------------------------------------------------------
 # E.g. to run: python tthAnalyzeRun_2l_2tau.py --version "2l_2tau_2018Feb07_BDT_LLepVLTau" --mode "forBDTtraining" --use_prod_ntuples
@@ -32,12 +34,12 @@ LUMI                               = None
 hadTau_selection                   = None
 hadTau_selection_relaxed           = None
 applyFakeRateWeights               = None
-hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016_vvLoosePresel.root" # "tthAnalysis/HiggsToTauTau/data/FR_tau_2016.root" #
+hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016.root" #
 
 if use_prod_ntuples and ERA == "2015":
   raise ValueError("No production Ntuples for 2015 data & MC")
 
-if mode == "forBDTtraining" and ERA == "2015":
+if mode.find("forBDTtraining") != -1 and ERA == "2015":
   raise ValueError("No fastsim samples for 2015")
 
 if mode == "VHbb":
@@ -46,19 +48,21 @@ if mode == "VHbb":
   else:
     from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2015 import samples_2015
     from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016 import samples_2016
-  hadTau_selection     = "dR03mvaMedium" # "dR03mvaTight"
+  hadTau_selection     =  "dR03mvaTight" # "dR03mvaVVLoose" # python tthAnalyzeRun_2l_2tau.py --version "2l_2tau_2018Feb19_VHbb_TLepVTTau" --mode "VHbb" --use_prod_ntuples
   applyFakeRateWeights = "4L"
-elif mode == "forBDTtraining":
-  if use_prod_ntuples:
-    from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_prodNtuples_2016_FastSim import samples_2016
-  else:
-    from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016_FastSim import samples_2016
+elif mode.find("forBDTtraining") != -1 :
+  if mode == "forBDTtraining" :
+      if use_prod_ntuples:
+        from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_prodNtuples_2016_FastSim import samples_2016
+      else:
+        from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016_FastSim import samples_2016
+  if mode == "forBDTtraining_VHbb" : from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_prodNtuples_2016 import samples_2016
   hadTau_selection         = "dR03mvaVTight"
-  hadTau_selection_relaxed = "dR03mvaVVLoose" #"dR03mvaMedium" #  "dR03mvaTight" #  "dR03mvaLoose" # "dR03mvaVTight" # "dR03mvaLoose"
-  # KEY: TDirectoryFile	 dR03mvaMedium;1	dR03mvaMedium
-  # KEY: TDirectoryFile	dR03mvaTight;1	dR03mvaTight
-  # KEY: TDirectoryFile	dR03mvaVTight;1	dR03mvaVTight
-  # KEY: TDirectoryFile	dR03mvaVVTight;1	dR03mvaVVTight
+  hadTau_selection_relaxed = "dR03mvaVVLoose"
+  # "dR03mvaMedium" # "dR03mvaTight" # "dR03mvaVTight" # "dR03mvaLoose" #
+  if hadTau_selection_relaxed=="dR03mvaVVLoose" : hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016_vvLoosePresel.root"
+  elif hadTau_selection_relaxed=="dR03mvaVLoose" : hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016_vLoosePresel.root"
+  else : hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016.root"
   applyFakeRateWeights     = "4L"
 else:
   raise ValueError("Invalid Configuration parameter 'mode' = %s !!" % mode)
@@ -83,6 +87,26 @@ if __name__ == '__main__':
   run_analysis           = False
   is_last_resubmission   = False
 
+  nbinsStart=[4,5,6,7,8,9,10,11,12];
+  hist_noHTT_tt=[]
+  hist_noHTT_ttV=[]
+  hist_noHTT_SUM_M=[]
+  hist_noHTT_SUM_T=[]
+  hist_noHTT_SUM_VT=[]
+  hist_noHTT_1B_M=[]
+  hist_noHTT_1B_T=[]
+  hist_noHTT_1B_VT=[]
+  for nbinsStartN in range(0,len(nbinsStart)) :
+    hist_noHTT_tt.append("mvaOutput_noHTT_tt_"+str(nbinsStart[nbinsStartN])+"bins")
+    hist_noHTT_ttV.append("mvaOutput_noHTT_ttV_"+str(nbinsStart[nbinsStartN])+"bins")
+    hist_noHTT_SUM_M.append("mvaOutput_SUM_M_"+str(nbinsStart[nbinsStartN])+"bins")
+    hist_noHTT_SUM_T.append("mvaOutput_SUM_T_"+str(nbinsStart[nbinsStartN])+"bins")
+    hist_noHTT_SUM_VT.append("mvaOutput_SUM_VT_"+str(nbinsStart[nbinsStartN])+"bins")
+    hist_noHTT_1B_M.append("mvaOutput_1B_M_"+str(nbinsStart[nbinsStartN])+"bins")
+    hist_noHTT_1B_T.append("mvaOutput_1B_T_"+str(nbinsStart[nbinsStartN])+"bins")
+    hist_noHTT_1B_VT.append("mvaOutput_1B_VT_"+str(nbinsStart[nbinsStartN])+"bins")
+  print list(hist_noHTT_tt)
+
   for idx_job_resubmission in range(max_job_resubmission):
     if is_last_resubmission:
       continue
@@ -99,7 +123,7 @@ if __name__ == '__main__':
       hadTau_selection         = hadTau_selection,
       hadTau_charge_selections = [ "disabled" ],
       applyFakeRateWeights     = applyFakeRateWeights,
-      chargeSumSelections      = [ "OS"] if mode == "forBDTtraining" else [ "OS", "SS" ],  #[ "OS", "SS" ],
+      chargeSumSelections      = [ "OS"] if mode.find("forBDTtraining") != -1 else [ "OS", "SS" ],  #[ "OS", "SS" ],
       central_or_shifts        = [
         "central",
 ##         "CMS_ttHl_btag_HFUp",
@@ -156,8 +180,23 @@ if __name__ == '__main__':
         "EventCounter",
         "numJets",
         "mTauTauVis",
-        "mvaDiscr_2l_2tau"
-      ],
+        "mvaDiscr_2l_2tau",
+        "mvaOutput_noHTT_tt",
+        "mvaOutput_noHTT_ttV",
+        "mvaOutput_noHTT_SUM_M",
+        "mvaOutput_noHTT_SUM_T",
+        "mvaOutput_noHTT_SUM_VT",
+        "mvaOutput_noHTT_1B_M",
+        "mvaOutput_noHTT_1B_T",
+        "mvaOutput_noHTT_1B_VT"
+      ] +list(hist_noHTT_tt)+
+      list(hist_noHTT_ttV)+
+      list(hist_noHTT_SUM_M)+
+      list(hist_noHTT_SUM_T)+
+      list(hist_noHTT_SUM_VT)+
+      list(hist_noHTT_1B_M)+
+      list(hist_noHTT_1B_T)+
+      list(hist_noHTT_1B_VT),
       select_rle_output                     = True,
       verbose                               = idx_job_resubmission > 0,
     )
