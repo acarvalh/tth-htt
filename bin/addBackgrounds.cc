@@ -39,7 +39,7 @@
 
 typedef std::vector<std::string> vstring;
 
-int main(int argc, char* argv[]) 
+int main(int argc, char* argv[])
 {
 //--- throw an exception in case ROOT encounters an error
   gErrorAbortLevel = kError;
@@ -57,25 +57,25 @@ int main(int argc, char* argv[])
   clock.Start("addBackgrounds");
 
 //--- read python configuration parameters
-  if ( !edm::readPSetsFrom(argv[1])->existsAs<edm::ParameterSet>("process") ) 
-    throw cms::Exception("addBackgrounds") 
+  if ( !edm::readPSetsFrom(argv[1])->existsAs<edm::ParameterSet>("process") )
+    throw cms::Exception("addBackgrounds")
       << "No ParameterSet 'process' found in configuration file = " << argv[1] << " !!\n";
-  
+
   edm::ParameterSet cfg = edm::readPSetsFrom(argv[1])->getParameter<edm::ParameterSet>("process");
 
   edm::ParameterSet cfgAddBackgrounds = cfg.getParameter<edm::ParameterSet>("addBackgrounds");
 
   vstring categories = cfgAddBackgrounds.getParameter<vstring>("categories");
-  
+
   vstring processes_input = cfgAddBackgrounds.getParameter<vstring>("processes_input");
   std::string process_output = cfgAddBackgrounds.getParameter<std::string>("process_output");
 
   vstring central_or_shifts = cfgAddBackgrounds.getParameter<vstring>("sysShifts");
   central_or_shifts.push_back(""); // CV: add central value
-  
-  fwlite::InputSource inputFiles(cfg); 
+
+  fwlite::InputSource inputFiles(cfg);
   if ( !(inputFiles.files().size() == 1) )
-    throw cms::Exception("addBackgrounds") 
+    throw cms::Exception("addBackgrounds")
       << "Exactly one input file expected !!\n";
   TFile* inputFile = new TFile(inputFiles.files().front().data());
 
@@ -86,12 +86,12 @@ int main(int argc, char* argv[])
 
   for ( vstring::const_iterator category = categories.begin();
 	category != categories.end(); ++category ) {
-    
+
     TDirectory* dir = getDirectory(inputFile, *category, true);
     assert(dir);
 
     std::cout << "processing category = " << (*category) << std::endl;
-	
+
     std::vector<const TDirectory*> subdirs_level1 = getSubdirectories(dir);
     for ( std::vector<const TDirectory*>::iterator subdir_level1 = subdirs_level1.begin();
 	  subdir_level1 != subdirs_level1.end(); ++subdir_level1 ) {
@@ -110,13 +110,14 @@ int main(int argc, char* argv[])
                the_process_input.find("ttH_hww") != std::string::npos ||
                the_process_input.find("ttH_hzz") != std::string::npos ) {
             continue;
-          } 
+          }
 	  if ( std::string((*subdir_level2)->GetName()).find("genEvt")  != std::string::npos ||
 	       std::string((*subdir_level2)->GetName()).find("lheInfo") != std::string::npos ||
+         std::string((*subdir_level2)->GetName()).find("evtntuple") != std::string::npos ||
 	       std::string((*subdir_level2)->GetName()).find("cutFlow") != std::string::npos ) {
 	    continue;
 	  }
-	  throw cms::Exception("addBackgrounds") 
+	  throw cms::Exception("addBackgrounds")
 	    << "Failed to find subdirectory = " << the_process_input << " within directory = " << (*subdir_level2)->GetName() << " !!\n";
 	  //std::cerr << "Failed to find subdirectory = " << the_process_input << " within directory = " << (*subdir_level2)->GetName() << " --> skipping !!" << std::endl;
 	  //continue;
@@ -142,7 +143,7 @@ int main(int argc, char* argv[])
 	    histograms.insert(histogramName.Data());
 	  }
 	}
-	
+
 	for ( std::set<std::string>::const_iterator histogram = histograms.begin();
 	      histogram != histograms.end(); ++histogram ) {
 	  std::cout << "histogram = " << (*histogram) << std::endl;
@@ -163,7 +164,7 @@ int main(int argc, char* argv[])
 	    std::string subdirName_output = Form("%s/%s/%s/%s", category->data(), (*subdir_level1)->GetName(), (*subdir_level2)->GetName(), process_output.data());
 	    TDirectory* subdir_output = createSubdirectory_recursively(fs, subdirName_output);
 	    subdir_output->cd();
-	    
+
 	    std::string histogramName_output;
 	    if ( !((*central_or_shift) == "" || (*central_or_shift) == "central") ) histogramName_output.append(*central_or_shift);
 	    if ( histogramName_output.length() > 0 ) histogramName_output.append("_");
