@@ -1095,7 +1095,7 @@ int main(int argc, char* argv[])
   typedef std::remove_pointer<decltype(bdt_filler_gen)>::type::float_type float_type;
   typedef std::remove_pointer<decltype(bdt_filler_gen)>::type::int_type   int_type;
 
-  if ( selectBDT ) { // if ( 1>0 ) { // Xanda  doTree
+  if ( selectBDT ) {
     bdt_filler = new std::remove_pointer<decltype(bdt_filler)>::type(
       makeHistManager_cfg(process_string, Form("%s/sel/evtntuple", histogramDir.data()), central_or_shift)
     );
@@ -1154,7 +1154,6 @@ int main(int argc, char* argv[])
 
   }
 
-
   int analyzedEntries = 0;
   int selectedEntries = 0;
   double selectedEntries_weighted = 0.;
@@ -1166,7 +1165,7 @@ int main(int argc, char* argv[])
   cutFlowHistManager->bookHistograms(fs);
 
   while(inputTree -> hasNextEvent() && (! run_lumi_eventSelector || (run_lumi_eventSelector && ! run_lumi_eventSelector -> areWeDone())))
-  { // xanda
+  {
     if(inputTree -> canReport(reportEvery))
     {
       std::cout << "processing Entry " << inputTree -> getCurrentMaxEventIdx()
@@ -1283,16 +1282,12 @@ int main(int argc, char* argv[])
     double genMAntiTopWj2 = -100;
 
     if ( isMC ) {
-      //std::cout << "readGen" << std::endl;
       genTopQuarks = genTopQuarkReader->read();
       genBJets = genBJetReader->read();
       genWBosons = genWBosonReader->read();
       genWJets = genWJetReader->read();
-      //std::cout << "calculate gen match" << std::endl;
       std::vector<float> genMatchingTopVar = isGenMatchedJetTripletVar(genTopQuarks, genBJets, genWBosons, genWJets, kGenTop);
       std::vector<float> genMatchingAntiTopVar = isGenMatchedJetTripletVar(genTopQuarks, genBJets, genWBosons, genWJets, kGenAntiTop);
-      //std::cout << "reading gen match" << std::endl;
-
       genPtTop = genMatchingTopVar[kGenPtTop];
       genPtTopB = genMatchingTopVar[kGenPtTopB];
       genPtTopW = genMatchingTopVar[kGenPtTopW];
@@ -1330,10 +1325,7 @@ int main(int argc, char* argv[])
       else if (genPtTop>0 || genPtAntiTop>0) gencount = 1;
       if (genMTopWj1>0 && genMAntiTopWj1>0) gencountHad = 2;
       else if (genMTopWj1>0 || genMAntiTopWj1>0) gencountHad = 1;
-      //std::cout << "read gen match" << std::endl;
     }
-    //std::cout << "fill gen var" << std::endl;
-    //std::cout << "genPtTop "<<genPtTop << std::endl;
     if ( bdt_filler_gen ) {
       bdt_filler_gen -> operator()({ eventInfo.run, eventInfo.lumi, eventInfo.event })
           ("genPtTop",        genPtTop)
@@ -1682,12 +1674,7 @@ int main(int argc, char* argv[])
     preselHistManager->evt_->fillHistograms(
       preselElectrons.size(), preselMuons.size(), selHadTaus.size(),
       selJets.size(), selBJets_loose.size(), selBJets_medium.size(),
-      //&dumbVec,&dumbVec,&dumbVec,&dumbVec,
-      //0,
       1.0, // evtWeight is first to be sure of not being loosing counting
-      //1,1,1,
-      //1,1,1,
-      // old Training
       -1., -1., -1., -1., -1., -1., -1., -1., -1., -1., -1.,
       mTauTauVis1_presel, mTauTauVis2_presel,
       -1., -1.,
@@ -1702,7 +1689,6 @@ int main(int argc, char* argv[])
       if ( run_lumi_eventSelector ) {
 	std::cout << "event FAILS selLeptons selection." << std::endl;
 	printLeptonCollection("selLeptons", selLeptons);
-	//printLeptonCollection("preselLeptons", preselLeptons);
       }
       continue;
     }
@@ -1780,9 +1766,9 @@ int main(int argc, char* argv[])
 //--- apply data/MC corrections for efficiencies of leptons passing the loose identification and isolation criteria
 //    to also pass the tight identification and isolation criteria
       if ( leptonSelection == kFakeable ) {
-	weight_data_to_MC_correction = dataToMCcorrectionInterface->getSF_leptonID_and_Iso_fakeable_to_loose();
+        weight_data_to_MC_correction *= dataToMCcorrectionInterface->getSF_leptonID_and_Iso_fakeable_to_loose();
       } else if ( leptonSelection == kTight ) {
-        weight_data_to_MC_correction = dataToMCcorrectionInterface->getSF_leptonID_and_Iso_tight_to_loose_wTightCharge();
+        weight_data_to_MC_correction *= dataToMCcorrectionInterface->getSF_leptonID_and_Iso_tight_to_loose_wTightCharge();
       }
 
 //--- apply data/MC corrections for hadronic tau identification efficiency
@@ -2033,9 +2019,7 @@ int main(int argc, char* argv[])
       for ( std::vector<const RecoLepton*>::const_iterator lepton2 = lepton1 + 1;
 	    lepton2 != fakeableLeptons.end(); ++lepton2 ) {
 	double mass = ((*lepton1)->p4() + (*lepton2)->p4()).mass();
-	//std::cout << "mass = " << mass << std::endl;
 	if ( (*lepton1)->is_electron() && (*lepton2)->is_electron() && std::fabs(mass - z_mass) < z_window ) {
-	  //std::cout << "--> setting failsZbosonMassVeto = true !!" << std::endl;
 	  failsZbosonMassVeto = true;
 	}
       }
@@ -2077,22 +2061,21 @@ int main(int argc, char* argv[])
     //--- compute variables BDTs used to discriminate ttH vs. ttV and ttH vs. ttba -- they will be used more than once -- Xanda
 
     double mindr_lep1_jet=TMath::Min(10., comp_mindr_lep1_jet(*selLepton_lead, selJets));
-    double mindr_lep2_jet=TMath::Min(10., comp_mindr_lep1_jet(*selLepton_lead, selJets));
-    double max_lep_eta=TMath::Max(std::abs(selLepton_lead -> eta()), std::abs(selLepton_sublead -> eta()));
-    double tau_pt=selHadTau -> pt();
-    double ptmiss=met.pt();
-    double dr_leps=deltaR(selLepton_lead -> p4(), selLepton_sublead -> p4());
-    double mT_lep1=comp_MT_met_lep1(*selLepton_lead, met.pt(), met.phi());
-    double mT_lep2=comp_MT_met_lep1(*selLepton_sublead, met.pt(), met.phi());
-    double dr_lep1_tau=deltaR(selLepton_lead -> p4(), selHadTau -> p4());
-    double dr_lep2_tau=deltaR(selLepton_sublead -> p4(), selHadTau -> p4());
+    double mindr_lep2_jet=TMath::Min(10., comp_mindr_lep2_jet(*selLepton_sublead, selJets));
+    //double max_lep_eta=TMath::Max(std::abs(selLepton_lead -> eta()), std::abs(selLepton_sublead -> eta()));
+    //double tau_pt=selHadTau -> pt();
+    //double ptmiss=met.pt();
+    //double dr_leps=deltaR(selLepton_lead -> p4(), selLepton_sublead -> p4());
+    //double mT_lep1=comp_MT_met_lep1(*selLepton_lead, met.pt(), met.phi());
+    //double mT_lep2=comp_MT_met_lep1(*selLepton_sublead, met.pt(), met.phi());
+    //double dr_lep1_tau=deltaR(selLepton_lead -> p4(), selHadTau -> p4());
+    //double dr_lep2_tau=deltaR(selLepton_sublead -> p4(), selHadTau -> p4());
     double avg_dr_jet=comp_avg_dr_jet(selJets);
     double nJet25_Recl=comp_n_jet25_recl(selJets);
     double lep1_conePt=comp_lep1_conePt(*selLepton_lead);
     double lep2_conePt=comp_lep2_conePt(*selLepton_sublead);
     double minMET400=std::min(met.pt(), (Double_t)400.);
-    //double MT_met_lep1 = MT_met_lep1;
-    double mindr_tau_jet = TMath::Min(10., comp_mindr_hadTau1_jet(*selHadTau, selJets));
+    //double mindr_tau_jet = TMath::Min(10., comp_mindr_hadTau1_jet(*selHadTau, selJets));
 
 //--- compute output of BDTs used to discriminate ttH vs. ttV and ttH vs. ttbar
 //    in 2lss_1tau category of ttH multilepton analysis
@@ -2240,6 +2223,7 @@ int main(int argc, char* argv[])
     	    max_mvaOutput_hadTopTagger = bdtResult[0];
     	  }
     	  //fillWithOverFlow2d(histogram_mva_hadTopTagger, bdtResult[0], bdtResult[1], 1.);
+        // to test if XML converted file is equal to plain pkl rearing -- do not erase the example
     	}
           }
     }
@@ -2524,7 +2508,6 @@ int main(int argc, char* argv[])
    mvaInputVariables_noHTT_2HTT["unfittedHadTop_pt"]=unfittedHadTopP4.pt();
    double mvaOutput_2lss_noHTT_2HTT =mva_2lss_noHTT_2HTT(mvaInputVariables_noHTT_2HTT);
 
-    //std::cout<<"Nbin "<<oldVar_from20_to_12<<" "<<oldVar_from20_to_7<<std::endl;
     //--- compute output of BDTs used to discriminate ttH vs. ttV and ttH vs. ttbar trained by Arun for 2lss_1tau category
     mvaInputs_2lss_1tau["avg_dr_jet"]           = comp_avg_dr_jet(selJets);
     mvaInputs_2lss_1tau["dr_leps"]              = deltaR(selLepton_lead->p4(), selLepton_sublead->p4());
@@ -2576,11 +2559,6 @@ int main(int argc, char* argv[])
       selJets.size(),
       selBJets_loose.size(),
       selBJets_medium.size(),
-      //&oldVarA,
-      //&HTT,
-      //&noHTT,
-      //&HTTMEM,
-      //1,
       evtWeight,
       //
       mvaOutput_2lss_ttV,
@@ -2631,11 +2609,6 @@ int main(int argc, char* argv[])
           selJets.size(),
           selBJets_loose.size(),
           selBJets_medium.size(),
-          //&oldVarA,
-          //&HTT,
-          //&noHTT,
-          //&HTTMEM,
-          //1,
           evtWeight,
           mvaOutput_2lss_ttV,
           mvaOutput_2lss_ttbar,
@@ -2854,8 +2827,6 @@ int main(int argc, char* argv[])
           ("mbb_loose",       selBJets_loose.size()>1 ?  (selBJets_loose[0]->p4()+selBJets_loose[1]->p4()).mass() : -1000  )
           ("ptbb_loose",       selBJets_loose.size()>1 ?  (selBJets_loose[0]->p4()+selBJets_loose[1]->p4()).pt() : -1000  )
           ("failsTightChargeCut",          failsTightChargeCut)
-          // add kinematical variables between HadTop and leptons/taus
-          // min/max dr
         .fill();
     }
 

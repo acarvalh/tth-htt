@@ -24,6 +24,7 @@ EvtHistManager_2lss_1tau::EvtHistManager_2lss_1tau(const edm::ParameterSet& cfg)
     << "Invalid Configuration parameter 'era' = " << era_string << " !!\n";
 }
 
+<<<<<<< HEAD
 void EvtHistManager_2lss_1tau::bookHistogramsMap(TFileDirectory& dir , int nbinsStart, int nbinsTarget)
 {
   std::string label[4]={"oldVarA","HTT","HTTMEM","noHTT"};
@@ -61,6 +62,8 @@ void EvtHistManager_2lss_1tau::fillHistogramsMap(int counter, double evtWeight,
     getSF_from_TH2(HTTMEM->at(counter), mvaOutput_2lss_HTTMEM_tt, mvaOutput_2lss_HTTMEM_ttV), evtWeight, evtWeightErr);
 }
 
+=======
+>>>>>>> 0b2420ef3aba978a760b35fcc50abdc4d44791e2
 void EvtHistManager_2lss_1tau::bookHistograms(TFileDirectory& dir)
 {
   //std::cout << "Book histos "<< std::endl;
@@ -98,6 +101,7 @@ void EvtHistManager_2lss_1tau::bookHistograms(TFileDirectory& dir)
   histogram_memDiscr_ = book1D(dir, "memDiscr", "memDiscr", 8, 0.5, 8.5);
   histogram_EventCounter_ = book1D(dir, "EventCounter", "EventCounter", 1, -0.5, +0.5);
 
+<<<<<<< HEAD
   histogram_mvaOutput_2lss_oldVarA_tt_= book1D(dir, "mvaOutput_2lss_oldVarA_tt", "mvaOutput_2lss_oldVarA_tt", 600, 0., +1.);
   histogram_mvaOutput_2lss_oldVarA_ttV_= book1D(dir, "mvaOutput_2lss_oldVarA_ttV", "mvaOutput_2lss_oldVarA_ttV",    600, 0., +1.);
   histogram_mvaOutput_2lss_HTT_tt_= book1D(dir, "mvaOutput_2lss_HTT_tt", "mvaOutput_2lss_HTT_tt",          600, 0., +1.);
@@ -125,6 +129,8 @@ void EvtHistManager_2lss_1tau::bookHistograms(TFileDirectory& dir)
   histogram_mvaOutput_2lss_noHTT_2MEM_= book1D(dir, "mvaOutput_2lss_noHTT_2MEM", "mvaOutput_2lss_noHTT_2MEM",    600, 0., +1.);
   histogram_mvaOutput_2lss_noHTT_2HTT_= book1D(dir, "mvaOutput_2lss_noHTT_2HTT", "mvaOutput_2lss_noHTT_2HTT", 600, 0., +1.);
 
+=======
+>>>>>>> 0b2420ef3aba978a760b35fcc50abdc4d44791e2
 }
 
 void EvtHistManager_2lss_1tau::fillHistograms(
@@ -148,6 +154,7 @@ void EvtHistManager_2lss_1tau::fillHistograms(
       double mvaOutput_Hjj_tagger,
       double mTauTauVis1,
       double mTauTauVis2,
+<<<<<<< HEAD
       double memOutput_LR, //const MEMOutput_2lss_1tau* memOutput_2lss_1tau,
       double memDiscr,
       // XGB training 1D
@@ -183,10 +190,12 @@ void EvtHistManager_2lss_1tau::fillHistograms(
       double mvaOutput_2lss_oldVarA_2MEM,
       double mvaOutput_2lss_noHTT_2MEM,
       double mvaOutput_2lss_noHTT_2HTT
+=======
+      double memOutput_LR,
+      double memDiscr
+>>>>>>> 0b2420ef3aba978a760b35fcc50abdc4d44791e2
     )
 {
-  //std::vector<std::vector<Double_t>>& HTT_2D,
-  //std::vector<std::vector<Double_t>>& noHTT_2D
   double evtWeightErr = 0.;
 
   fillWithOverFlow(histogram_numElectrons_, numElectrons, evtWeight, evtWeightErr);
@@ -213,12 +222,13 @@ void EvtHistManager_2lss_1tau::fillHistograms(
   fillWithOverFlow(histogram_mvaOutput_Hj_tagger_, mvaOutput_Hj_tagger, evtWeight, evtWeightErr);
   fillWithOverFlow(histogram_mvaOutput_Hjj_tagger_, mvaOutput_Hjj_tagger, evtWeight, evtWeightErr);
 
-  fillWithOverFlow(histogram_mTauTauVis_, mTauTauVis1, evtWeight, evtWeightErr);
+  fillWithOverFlow(histogram_mTauTauVis_, mTauTauVis1, evtWeight, evtWeightErr); // histogram to Karl code not crash in sidebands
   fillWithOverFlow(histogram_mTauTauVis1_, mTauTauVis1, evtWeight, evtWeightErr);
   fillWithOverFlow(histogram_mTauTauVis2_, mTauTauVis2, evtWeight, evtWeightErr);
   fillWithOverFlow(histogram_memOutput_LR_, memOutput_LR, evtWeight, evtWeightErr);
   fillWithOverFlow(histogram_memDiscr_, memDiscr , evtWeight, evtWeightErr);
 
+<<<<<<< HEAD
   fillWithOverFlow(histogram_mvaOutput_2lss_oldVarA_tt_, mvaOutput_2lss_oldVarA_tt, evtWeight, evtWeightErr);
   fillWithOverFlow(histogram_mvaOutput_2lss_oldVarA_ttV_, mvaOutput_2lss_oldVarA_ttV, evtWeight, evtWeightErr);
 
@@ -296,10 +306,12 @@ void EvtHistManager_2lss_1tau::fillHistograms(
   }
   */
 
+=======
+>>>>>>> 0b2420ef3aba978a760b35fcc50abdc4d44791e2
   fillWithOverFlow(histogram_EventCounter_, 0., evtWeight, evtWeightErr);
 }
 
 void EvtHistManager_2lss_1tau::integralHistograms(TFileDirectory& dir)
 {
-  std::cout<<"Integral of histogram "<< histogram_mvaOutput_2lss_oldVarA_tt_->Integral() <<std::endl;
+  std::cout<<"Integral of histogram "<< histogram_mTauTauVis_->Integral() <<std::endl;
 }

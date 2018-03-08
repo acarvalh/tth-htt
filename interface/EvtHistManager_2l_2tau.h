@@ -11,7 +11,7 @@
 #include "tthAnalysis/HiggsToTauTau/interface/HistManagerBase.h" // HistManagerBase
 
 class EvtHistManager_2l_2tau
-  : public HistManagerBase
+: public HistManagerBase
 {
  public:
   EvtHistManager_2l_2tau(edm::ParameterSet const& cfg);
@@ -19,6 +19,7 @@ class EvtHistManager_2l_2tau
 
   /// book and fill histograms
   void bookHistograms(TFileDirectory& dir);
+<<<<<<< HEAD
   void fillHistograms(int numElectrons, int numMuons, int numHadTaus, int numJets, int numBJets_loose, int numBJets_medium,
 		      double mvaOutput_2l_2tau_ttV, double mvaOutput_2l_2tau_ttbar, double mvaDiscr_2l_2tau,
 		      double mTauTauVis, double leptonPairCharge, double hadTauPairCharge, double evtWeight,
@@ -26,6 +27,9 @@ class EvtHistManager_2l_2tau
           double mvaOutput_noHTT_SUM_M, double mvaOutput_noHTT_SUM_T, double mvaOutput_noHTT_SUM_VT,
           double mvaOutput_noHTT_1B_M, double mvaOutput_noHTT_1B_T, double mvaOutput_noHTT_1B_VT
         );
+=======
+  void fillHistograms(int numElectrons, int numMuons, int numHadTaus, int numJets, int numBJets_loose, int numBJets_medium, double mvaOutput_2l_2tau_ttV, double mvaOutput_2l_2tau_ttbar, double mvaDiscr_2l_2tau, double mTauTauVis, double leptonPairCharge, double hadTauPairCharge, double evtWeight, double mvaOutput_noHTT_tt, double mvaOutput_noHTT_ttV, double mvaOutput_noHTT_SUM_VT, double mvaOutput_noHTT_1B_VT );
+>>>>>>> 0b2420ef3aba978a760b35fcc50abdc4d44791e2
 
   const TH1* getHistogram_EventCounter() const { return histogram_EventCounter_; }
 
@@ -51,6 +55,7 @@ class EvtHistManager_2l_2tau
   TH1* histogram_EventCounter_;
 
   TH1* histogram_mvaOutput_noHTT_tt_;
+<<<<<<< HEAD
   ///*
   TH1* histogram_mvaOutput_noHTT_tt_4bins_;
   TH1* histogram_mvaOutput_noHTT_tt_5bins_;
@@ -154,6 +159,11 @@ class EvtHistManager_2l_2tau
   TH1* histogram_mvaOutput_noHTT_1B_VT_12bins_;
   //*/
 
+=======
+  TH1* histogram_mvaOutput_noHTT_ttV_;
+  TH1* histogram_mvaOutput_noHTT_SUM_VT_;
+  TH1* histogram_mvaOutput_noHTT_1B_VT_;
+>>>>>>> 0b2420ef3aba978a760b35fcc50abdc4d44791e2
 };
 
 #endif

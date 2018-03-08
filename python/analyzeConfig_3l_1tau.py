@@ -313,7 +313,11 @@ class analyzeConfig_3l_1tau(analyzeConfig):
       hadTau_selection = "|".join([ hadTau_selection, self.hadTau_selection_part2 ])
 
       if lepton_and_hadTau_selection == "forBDTtraining":
+<<<<<<< HEAD
         lepton_selection = "Tight" # "Loose" #
+=======
+        lepton_selection = "Loose"
+>>>>>>> 0b2420ef3aba978a760b35fcc50abdc4d44791e2
         hadTau_selection = "Tight|%s" % self.hadTau_selection_relaxed
 
       for lepton_and_hadTau_frWeight in self.lepton_and_hadTau_frWeights:
@@ -394,7 +398,11 @@ class analyzeConfig_3l_1tau(analyzeConfig):
                   'hadTau_selection' : hadTau_selection,
                   'apply_hadTauGenMatching' : self.apply_hadTauGenMatching,
                   'chargeSumSelection' : chargeSumSelection,
+<<<<<<< HEAD
                   'applyFakeRateWeights' : self.applyFakeRateWeights if self.isBDTtraining or not (lepton_selection == "Tight" and hadTau_selection.find("Tight") != -1) else "disabled", 
+=======
+                  'applyFakeRateWeights' : self.applyFakeRateWeights if not (lepton_selection == "Tight" and hadTau_selection.find("Tight") != -1) else "disabled",
+>>>>>>> 0b2420ef3aba978a760b35fcc50abdc4d44791e2
                   ##'use_HIP_mitigation_mediumMuonId' : sample_info["use_HIP_mitigation_mediumMuonId"],
                   'use_HIP_mitigation_mediumMuonId' : True,
                   'is_mc' : is_mc,

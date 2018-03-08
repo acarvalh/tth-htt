@@ -22,27 +22,6 @@ class EvtHistManager_2lss_1tau
   EvtHistManager_2lss_1tau(edm::ParameterSet const& cfg);
   ~EvtHistManager_2lss_1tau() {}
 
-  const Int_t  nbinsTarget[9]={5,6,7,8,9,10};
-  const Int_t  nbinsStart[3]={15,20};
-  const Int_t nstart =2;
-  const Int_t ntarget =6;
-
-  //void LoadMaps(int nstart, int ntarget);
-  ///*
-  void bookHistogramsMap(TFileDirectory& dir , int , int);
-  void fillHistogramsMap(int counter, double evtWeight,
-     std::vector<TH2*>* oldVarA,
-     std::vector<TH2*>* HTT,
-     std::vector<TH2*>* noHTT,
-     std::vector<TH2*>* HTTMEM,
-     double mvaOutput_2lss_oldVarA_tt, double mvaOutput_2lss_oldVarA_ttV,
-     double mvaOutput_2lss_noHTT_tt, double mvaOutput_2lss_noHTT_ttV,
-     double mvaOutput_2lss_HTT_tt,
-     double mvaOutput_2lss_HTTMEM_tt, double mvaOutput_2lss_HTTMEM_ttV
-     );
-     //*/
-
-
   void bookHistograms(TFileDirectory& dir);
   void integralHistograms(TFileDirectory& dir);
   void fillHistograms(
@@ -52,11 +31,6 @@ class EvtHistManager_2lss_1tau
     std::vector<const RecoJet*>::size_type numJets,
     std::vector<const RecoJet*>::size_type numBJets_loose,
     std::vector<const RecoJet*>::size_type numBJets_medium,
-    //std::vector<TH2*>* oldVarA,
-    //std::vector<TH2*>* HTT,
-    //std::vector<TH2*>* noHTT,
-    //std::vector<TH2*>* HTTMEM,
-    //int sel,
     double evtWeight,
     //
     double mvaOutput_2lss_ttV,
@@ -72,6 +46,7 @@ class EvtHistManager_2lss_1tau
     double mvaOutput_Hjj_tagger,
     double mTauTauVis1,
     double mTauTauVis2,
+<<<<<<< HEAD
     double memOutput_LR, //const MEMOutput_2lss_1tau* memOutput_2lss_1tau,
     double memDiscr,
     // XGB training 1D
@@ -95,6 +70,10 @@ class EvtHistManager_2lss_1tau
     double mvaOutput_2lss_oldVarA_2MEM,
     double mvaOutput_2lss_noHTT_2MEM,
     double mvaOutput_2lss_noHTT_2HTT
+=======
+    double memOutput_LR,
+    double memDiscr
+>>>>>>> 0b2420ef3aba978a760b35fcc50abdc4d44791e2
     );
 
   const TH1* getHistogram_EventCounter() const { return histogram_EventCounter_; }
@@ -132,26 +111,9 @@ class EvtHistManager_2lss_1tau
   TH1* histogram_memOutput_LR_;
   TH1* histogram_memDiscr_;
 
-  /*
-  TH1* histogram_memOutput_isValid_;
-  TH1* histogram_memOutput_errorFlag_;
-  TH1* histogram_memOutput_type_;
-  TH1* histogram_memOutput_logWeight_ttH_;
-  TH1* histogram_memOutput_logWeight_ttZ_;
-  TH1* histogram_memOutput_logWeight_ttZ_Zll_;
-  TH1* histogram_memOutput_logWeight_tt_;
-  TH1* histogram_memOutput_LR_;
-  TH1* histogram_memOutput_LR_type0_;
-  TH1* histogram_memOutput_LR_type1_;
-  TH1* histogram_memDiscr_;
-  TH1* histogram_memDiscr_type0_;
-  TH1* histogram_memDiscr_type1_;
-  TH1* histogram_mem_logCPUTime_;
-  TH1* histogram_mem_logRealTime_;
-  */
-
   TH1* histogram_EventCounter_;
 
+<<<<<<< HEAD
   TH1* histogram_mvaOutput_2lss_oldVarA_tt_;
   TH1* histogram_mvaOutput_2lss_oldVarA_ttV_;
   TH1* histogram_mvaOutput_2lss_noHTT_tt_;
@@ -197,6 +159,8 @@ class EvtHistManager_2lss_1tau
   std::vector<TH1*> hist_noHTT_2D_;
 
   std::vector<TH1*> histograms_;
+=======
+>>>>>>> 0b2420ef3aba978a760b35fcc50abdc4d44791e2
 };
 
 #endif
