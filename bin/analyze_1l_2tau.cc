@@ -2350,9 +2350,9 @@ int main(int argc, char* argv[])
     mvaInputsHTT_sum["mvaOutput_hadTopTaggerWithKinFit"]         = max_mvaOutput_hadTopTaggerWithKinFit;
     mvaInputsHTT_sum["HadTop_pt"]               = fittedHadTopP4.pt();
     mvaInputsHTT_sum["mvaOutput_Hj_tagger"]     = mvaOutput_Hj_tagger;
-    double mvaOutput_sum_HTT = mva_HTT_sum(mvaInputsHTT_sum);
+    double mvaOutput_sum_HTT_VT = mva_HTT_sum(mvaInputsHTT_sum);
     double mvaOutput_sum_HTT_T = mva_HTT_sum_T(mvaInputsHTT_sum);
-    double mvaOutput_sum_HTT_VT = mva_HTT_sum_VT(mvaInputsHTT_sum);
+    //double mvaOutput_sum_HTT_VT = mva_HTT_sum_VT(mvaInputsHTT_sum);
 
     std::map<std::string, double> mvaInputsnoHTT_sum;
     mvaInputsnoHTT_sum["avg_dr_jet"]             = comp_avg_dr_jet(selJets);
@@ -2371,9 +2371,9 @@ int main(int argc, char* argv[])
     mvaInputsnoHTT_sum["nBJetLoose"]             = selBJets_loose.size();
     mvaInputsnoHTT_sum["tau1_pt"]                = selHadTau_lead->pt();
     mvaInputsnoHTT_sum["tau2_pt"]                = selHadTau_sublead->pt();
-    double mvaOutput_sum_noHTT = mva_noHTT_sum(mvaInputsnoHTT_sum);
+    double mvaOutput_sum_noHTT_VT = mva_noHTT_sum(mvaInputsnoHTT_sum);
     double mvaOutput_sum_noHTT_T = mva_noHTT_sum_T(mvaInputsnoHTT_sum);
-    double mvaOutput_sum_noHTT_VT = mva_noHTT_sum_VT(mvaInputsnoHTT_sum);
+    //double mvaOutput_sum_noHTT_VT = mva_noHTT_sum_VT(mvaInputsnoHTT_sum);
 
 
 //--- fill histograms with events passing final selection
@@ -2412,8 +2412,6 @@ int main(int argc, char* argv[])
       mvaDiscr_1l_2tau,
       mTauTauVis,
       //////////////
-      mvaOutput_sum_HTT,
-      mvaOutput_sum_noHTT,
       mvaOutput_sum_HTT_T,
       mvaOutput_sum_noHTT_T,
       mvaOutput_sum_HTT_VT,
@@ -2473,8 +2471,6 @@ int main(int argc, char* argv[])
           mvaDiscr_1l_2tau,
           mTauTauVis,
           //////////////
-          mvaOutput_sum_HTT,
-          mvaOutput_sum_noHTT,
           mvaOutput_sum_HTT_T,
           mvaOutput_sum_noHTT_T,
           mvaOutput_sum_HTT_VT,
@@ -2555,8 +2551,6 @@ int main(int argc, char* argv[])
       mvaDiscr_1l_2tau,
       mTauTauVis,
       //////////////
-      mvaOutput_sum_HTT,
-      mvaOutput_sum_noHTT,
       mvaOutput_sum_HTT_T,
       mvaOutput_sum_noHTT_T,
       mvaOutput_sum_HTT_VT,

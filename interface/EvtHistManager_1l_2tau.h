@@ -51,9 +51,9 @@ class EvtHistManager_1l_2tau
     double mvaOutput_1l_2tau_ttbar_OldVarHTT,
     double mvaOutput_1l_2tau_ttV, double mvaDiscr_1l_2tau, double mTauTauVis,
     //////////////
-    double mvaOutput_sum_HTT,
-    double mvaOutput_sum_noHTT,
     double mvaOutput_sum_HTT_T,
+    double mvaOutput_sum_noHTT_T,
+    double mvaOutput_sum_HTT_VT,
     double mvaOutput_sum_noHTT_VT,
     /////////////
     double mvaOutput_ttbar_HTT,
@@ -97,10 +97,10 @@ class EvtHistManager_1l_2tau
   TH1* histogram_mvaOutput_ttbar_noHTT_;
 
   /////////////
-  TH1* histogram_mvaOutput_sum_HTT_;
-  TH1* histogram_mvaOutput_sum_noHTT_;
-
   TH1* histogram_mvaOutput_sum_HTT_T_;
+  TH1* histogram_mvaOutput_sum_noHTT_T_;
+
+  TH1* histogram_mvaOutput_sum_HTT_VT_;
   TH1* histogram_mvaOutput_sum_noHTT_VT_;
 
   TH1* histogram_mvaOutput_ttV_noHTT_;
