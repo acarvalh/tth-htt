@@ -87,10 +87,10 @@ void EvtHistManager_1l_2tau::bookHistograms(TFileDirectory& dir)
   histogram_mvaOutput_ttbar_noHTT_ = book1D(dir, "mvaOutput_ttbar_noHTT", "mvaOutput_ttbar_noHTT", 600, 0., 1.);
 
   ////////////////////////
-  histogram_mvaOutput_sum_HTT_ = book1D(dir, "mvaOutput_sum_HTT", "mvaOutput_sum_HTT", 600, 0., 1.);
-  histogram_mvaOutput_sum_noHTT_ = book1D(dir, "mvaOutput_sum_noHTT", "mvaOutput_sum_noHTT", 600, 0., 1.);
+  histogram_mvaOutput_sum_HTT_T_ = book1D(dir, "mvaOutput_sum_HTT", "mvaOutput_sum_HTT", 600, 0., 1.);
+  histogram_mvaOutput_sum_noHTT_T_ = book1D(dir, "mvaOutput_sum_noHTT", "mvaOutput_sum_noHTT", 600, 0., 1.);
 
-  histogram_mvaOutput_sum_HTT_T_ = book1D(dir, "mvaOutput_sum_HTT_T", "mvaOutput_sum_HTT_T", 600, 0., 1.);
+  histogram_mvaOutput_sum_HTT_VT_ = book1D(dir, "mvaOutput_sum_HTT_T", "mvaOutput_sum_HTT_T", 600, 0., 1.);
   histogram_mvaOutput_sum_noHTT_VT_ = book1D(dir, "mvaOutput_sum_noHTT_VT", "mvaOutput_sum_noHTT_VT", 600, 0., 1.);
 
   /////////////////////////
@@ -112,9 +112,9 @@ void EvtHistManager_1l_2tau::fillHistograms(int numElectrons, int numMuons, int 
   double mvaOutput_1l_2tau_ttbar_OldVarHTT,
   double mvaOutput_1l_2tau_ttV, double mvaDiscr_1l_2tau, double mTauTauVis,
   //////////////
-  double mvaOutput_sum_HTT,
-  double mvaOutput_sum_noHTT,
   double mvaOutput_sum_HTT_T,
+  double mvaOutput_sum_noHTT_T,
+  double mvaOutput_sum_HTT_VT,
   double mvaOutput_sum_noHTT_VT,
   /////////////
   double mvaOutput_ttbar_HTT,
@@ -137,11 +137,11 @@ void EvtHistManager_1l_2tau::fillHistograms(int numElectrons, int numMuons, int 
   fillWithOverFlow(histogram_mvaOutput_ttbar_noHTT_, mvaOutput_ttbar_noHTT, evtWeight, evtWeightErr);
 
   ////////////////////////////////////////////////////////////////////
-  fillWithOverFlow(histogram_mvaOutput_sum_HTT_, mvaOutput_sum_HTT, evtWeight, evtWeightErr);
-  fillWithOverFlow(histogram_mvaOutput_sum_noHTT_, mvaOutput_sum_noHTT, evtWeight, evtWeightErr);
+  fillWithOverFlow(histogram_mvaOutput_sum_HTT_T_, mvaOutput_sum_HTT_T, evtWeight, evtWeightErr);
+  fillWithOverFlow(histogram_mvaOutput_sum_noHTT_T_, mvaOutput_sum_noHTT_T, evtWeight, evtWeightErr);
 
-  fillWithOverFlow(histogram_mvaOutput_sum_HTT_T_, mvaOutput_sum_HTT, evtWeight, evtWeightErr);
-  fillWithOverFlow(histogram_mvaOutput_sum_noHTT_VT_, mvaOutput_sum_noHTT, evtWeight, evtWeightErr);
+  fillWithOverFlow(histogram_mvaOutput_sum_HTT_VT_, mvaOutput_sum_HTT_VT, evtWeight, evtWeightErr);
+  fillWithOverFlow(histogram_mvaOutput_sum_noHTT_VT_, mvaOutput_sum_noHTT_VT, evtWeight, evtWeightErr);
   ////////////////////////////////////////////////////////////////////
 
   fillWithOverFlow(histogram_mvaOutput_ttV_noHTT_, mvaOutput_ttV_noHTT, evtWeight, evtWeightErr);
