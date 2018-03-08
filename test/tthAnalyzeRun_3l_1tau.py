@@ -43,11 +43,7 @@ hadTau_selection_relaxed           = None
 changeBranchNames                  = use_prod_ntuples
 applyFakeRateWeights               = None
 MEMbranch                          = ''
-<<<<<<< HEAD
 hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016.root"
-=======
-hadTauFakeRateWeight_inputFileName = "tthAnalysis/HiggsToTauTau/data/FR_tau_2016_vvLoosePresel.root" # "tthAnalysis/HiggsToTauTau/data/FR_tau_2016.root" #
->>>>>>> 0b2420ef3aba978a760b35fcc50abdc4d44791e2
 
 # Karl: temporarily disable other modes until we've proper Ntuples
 if "afterAddMEM" in mode : #not in ["VHbb", "forBDTtraining_beforeAddMEM"]:
@@ -90,7 +86,6 @@ elif mode == "addMEM":
 elif mode.find("forBDTtraining") != -1 :
   applyFakeRateWeights     = "3lepton"
   hadTau_selection         = "dR03mvaVTight"
-<<<<<<< HEAD
   hadTau_selection_relaxed = options.tauWP #"dR03mvaTight"
   # python tthAnalyzeRun_3l_1tau.py --version "3l_1tau_2018Feb18_VHbb_trees_TLepVLTau" --mode "forBDTtraining_beforeAddMEM" --use_prod_ntuples --tauWP "dR03mvaTight"
   # "dR03mvaMedium" # "dR03mvaTight" # "dR03mvaVTight" # "dR03mvaLoose" #
