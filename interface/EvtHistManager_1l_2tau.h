@@ -25,7 +25,6 @@ class EvtHistManager_1l_2tau
   void fillHistograms(int numElectrons, int numMuons, int numHadTaus, int numJets, int numBJets_loose, int numBJets_medium,
     double mvaOutput_1l_2tau_ttbar,
     double mvaOutput_1l_2tau_ttbar_Old,
-<<<<<<< HEAD
     double mvaOutput_1l_2tau_ttbar_HTTLepID,
     double mvaOutput_1l_2tau_ttbar_OldVar,
     double mvaOutput_1l_2tau_ttbar_OldVarHTT,
@@ -47,12 +46,6 @@ class EvtHistManager_1l_2tau
     double mvaOutput_1B_noHTT_T,
     double mvaOutput_1B_HTT_VT,
     double mvaOutput_1B_noHTT_VT,
-    /////////////
-=======
-    double mvaOutput_1l_2tau_ttV,
-    double mvaDiscr_1l_2tau,
-    double mTauTauVis,
->>>>>>> 0b2420ef3aba978a760b35fcc50abdc4d44791e2
     double evtWeight);
 
   const TH1* getHistogram_EventCounter() const { return histogram_EventCounter_; }
@@ -71,7 +64,7 @@ class EvtHistManager_1l_2tau
   TH1* histogram_mvaOutput_1l_2tau_ttbar_;
   TH1* histogram_mvaOutput_1l_2tau_ttbar_Old_;
   TH1* histogram_mvaOutput_1l_2tau_ttbar_Old_5bins_;
-<<<<<<< HEAD
+
   TH1* histogram_mvaOutput_1l_2tau_ttbar_HTTLepID_;
   TH1* histogram_mvaOutput_1l_2tau_ttbar_OldVar_;
   TH1* histogram_mvaOutput_1l_2tau_ttbar_OldVarHTT_;
@@ -100,8 +93,6 @@ class EvtHistManager_1l_2tau
   TH1* histogram_mvaOutput_1B_HTT_VT_;
   TH1* histogram_mvaOutput_1B_noHTT_VT_;
   /////////////
-=======
->>>>>>> 0b2420ef3aba978a760b35fcc50abdc4d44791e2
 
   TH1* histogram_mvaOutput_1l_2tau_ttV_;
   TH1* histogram_mvaDiscr_1l_2tau_;

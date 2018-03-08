@@ -46,7 +46,6 @@ class EvtHistManager_2lss_1tau
     double mvaOutput_Hjj_tagger,
     double mTauTauVis1,
     double mTauTauVis2,
-<<<<<<< HEAD
     double memOutput_LR, //const MEMOutput_2lss_1tau* memOutput_2lss_1tau,
     double memDiscr,
     // XGB training 1D
@@ -70,10 +69,6 @@ class EvtHistManager_2lss_1tau
     double mvaOutput_2lss_oldVarA_2MEM,
     double mvaOutput_2lss_noHTT_2MEM,
     double mvaOutput_2lss_noHTT_2HTT
-=======
-    double memOutput_LR,
-    double memDiscr
->>>>>>> 0b2420ef3aba978a760b35fcc50abdc4d44791e2
     );
 
   const TH1* getHistogram_EventCounter() const { return histogram_EventCounter_; }
@@ -113,7 +108,6 @@ class EvtHistManager_2lss_1tau
 
   TH1* histogram_EventCounter_;
 
-<<<<<<< HEAD
   TH1* histogram_mvaOutput_2lss_oldVarA_tt_;
   TH1* histogram_mvaOutput_2lss_oldVarA_ttV_;
   TH1* histogram_mvaOutput_2lss_noHTT_tt_;
@@ -122,11 +116,6 @@ class EvtHistManager_2lss_1tau
   TH1* histogram_mvaOutput_2lss_HTTMEM_tt_;
   TH1* histogram_mvaOutput_2lss_HTTMEM_ttV_;
   TH1* histogram_mvaOutput_2lss_HTT_LepID_tt_;
-
-  //TH1* hist_oldVar_from20_to_12_;
-  //TH1* hist_oldVar_from20_to_7_;
-  //std::vector<std::vector<TH1*>> hist_HTT_2D_(int 3, int 9); // nbinsStart.size()
-  //std::vector<std::vector<TH1*>> hist_noHTT_2D_(int 3, int 9);
 
   //const int & nstart =2;
   //const int & ntarget =6;
@@ -159,8 +148,6 @@ class EvtHistManager_2lss_1tau
   std::vector<TH1*> hist_noHTT_2D_;
 
   std::vector<TH1*> histograms_;
-=======
->>>>>>> 0b2420ef3aba978a760b35fcc50abdc4d44791e2
 };
 
 #endif

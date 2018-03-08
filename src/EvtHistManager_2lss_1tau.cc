@@ -24,7 +24,6 @@ EvtHistManager_2lss_1tau::EvtHistManager_2lss_1tau(const edm::ParameterSet& cfg)
     << "Invalid Configuration parameter 'era' = " << era_string << " !!\n";
 }
 
-<<<<<<< HEAD
 void EvtHistManager_2lss_1tau::bookHistogramsMap(TFileDirectory& dir , int nbinsStart, int nbinsTarget)
 {
   std::string label[4]={"oldVarA","HTT","HTTMEM","noHTT"};
@@ -62,8 +61,6 @@ void EvtHistManager_2lss_1tau::fillHistogramsMap(int counter, double evtWeight,
     getSF_from_TH2(HTTMEM->at(counter), mvaOutput_2lss_HTTMEM_tt, mvaOutput_2lss_HTTMEM_ttV), evtWeight, evtWeightErr);
 }
 
-=======
->>>>>>> 0b2420ef3aba978a760b35fcc50abdc4d44791e2
 void EvtHistManager_2lss_1tau::bookHistograms(TFileDirectory& dir)
 {
   //std::cout << "Book histos "<< std::endl;
@@ -101,7 +98,6 @@ void EvtHistManager_2lss_1tau::bookHistograms(TFileDirectory& dir)
   histogram_memDiscr_ = book1D(dir, "memDiscr", "memDiscr", 8, 0.5, 8.5);
   histogram_EventCounter_ = book1D(dir, "EventCounter", "EventCounter", 1, -0.5, +0.5);
 
-<<<<<<< HEAD
   histogram_mvaOutput_2lss_oldVarA_tt_= book1D(dir, "mvaOutput_2lss_oldVarA_tt", "mvaOutput_2lss_oldVarA_tt", 600, 0., +1.);
   histogram_mvaOutput_2lss_oldVarA_ttV_= book1D(dir, "mvaOutput_2lss_oldVarA_ttV", "mvaOutput_2lss_oldVarA_ttV",    600, 0., +1.);
   histogram_mvaOutput_2lss_HTT_tt_= book1D(dir, "mvaOutput_2lss_HTT_tt", "mvaOutput_2lss_HTT_tt",          600, 0., +1.);
@@ -129,8 +125,6 @@ void EvtHistManager_2lss_1tau::bookHistograms(TFileDirectory& dir)
   histogram_mvaOutput_2lss_noHTT_2MEM_= book1D(dir, "mvaOutput_2lss_noHTT_2MEM", "mvaOutput_2lss_noHTT_2MEM",    600, 0., +1.);
   histogram_mvaOutput_2lss_noHTT_2HTT_= book1D(dir, "mvaOutput_2lss_noHTT_2HTT", "mvaOutput_2lss_noHTT_2HTT", 600, 0., +1.);
 
-=======
->>>>>>> 0b2420ef3aba978a760b35fcc50abdc4d44791e2
 }
 
 void EvtHistManager_2lss_1tau::fillHistograms(
@@ -154,7 +148,6 @@ void EvtHistManager_2lss_1tau::fillHistograms(
       double mvaOutput_Hjj_tagger,
       double mTauTauVis1,
       double mTauTauVis2,
-<<<<<<< HEAD
       double memOutput_LR, //const MEMOutput_2lss_1tau* memOutput_2lss_1tau,
       double memDiscr,
       // XGB training 1D
@@ -190,10 +183,6 @@ void EvtHistManager_2lss_1tau::fillHistograms(
       double mvaOutput_2lss_oldVarA_2MEM,
       double mvaOutput_2lss_noHTT_2MEM,
       double mvaOutput_2lss_noHTT_2HTT
-=======
-      double memOutput_LR,
-      double memDiscr
->>>>>>> 0b2420ef3aba978a760b35fcc50abdc4d44791e2
     )
 {
   double evtWeightErr = 0.;
@@ -228,7 +217,6 @@ void EvtHistManager_2lss_1tau::fillHistograms(
   fillWithOverFlow(histogram_memOutput_LR_, memOutput_LR, evtWeight, evtWeightErr);
   fillWithOverFlow(histogram_memDiscr_, memDiscr , evtWeight, evtWeightErr);
 
-<<<<<<< HEAD
   fillWithOverFlow(histogram_mvaOutput_2lss_oldVarA_tt_, mvaOutput_2lss_oldVarA_tt, evtWeight, evtWeightErr);
   fillWithOverFlow(histogram_mvaOutput_2lss_oldVarA_ttV_, mvaOutput_2lss_oldVarA_ttV, evtWeight, evtWeightErr);
 
@@ -241,9 +229,6 @@ void EvtHistManager_2lss_1tau::fillHistograms(
   fillWithOverFlow(histogram_mvaOutput_2lss_HTTMEM_ttV_, mvaOutput_2lss_HTTMEM_ttV, evtWeight, evtWeightErr);
   fillWithOverFlow(histogram_mvaOutput_2lss_HTTMEM_SUM_M_, mvaOutput_2lss_HTTMEM_SUM_M, evtWeight, evtWeightErr);
   fillWithOverFlow(histogram_mvaOutput_2lss_HTTMEM_SUM_T_, mvaOutput_2lss_HTTMEM_SUM_T, evtWeight, evtWeightErr);
-
-  //fillWithOverFlow(hist_oldVar_from20_to_12_, oldVar_from20_to_12, evtWeight, evtWeightErr);
-  //fillWithOverFlow(hist_oldVar_from20_to_7_, oldVar_from20_to_7, evtWeight, evtWeightErr);
 
   fillWithOverFlow(histogram_mvaOutput_2lss_HTTMEM_1B_M_, mvaOutput_2lss_HTTMEM_1B_M, evtWeight, evtWeightErr);
   fillWithOverFlow(histogram_mvaOutput_2lss_HTTMEM_1B_T_, mvaOutput_2lss_HTTMEM_1B_T, evtWeight, evtWeightErr);
@@ -259,55 +244,6 @@ void EvtHistManager_2lss_1tau::fillHistograms(
   fillWithOverFlow(histogram_mvaOutput_2lss_noHTT_2MEM_, mvaOutput_2lss_noHTT_2MEM, evtWeight, evtWeightErr);
   fillWithOverFlow(histogram_mvaOutput_2lss_noHTT_2HTT_, mvaOutput_2lss_noHTT_2HTT, evtWeight, evtWeightErr);
 
-
-  /*
-  double mTauTauVisSF = ( mTauTauVis1 > 0. && mTauTauVis2 > 0. ) ? 0.5 : 1.;
-  if ( mTauTauVis1 > 0. ) {
-    fillWithOverFlow(histogram_mTauTauVis_, mTauTauVis1, mTauTauVisSF*evtWeight, mTauTauVisSF*evtWeightErr);
-  }
-  if ( mTauTauVis2 > 0. ) {
-    fillWithOverFlow(histogram_mTauTauVis_, mTauTauVis2, mTauTauVisSF*evtWeight, mTauTauVisSF*evtWeightErr);
-  }
-
-
-  if ( memOutput_2lss_1tau ) {
-    fillWithOverFlow(histogram_memOutput_isValid_, memOutput_2lss_1tau->isValid(), evtWeight, evtWeightErr);
-    if ( memOutput_2lss_1tau->isValid() ) {
-      fillWithOverFlow(histogram_memOutput_errorFlag_, memOutput_2lss_1tau->errorFlag(), evtWeight, evtWeightErr);
-      if ( memOutput_2lss_1tau->errorFlag() == 0 ) {
-	fillWithOverFlow(histogram_memOutput_type_, memOutput_2lss_1tau->type(), evtWeight, evtWeightErr);
-	fillWithOverFlow(histogram_memOutput_logWeight_ttH_, getLogWeight(memOutput_2lss_1tau->weight_ttH()), evtWeight, evtWeightErr);
-	fillWithOverFlow(histogram_memOutput_logWeight_ttZ_, getLogWeight(memOutput_2lss_1tau->weight_ttZ()), evtWeight, evtWeightErr);
-	fillWithOverFlow(histogram_memOutput_logWeight_ttZ_Zll_, getLogWeight(memOutput_2lss_1tau->weight_ttZ_Zll()), evtWeight, evtWeightErr);
-	fillWithOverFlow(histogram_memOutput_logWeight_tt_, getLogWeight(memOutput_2lss_1tau->weight_tt()), evtWeight, evtWeightErr);
-	fillWithOverFlow(histogram_memOutput_LR_, memOutput_2lss_1tau->LR(), evtWeight, evtWeightErr);
-	fillWithOverFlow(histogram_memDiscr_, memDiscr, evtWeight, evtWeightErr);
-	TH1* histogram_memOutput_LR_type = 0;
-	TH1* histogram_memDiscr_type = 0;
-	if ( memOutput_2lss_1tau->type() == 0 ) {
-	  histogram_memOutput_LR_type = histogram_memOutput_LR_type0_;
-	  histogram_memDiscr_type = histogram_memDiscr_type0_;
-	} else if ( memOutput_2lss_1tau->type() == 1 ) {
-	  histogram_memOutput_LR_type = histogram_memOutput_LR_type1_;
-	  histogram_memDiscr_type = histogram_memDiscr_type1_;
-	}
-	if ( histogram_memOutput_LR_type ) {
-	  fillWithOverFlow(histogram_memOutput_LR_type, memOutput_2lss_1tau->LR(), evtWeight, evtWeightErr);
-	}
-	if ( histogram_memDiscr_type ) {
-	  fillWithOverFlow(histogram_memDiscr_type, memDiscr, evtWeight, evtWeightErr);
-	}
-	fillWithOverFlow(histogram_mem_logCPUTime_, TMath::Log(TMath::Max((Float_t)1.e-21, memOutput_2lss_1tau->cpuTime())), evtWeight, evtWeightErr);
-	fillWithOverFlow(histogram_mem_logRealTime_, TMath::Log(TMath::Max((Float_t)1.e-21, memOutput_2lss_1tau->realTime())), evtWeight, evtWeightErr);
-      }
-    }
-  } else {
-    fillWithOverFlow(histogram_memOutput_isValid_, -1, evtWeight, evtWeightErr);
-  }
-  */
-
-=======
->>>>>>> 0b2420ef3aba978a760b35fcc50abdc4d44791e2
   fillWithOverFlow(histogram_EventCounter_, 0., evtWeight, evtWeightErr);
 }
 
