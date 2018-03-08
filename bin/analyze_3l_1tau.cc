@@ -1413,7 +1413,10 @@ int main(int argc, char* argv[])
       } else if ( applyFakeRateWeights == kFR_1tau) {
         weight_fakeRate = prob_fake_hadTau;
       }
-      if ( !selectBDT ) evtWeight *= weight_fakeRate;
+      if ( !selectBDT ) {
+        //std::cout << "evtWeight = " << evtWeight<< " weight_fakeRate "<<weight_fakeRate << std::endl;
+        evtWeight *= weight_fakeRate;
+      }
 
       // CV: apply data/MC ratio for jet->tau fake-rates in case data-driven "fake" background estimation is applied to leptons only
       if ( isMC && apply_hadTauFakeRateSF && hadTauSelection == kTight && !(selHadTau->genHadTau() || selHadTau->genLepton()) ) {
@@ -1423,7 +1426,6 @@ int main(int argc, char* argv[])
 	}
 	evtWeight *= weight_data_to_MC_correction_tau;
       }
-    std::cout << "end compute D/MC "<< std::endl;
 
     if ( isDEBUG ) {
       std::cout << "evtWeight = " << evtWeight << std::endl;
@@ -1452,7 +1454,6 @@ int main(int argc, char* argv[])
     }
     cutFlowTable.update("sel lepton trigger match", evtWeight);
     cutFlowHistManager->fillHistograms("sel lepton trigger match", evtWeight);
-    std::cout << "trigger applied"<< std::endl;
 
     // apply requirement on jets (incl. b-tagged jets) and hadronic taus on level of final event selection
     if ( !((int)selJets.size() >= minNumJets) ) {

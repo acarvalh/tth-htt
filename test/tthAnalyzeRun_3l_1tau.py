@@ -19,7 +19,7 @@ from tthAnalysis.HiggsToTauTau.jobTools import query_yes_no
 #--------------------------------------------------------------------------------
 
 # python tthAnalyzeRun_3l_1tau.py --version "3l_1tau_2018Feb13_BDT_mMEM_LLepVVLTau" --mode "forBDTtraining_beforeAddMEM" --use_prod_ntuples
-# E.g. to run: python tthAnalyzeRun_3l_1tau.py --version "2017Oct24" --mode "VHbb" --use_prod_ntuples
+# E.g. to run: python tthAnalyzeRun_3l_1tau.py --version "3l_1tau_2018Mar08_VHbb_TLepMTau" --mode "VHbb" --use_prod_ntuples
 from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--version ", type="string", dest="version", help="Name of output reository with results\n Trees will be stored in /hdfs/local/USER/ttHAnalysis/2016/VERSION/", default='dumb')
@@ -75,7 +75,7 @@ if mode == "VHbb":
       "/Tau/Run2016H-PromptReco-v2/MINIAOD",
       "/Tau/Run2016H-PromptReco-v3/MINIAOD"]:
       sample_info["use_it"] = False
-  hadTau_selection = "dR03mvaVTight" # "dR03mvaMedium"
+  hadTau_selection = "dR03mvaMedium"# "dR03mvaTight" #
   applyFakeRateWeights = "3lepton"
 elif mode == "addMEM":
   from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016_3l1tau_addMEM import samples_2016
@@ -242,13 +242,13 @@ if __name__ == '__main__':
       logging.info(" #jobs of type '%s' = %i" % (job_type, num_jobs))
     job_statistics_summary[idx_job_resubmission] = job_statistics
 
-    #if idx_job_resubmission == 0:
-    #  run_analysis = query_yes_no("Start jobs ?")
-    #if run_analysis:
-    #  analysis.run()
-    #else:
-    #  sys.exit(0)
-    analysis.run()
+    if idx_job_resubmission == 0:
+      run_analysis = query_yes_no("Start jobs ?")
+    if run_analysis:
+      analysis.run()
+    else:
+      sys.exit(0)
+    #analysis.run()
 
     if job_statistics['analyze'] == 0:
       is_last_resubmission = True
