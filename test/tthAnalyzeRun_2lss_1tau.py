@@ -67,7 +67,7 @@ elif mode == "addMEM":
   hadTau_selection     = options.tauWP #"dR03mvaMedium" #"dR03mvaTight" #
   applyFakeRateWeights = "2lepton"
 elif mode.find("forBDTtraining") != -1 :
-  hadTau_selection         = "dR03mvaVTight" #"dR03mvaMedium" #"dR03mvaVTight" ## the file with FR is done wrt VTight
+  hadTau_selection         = "dR03mvaVTight" #"dR03mvaMedium" #"dR03mvaVTight"  the file with FR is done wrt VTight
   hadTau_selection_relaxed = options.tauWP #"dR03mvaLoose" #"dR03mvaMedium" #"dR03mvaVTight" #"dR03mvaVTight" # #
   applyFakeRateWeights = "2lepton"
   if mode == "forBDTtraining_beforeAddMEM":
@@ -168,61 +168,61 @@ if __name__ == '__main__':
       applyFakeRateWeights      = applyFakeRateWeights,
       chargeSumSelections       = [ "OS"] if mode.find("forBDTtraining") != -1 else [ "OS", "SS" ],
       central_or_shifts         = [
-        "central",
-##         "CMS_ttHl_btag_HFUp",
-##         "CMS_ttHl_btag_HFDown",
-##         "CMS_ttHl_btag_HFStats1Up",
-##         "CMS_ttHl_btag_HFStats1Down",
-##         "CMS_ttHl_btag_HFStats2Up",
-##         "CMS_ttHl_btag_HFStats2Down",
-##         "CMS_ttHl_btag_LFUp",
-##         "CMS_ttHl_btag_LFDown",
-##         "CMS_ttHl_btag_LFStats1Up",
-##         "CMS_ttHl_btag_LFStats1Down",
-##         "CMS_ttHl_btag_LFStats2Up",
-##         "CMS_ttHl_btag_LFStats2Down",
-##         "CMS_ttHl_btag_cErr1Up",
-##         "CMS_ttHl_btag_cErr1Down",
-##         "CMS_ttHl_btag_cErr2Up",
-##         "CMS_ttHl_btag_cErr2Down",
-##         "CMS_ttHl_JESUp",
-##         "CMS_ttHl_JESDown",
-        #------------------------------------------------------
-        # CV: enable the CMS_ttHl_FRe_shape and CMS_ttHl_FRm_shape only
-        #     if you plan to run compShapeSyst 1!
-##         "CMS_ttHl_FRe_shape_ptUp",
-##         "CMS_ttHl_FRe_shape_ptDown",
-##         "CMS_ttHl_FRe_shape_etaUp",
-##         "CMS_ttHl_FRe_shape_etaDown",
-##         "CMS_ttHl_FRe_shape_eta_barrelUp",
-##         "CMS_ttHl_FRe_shape_eta_barrelDown",
-##         "CMS_ttHl_FRm_shape_ptUp",
-##         "CMS_ttHl_FRm_shape_ptDown",
-##         "CMS_ttHl_FRm_shape_etaUp",
-##         "CMS_ttHl_FRm_shape_etaDown",
-        #------------------------------------------------------
-##         "CMS_ttHl_tauESUp",
-##         "CMS_ttHl_tauESDown",
-##         "CMS_ttHl_FRjt_normUp",
-##         "CMS_ttHl_FRjt_normDown",
-##         "CMS_ttHl_FRjt_shapeUp",
-##         "CMS_ttHl_FRjt_shapeDown",
-##         "CMS_ttHl_FRet_shiftUp",
-##         "CMS_ttHl_FRet_shiftDown",
-##         "CMS_ttHl_FRmt_shiftUp",
-##         "CMS_ttHl_FRmt_shiftDown",
-##         "CMS_ttHl_thu_shape_ttH_x1Up",
-##         "CMS_ttHl_thu_shape_ttH_x1Down",
-##         "CMS_ttHl_thu_shape_ttH_y1Up",
-##         "CMS_ttHl_thu_shape_ttH_y1Down",
-##         "CMS_ttHl_thu_shape_ttW_x1Up",
-##         "CMS_ttHl_thu_shape_ttW_x1Down",
-##         "CMS_ttHl_thu_shape_ttW_y1Up",
-##         "CMS_ttHl_thu_shape_ttW_y1Down",
-##         "CMS_ttHl_thu_shape_ttZ_x1Up",
-##         "CMS_ttHl_thu_shape_ttZ_x1Down",
-##         "CMS_ttHl_thu_shape_ttZ_y1Up",
-##         "CMS_ttHl_thu_shape_ttZ_y1Down",
+         "central",
+         "CMS_ttHl_btag_HFUp",
+         "CMS_ttHl_btag_HFDown",
+         "CMS_ttHl_btag_HFStats1Up",
+         "CMS_ttHl_btag_HFStats1Down",
+         "CMS_ttHl_btag_HFStats2Up",
+         "CMS_ttHl_btag_HFStats2Down",
+         "CMS_ttHl_btag_LFUp",
+         "CMS_ttHl_btag_LFDown",
+         "CMS_ttHl_btag_LFStats1Up",
+         "CMS_ttHl_btag_LFStats1Down",
+         "CMS_ttHl_btag_LFStats2Up",
+         "CMS_ttHl_btag_LFStats2Down",
+         "CMS_ttHl_btag_cErr1Up",
+         "CMS_ttHl_btag_cErr1Down",
+         "CMS_ttHl_btag_cErr2Up",
+         "CMS_ttHl_btag_cErr2Down",
+         "CMS_ttHl_JESUp",
+         "CMS_ttHl_JESDown",
+         #------------------------------------------------------
+         # CV: enable the CMS_ttHl_FRe_shape and CMS_ttHl_FRm_shape only
+         #     if you plan to run compShapeSyst 1!
+         "CMS_ttHl_FRe_shape_ptUp",
+         "CMS_ttHl_FRe_shape_ptDown",
+         "CMS_ttHl_FRe_shape_etaUp",
+         "CMS_ttHl_FRe_shape_etaDown",
+         "CMS_ttHl_FRe_shape_eta_barrelUp",
+         "CMS_ttHl_FRe_shape_eta_barrelDown",
+         "CMS_ttHl_FRm_shape_ptUp",
+         "CMS_ttHl_FRm_shape_ptDown",
+         "CMS_ttHl_FRm_shape_etaUp",
+         "CMS_ttHl_FRm_shape_etaDown",
+         #------------------------------------------------------
+         "CMS_ttHl_tauESUp",
+         "CMS_ttHl_tauESDown",
+         "CMS_ttHl_FRjt_normUp",
+         "CMS_ttHl_FRjt_normDown",
+         "CMS_ttHl_FRjt_shapeUp",
+         "CMS_ttHl_FRjt_shapeDown",
+         "CMS_ttHl_FRet_shiftUp",
+         "CMS_ttHl_FRet_shiftDown",
+         "CMS_ttHl_FRmt_shiftUp",
+         "CMS_ttHl_FRmt_shiftDown",
+         "CMS_ttHl_thu_shape_ttH_x1Up",
+         "CMS_ttHl_thu_shape_ttH_x1Down",
+         "CMS_ttHl_thu_shape_ttH_y1Up",
+         "CMS_ttHl_thu_shape_ttH_y1Down",
+         "CMS_ttHl_thu_shape_ttW_x1Up",
+         "CMS_ttHl_thu_shape_ttW_x1Down",
+         "CMS_ttHl_thu_shape_ttW_y1Up",
+         "CMS_ttHl_thu_shape_ttW_y1Down",
+         "CMS_ttHl_thu_shape_ttZ_x1Up",
+         "CMS_ttHl_thu_shape_ttZ_x1Down",
+         "CMS_ttHl_thu_shape_ttZ_y1Up",
+         "CMS_ttHl_thu_shape_ttZ_y1Down",
       ],
       max_files_per_job         = max_files_per_job,
       era                       = ERA,
@@ -287,13 +287,13 @@ if __name__ == '__main__':
       logging.info(" #jobs of type '%s' = %i" % (job_type, num_jobs))
     job_statistics_summary[idx_job_resubmission] = job_statistics
 
-    if idx_job_resubmission == 0:
-      run_analysis = query_yes_no("Start jobs ?")
-    if run_analysis:
-      analysis.run()
-    else:
-      sys.exit(0)
-    #analysis.run()
+    #if idx_job_resubmission == 0:
+    #  run_analysis = query_yes_no("Start jobs ?")
+    #if run_analysis:
+    #  analysis.run()
+    #else:
+    #  sys.exit(0)
+    analysis.run()
 
     if job_statistics['analyze'] == 0:
       is_last_resubmission = True

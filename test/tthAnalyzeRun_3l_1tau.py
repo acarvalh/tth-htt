@@ -75,7 +75,7 @@ if mode == "VHbb":
       "/Tau/Run2016H-PromptReco-v2/MINIAOD",
       "/Tau/Run2016H-PromptReco-v3/MINIAOD"]:
       sample_info["use_it"] = False
-  hadTau_selection = "dR03mvaMedium"
+  hadTau_selection = "dR03mvaVTight" # "dR03mvaMedium"
   applyFakeRateWeights = "3lepton"
 elif mode == "addMEM":
   from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016_3l1tau_addMEM import samples_2016
