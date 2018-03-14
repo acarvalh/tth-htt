@@ -1569,11 +1569,11 @@ int main(int argc, char* argv[])
       selJets.size(),
       selBJets_loose.size(),
       selBJets_medium.size(),
-      -1., -1.,  -1.,  -1.,
+      -1., -1.,  -1.,  -1., 
       mTauTauVis_presel,
-      -1.,-1.,
-      -1., -1.,  -1.,  -1., -1.,-1.0,-1.0,
-      -1., -1.,-1., -1.,-1., -1.,
+      -1.,-1., -1., -1.,
+      -1., -1., -1., -1., -1., -1.,
+      -1., -1., -1., -1., -1.,
       1.);
 
 	//--- apply final event selection
