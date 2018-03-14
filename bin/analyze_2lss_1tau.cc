@@ -21,6 +21,7 @@
 #include "tthAnalysis/HiggsToTauTau/interface/RecoMEt.h" // RecoMEt
 #include "tthAnalysis/HiggsToTauTau/interface/MEMOutput_2lss_1tau.h" // MEMOutput_2lss_1tau
 #include "tthAnalysis/HiggsToTauTau/interface/TMVAInterface.h" // TMVAInterface
+#include "tthAnalysis/HiggsToTauTau/interface/XGBInterface.h" // XGBInterface
 #include "tthAnalysis/HiggsToTauTau/interface/mvaAuxFunctions.h" // check_mvaInputs, get_mvaInputVariables
 #include "tthAnalysis/HiggsToTauTau/interface/mvaInputVariables.h" // auxiliary functions for computing input variables of the MVA used for signal extraction in the 2lss_1tau category
 #include "tthAnalysis/HiggsToTauTau/interface/LeptonFakeRateInterface.h" // LeptonFakeRateInterface
@@ -100,80 +101,6 @@ enum { kFR_disabled, kFR_2lepton, kFR_3L, kFR_1tau };
 const int hadTauSelection_antiElectron = -1; // not applied
 const int hadTauSelection_antiMuon = -1; // not applied
 bool do2D = false;
-
-double comp_mvaOutput_Hj_tagger(const RecoJet* jet,
-                                const std::vector<const RecoLepton*>& leptons,
-                                std::map<std::string, double>& mvaInputs_Hj_tagger,
-                                TMVAInterface& mva_Hj_tagger,
-                                const EventInfo & eventInfo)
-{
-  double dRmin_lepton = -1.;
-  double dRmax_lepton = -1.;
-  for ( std::vector<const RecoLepton*>::const_iterator lepton = leptons.begin();
-	lepton != leptons.end(); ++lepton ) {
-    double dR = deltaR(jet->eta(), jet->phi(), (*lepton)->eta(), (*lepton)->phi());
-    if ( dRmin_lepton == -1. || dR < dRmin_lepton ) dRmin_lepton = dR;
-    if ( dRmax_lepton == -1. || dR > dRmax_lepton ) dRmax_lepton = dR;
-  }
-
-  mvaInputs_Hj_tagger["Jet_lepdrmin"] = dRmin_lepton;
-  mvaInputs_Hj_tagger["max(Jet_pfCombinedInclusiveSecondaryVertexV2BJetTags,0.)"] = std::max(0., jet->BtagCSV());
-  mvaInputs_Hj_tagger["max(Jet_qg,0.)"] = std::max(0., jet->QGDiscr());
-  mvaInputs_Hj_tagger["Jet_lepdrmax"] = dRmax_lepton;
-  mvaInputs_Hj_tagger["Jet_pt"] = jet->pt();
-
-  check_mvaInputs(mvaInputs_Hj_tagger, eventInfo);
-
-  double mvaOutput_Hj_tagger = mva_Hj_tagger(mvaInputs_Hj_tagger);
-  return mvaOutput_Hj_tagger;
-}
-
-double comp_mvaOutput_Hjj_tagger(const RecoJet* jet1, const RecoJet* jet2, const std::vector<const RecoJet*>& jets,
-				 const std::vector<const RecoLepton*>& leptons,
-				 std::map<std::string, double>& mvaInputs_Hjj_tagger, TMVAInterface& mva_Hjj_tagger,
-				 std::map<std::string, double>& mvaInputs_Hj_tagger, TMVAInterface& mva_Hj_tagger,
-                 const EventInfo & eventInfo)
-{
-  double jet1_mvaOutput_Hj_tagger = comp_mvaOutput_Hj_tagger(
-    jet1, leptons,
-    mvaInputs_Hj_tagger, mva_Hj_tagger,
-    eventInfo);
-  double jet2_mvaOutput_Hj_tagger = comp_mvaOutput_Hj_tagger(
-    jet2, leptons,
-    mvaInputs_Hj_tagger, mva_Hj_tagger,
-    eventInfo);
-  Particle::LorentzVector dijetP4 = jet1->p4() + jet2->p4();
-  const RecoLepton* lepton_nearest = 0;
-  double dRmin_lepton = -1.;
-  for ( std::vector<const RecoLepton*>::const_iterator lepton = leptons.begin();
-	lepton != leptons.end(); ++lepton ) {
-    double dR = deltaR(dijetP4.eta(), dijetP4.phi(), (*lepton)->eta(), (*lepton)->phi());
-    if ( dRmin_lepton == -1. || dR < dRmin_lepton ) {
-      lepton_nearest = (*lepton);
-      dRmin_lepton = dR;
-    }
-  }
-  double dRmin_jet_other = -1.;
-  double dRmax_jet_other = -1.;
-  for ( std::vector<const RecoJet*>::const_iterator jet_other = jets.begin();
-	jet_other != jets.end(); ++jet_other ) {
-    if ( (*jet_other) == jet1 || (*jet_other) == jet2 ) continue;
-    double dR = deltaR(dijetP4.eta(), dijetP4.phi(), (*jet_other)->eta(), (*jet_other)->phi());
-    if ( dRmin_jet_other == -1. || dR < dRmin_jet_other ) dRmin_jet_other = dR;
-    if ( dRmax_jet_other == -1. || dR > dRmax_jet_other ) dRmax_jet_other = dR;
-  }
-  mvaInputs_Hjj_tagger["bdtJetPair_minlepmass"] = ( lepton_nearest ) ? (dijetP4 + lepton_nearest->p4()).mass() : 0.;
-  mvaInputs_Hjj_tagger["bdtJetPair_sumbdt"] = jet1_mvaOutput_Hj_tagger + jet2_mvaOutput_Hj_tagger;
-  mvaInputs_Hjj_tagger["bdtJetPair_dr"] = deltaR(jet1->eta(), jet1->phi(), jet2->eta(), jet2->phi());
-  mvaInputs_Hjj_tagger["bdtJetPair_minjdr"] = dRmin_jet_other;
-  mvaInputs_Hjj_tagger["bdtJetPair_mass"] = dijetP4.mass();
-  mvaInputs_Hjj_tagger["bdtJetPair_minjOvermaxjdr"] = ( dRmax_jet_other > 0. ) ? dRmin_jet_other/dRmax_jet_other : 1.;
-
-  check_mvaInputs(mvaInputs_Hjj_tagger, eventInfo);
-
-  double mvaOutput_Hjj_tagger = mva_Hjj_tagger(mvaInputs_Hjj_tagger);
-  return mvaOutput_Hjj_tagger;
-}
 
 /**
  * @brief Produce datacard and control plots for 2lss_1tau categories.
@@ -630,7 +557,6 @@ int main(int argc, char* argv[])
 
   double evtWeightSum=0; // to devbug
   //--- initialize hadronic top tagger BDT
-  //std::string mvaFileName_hadTopTagger = "tthAnalysis/HiggsToTauTau/data/hadTopTagger_BDTG_2017Oct10_opt2.xml";
   std::string mvaFileName_hadTopTaggerWithKinFit = "tthAnalysis/HiggsToTauTau/data/all_HadTopTagger_sklearnV0o17o1_HypOpt_XGB_ntrees_1000_deph_3_lr_0o01_CSV_sort_withKinFit.pkl";
   std::string mvaFileName_hadTopTaggerNoKinFit = "tthAnalysis/HiggsToTauTau/data/all_HadTopTagger_sklearnV0o17o1_HypOpt_XGB_ntrees_1000_deph_3_lr_0o01_CSV_sort.pkl";
   std::string mvaFileName_hadTopTagger = "tthAnalysis/HiggsToTauTau/data/all_HadTopTagger_sklearnV0o17o1_HypOpt_XGB_ntrees_1000_deph_3_lr_0o01_CSV_sort.pkl";
@@ -1326,7 +1252,7 @@ int main(int argc, char* argv[])
       if (genMTopWj1>0 && genMAntiTopWj1>0) gencountHad = 2;
       else if (genMTopWj1>0 || genMAntiTopWj1>0) gencountHad = 1;
     }
-    if ( bdt_filler_gen ) {
+    if ( bdt_filler_gen && isMC ) {
       bdt_filler_gen -> operator()({ eventInfo.run, eventInfo.lumi, eventInfo.event })
           ("genPtTop",        genPtTop)
           ("genPtTopB",       genPtTopB)
@@ -2062,14 +1988,14 @@ int main(int argc, char* argv[])
 
     double mindr_lep1_jet=TMath::Min(10., comp_mindr_lep1_jet(*selLepton_lead, selJets));
     double mindr_lep2_jet=TMath::Min(10., comp_mindr_lep2_jet(*selLepton_sublead, selJets));
-    //double max_lep_eta=TMath::Max(std::abs(selLepton_lead -> eta()), std::abs(selLepton_sublead -> eta()));
-    //double tau_pt=selHadTau -> pt();
-    //double ptmiss=met.pt();
-    //double dr_leps=deltaR(selLepton_lead -> p4(), selLepton_sublead -> p4());
-    //double mT_lep1=comp_MT_met_lep1(*selLepton_lead, met.pt(), met.phi());
+    double max_lep_eta=TMath::Max(std::abs(selLepton_lead -> eta()), std::abs(selLepton_sublead -> eta()));
+    double tau_pt=selHadTau -> pt();
+    double ptmiss=met.pt();
+    double dr_leps=deltaR(selLepton_lead -> p4(), selLepton_sublead -> p4());
+    double mT_lep1=comp_MT_met_lep1(*selLepton_lead, met.pt(), met.phi());
     //double mT_lep2=comp_MT_met_lep1(*selLepton_sublead, met.pt(), met.phi());
-    //double dr_lep1_tau=deltaR(selLepton_lead -> p4(), selHadTau -> p4());
-    //double dr_lep2_tau=deltaR(selLepton_sublead -> p4(), selHadTau -> p4());
+    double dr_lep1_tau=deltaR(selLepton_lead -> p4(), selHadTau -> p4());
+    double dr_lep2_tau=deltaR(selLepton_sublead -> p4(), selHadTau -> p4());
     double avg_dr_jet=comp_avg_dr_jet(selJets);
     double nJet25_Recl=comp_n_jet25_recl(selJets);
     double lep1_conePt=comp_lep1_conePt(*selLepton_lead);
@@ -2257,6 +2183,8 @@ int main(int argc, char* argv[])
       }
     }
 
+    double mT_lep2 = comp_MT_met_lep1(*selLepton_sublead, met.pt(), met.phi());
+    double mindr_tau_jet = TMath::Min(10., comp_mindr_hadTau1_jet(*selHadTau, selJets));
     //--- compute output of BDTs used to discriminate ttH vs. ttV and ttH vs. ttbar -- Xanda
     //std::cout<<"filling BDTs olVar_tt"<<std::endl;
     std::map<std::string, double> mvaInputVariables_oldVar_ttV;
@@ -2738,9 +2666,9 @@ int main(int argc, char* argv[])
           ("max_lep_eta",            TMath::Max(std::abs(selLepton_lead -> eta()), std::abs(selLepton_sublead -> eta())))
           ("avg_dr_lep",             1.0) // comp_avg_dr_jet(selLeptons))
           ("lep2_tth_mva",           selLepton_sublead -> mvaRawTTH())
-          ("mT_lep2",                comp_MT_met_lep1(*selLepton_sublead, met.pt(), met.phi()))
+          ("mT_lep2",               mT_lep2)
           ("dr_lep2_tau",            deltaR(selLepton_sublead -> p4(), selHadTau -> p4()))
-          ("mindr_tau_jet",          TMath::Min(10., comp_mindr_hadTau1_jet(*selHadTau, selJets)))
+          ("mindr_tau_jet",         mindr_tau_jet)
           ("avg_dr_jet",             comp_avg_dr_jet(selJets))
           ("nJet25_Recl",            comp_n_jet25_recl(selJets))
           ("ptmiss",                 met.pt())

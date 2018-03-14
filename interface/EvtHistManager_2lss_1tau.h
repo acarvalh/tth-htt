@@ -22,6 +22,27 @@ class EvtHistManager_2lss_1tau
   EvtHistManager_2lss_1tau(edm::ParameterSet const& cfg);
   ~EvtHistManager_2lss_1tau() {}
 
+   const Int_t  nbinsTarget[9]={5,6,7,8,9,10};
+   const Int_t  nbinsStart[3]={15,20};
+   const Int_t nstart =2;
+   const Int_t ntarget =6;
+
+   //void LoadMaps(int nstart, int ntarget);
+   ///*
+   void bookHistogramsMap(TFileDirectory& dir , int , int);
+   void fillHistogramsMap(int counter, double evtWeight,
+      std::vector<TH2*>* oldVarA,
+      std::vector<TH2*>* HTT,
+      std::vector<TH2*>* noHTT,
+      std::vector<TH2*>* HTTMEM,
+      double mvaOutput_2lss_oldVarA_tt, double mvaOutput_2lss_oldVarA_ttV,
+      double mvaOutput_2lss_noHTT_tt, double mvaOutput_2lss_noHTT_ttV,
+      double mvaOutput_2lss_HTT_tt,
+      double mvaOutput_2lss_HTTMEM_tt, double mvaOutput_2lss_HTTMEM_ttV
+      );
+      //*/
+
+
   void bookHistograms(TFileDirectory& dir);
   void integralHistograms(TFileDirectory& dir);
   void fillHistograms(
