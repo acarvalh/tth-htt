@@ -48,11 +48,7 @@ if mode == "VHbb":
   else:
     from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2015 import samples_2015
     from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016 import samples_2016
-<<<<<<< HEAD
   hadTau_selection     =  "dR03mvaTight" # "dR03mvaVVLoose" # python tthAnalyzeRun_2l_2tau.py --version "2l_2tau_2018Feb19_VHbb_TLepVTTau" --mode "VHbb" --use_prod_ntuples
-=======
-  hadTau_selection     =  "dR03mvaVTight" # "dR03mvaVVLoose" #  "dR03mvaMedium" #
->>>>>>> 0b2420ef3aba978a760b35fcc50abdc4d44791e2
   applyFakeRateWeights = "4L"
 elif mode.find("forBDTtraining") != -1 :
   if mode == "forBDTtraining" :
@@ -90,26 +86,6 @@ if __name__ == '__main__':
   job_statistics_summary = {}
   run_analysis           = False
   is_last_resubmission   = False
-
-  nbinsStart=[4,5,6,7,8,9,10,11,12];
-  hist_noHTT_tt=[]
-  hist_noHTT_ttV=[]
-  hist_noHTT_SUM_M=[]
-  hist_noHTT_SUM_T=[]
-  hist_noHTT_SUM_VT=[]
-  hist_noHTT_1B_M=[]
-  hist_noHTT_1B_T=[]
-  hist_noHTT_1B_VT=[]
-  for nbinsStartN in range(0,len(nbinsStart)) :
-    hist_noHTT_tt.append("mvaOutput_noHTT_tt_"+str(nbinsStart[nbinsStartN])+"bins")
-    hist_noHTT_ttV.append("mvaOutput_noHTT_ttV_"+str(nbinsStart[nbinsStartN])+"bins")
-    hist_noHTT_SUM_M.append("mvaOutput_SUM_M_"+str(nbinsStart[nbinsStartN])+"bins")
-    hist_noHTT_SUM_T.append("mvaOutput_SUM_T_"+str(nbinsStart[nbinsStartN])+"bins")
-    hist_noHTT_SUM_VT.append("mvaOutput_SUM_VT_"+str(nbinsStart[nbinsStartN])+"bins")
-    hist_noHTT_1B_M.append("mvaOutput_1B_M_"+str(nbinsStart[nbinsStartN])+"bins")
-    hist_noHTT_1B_T.append("mvaOutput_1B_T_"+str(nbinsStart[nbinsStartN])+"bins")
-    hist_noHTT_1B_VT.append("mvaOutput_1B_VT_"+str(nbinsStart[nbinsStartN])+"bins")
-  print list(hist_noHTT_tt)
 
   for idx_job_resubmission in range(max_job_resubmission):
     if is_last_resubmission:
@@ -193,14 +169,7 @@ if __name__ == '__main__':
         "mvaOutput_noHTT_1B_M",
         "mvaOutput_noHTT_1B_T",
         "mvaOutput_noHTT_1B_VT"
-      ] +list(hist_noHTT_tt)+
-      list(hist_noHTT_ttV)+
-      list(hist_noHTT_SUM_M)+
-      list(hist_noHTT_SUM_T)+
-      list(hist_noHTT_SUM_VT)+
-      list(hist_noHTT_1B_M)+
-      list(hist_noHTT_1B_T)+
-      list(hist_noHTT_1B_VT),
+      ] ,
       select_rle_output                     = True,
       verbose                               = idx_job_resubmission > 0,
     )

@@ -71,7 +71,6 @@ void EvtHistManager_2l_2tau::fillHistograms(int numElectrons, int numMuons, int 
   fillWithOverFlow(histogram_EventCounter_, 0., evtWeight, evtWeightErr);
 
   fillWithOverFlow(histogram_mvaOutput_noHTT_tt_, mvaOutput_noHTT_tt, evtWeight, evtWeightErr);
-  fillWithOverFlow(histogram_mvaOutput_noHTT_tt_4bins_, mvaOutput_noHTT_tt, evtWeight, evtWeightErr);
   fillWithOverFlow(histogram_mvaOutput_noHTT_ttV_, mvaOutput_noHTT_ttV, evtWeight, evtWeightErr);
   fillWithOverFlow(histogram_mvaOutput_noHTT_SUM_M_, mvaOutput_noHTT_SUM_M, evtWeight, evtWeightErr);
   fillWithOverFlow(histogram_mvaOutput_noHTT_SUM_T_, mvaOutput_noHTT_SUM_T, evtWeight, evtWeightErr);
