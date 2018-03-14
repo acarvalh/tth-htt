@@ -75,7 +75,7 @@ if mode == "VHbb":
       "/Tau/Run2016H-PromptReco-v2/MINIAOD",
       "/Tau/Run2016H-PromptReco-v3/MINIAOD"]:
       sample_info["use_it"] = False
-  hadTau_selection = "dR03mvaMedium"# "dR03mvaTight" #
+  hadTau_selection = options.tauWP # "dR03mvaMedium"#
   applyFakeRateWeights = "3lepton"
 elif mode == "addMEM":
   from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016_3l1tau_addMEM import samples_2016
@@ -111,10 +111,6 @@ elif mode.find("forBDTtraining") != -1 :
       from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016_3l1tau_addMEM import samples_2016
       changeBranchNames    = True
       MEMbranch            = 'memObjects_2lss_1tau_lepFakeable_tauTight_dR03mvaMedium'
-=======
-  hadTau_selection_relaxed = "dR03mvaVVLoose"
-  MEMbranch                = 'memObjects_2lss_1tau_lepLoose_tauTight_dR03mvaVVLoose'
->>>>>>> 0b2420ef3aba978a760b35fcc50abdc4d44791e2
 else:
   raise ValueError("Invalid Configuration parameter 'mode' = %s !!" % mode)
 
@@ -158,60 +154,60 @@ if __name__ == '__main__':
       chargeSumSelections  = [ "OS" ] if "forBDTtraining" in mode else [ "OS", "SS" ],
       central_or_shifts    = [
         "central",
-##         "CMS_ttHl_btag_HFUp",
-##         "CMS_ttHl_btag_HFDown",
-##         "CMS_ttHl_btag_HFStats1Up",
-##         "CMS_ttHl_btag_HFStats1Down",
-##         "CMS_ttHl_btag_HFStats2Up",
-##         "CMS_ttHl_btag_HFStats2Down",
-##         "CMS_ttHl_btag_LFUp",
-##         "CMS_ttHl_btag_LFDown",
-##         "CMS_ttHl_btag_LFStats1Up",
-##         "CMS_ttHl_btag_LFStats1Down",
-##         "CMS_ttHl_btag_LFStats2Up",
-##         "CMS_ttHl_btag_LFStats2Down",
-##         "CMS_ttHl_btag_cErr1Up",
-##         "CMS_ttHl_btag_cErr1Down",
-##         "CMS_ttHl_btag_cErr2Up",
-##         "CMS_ttHl_btag_cErr2Down",
-##         "CMS_ttHl_JESUp",
-##         "CMS_ttHl_JESDown",
+         "CMS_ttHl_btag_HFUp",
+         "CMS_ttHl_btag_HFDown",
+         "CMS_ttHl_btag_HFStats1Up",
+         "CMS_ttHl_btag_HFStats1Down",
+         "CMS_ttHl_btag_HFStats2Up",
+         "CMS_ttHl_btag_HFStats2Down",
+         "CMS_ttHl_btag_LFUp",
+         "CMS_ttHl_btag_LFDown",
+         "CMS_ttHl_btag_LFStats1Up",
+         "CMS_ttHl_btag_LFStats1Down",
+         "CMS_ttHl_btag_LFStats2Up",
+         "CMS_ttHl_btag_LFStats2Down",
+         "CMS_ttHl_btag_cErr1Up",
+         "CMS_ttHl_btag_cErr1Down",
+         "CMS_ttHl_btag_cErr2Up",
+         "CMS_ttHl_btag_cErr2Down",
+         "CMS_ttHl_JESUp",
+         "CMS_ttHl_JESDown",
         #------------------------------------------------------
         # CV: enable the CMS_ttHl_FRe_shape and CMS_ttHl_FRm_shape only
         #     if you plan to run compShapeSyst 1!
-##         "CMS_ttHl_FRe_shape_ptUp",
-##         "CMS_ttHl_FRe_shape_ptDown",
-##         "CMS_ttHl_FRe_shape_etaUp",
-##         "CMS_ttHl_FRe_shape_etaDown",
-##         "CMS_ttHl_FRe_shape_eta_barrelUp",
-##         "CMS_ttHl_FRe_shape_eta_barrelDown",
-##         "CMS_ttHl_FRm_shape_ptUp",
-##         "CMS_ttHl_FRm_shape_ptDown",
-##         "CMS_ttHl_FRm_shape_etaUp",
-##         "CMS_ttHl_FRm_shape_etaDown",
+         "CMS_ttHl_FRe_shape_ptUp",
+         "CMS_ttHl_FRe_shape_ptDown",
+         "CMS_ttHl_FRe_shape_etaUp",
+         "CMS_ttHl_FRe_shape_etaDown",
+         "CMS_ttHl_FRe_shape_eta_barrelUp",
+         "CMS_ttHl_FRe_shape_eta_barrelDown",
+         "CMS_ttHl_FRm_shape_ptUp",
+         "CMS_ttHl_FRm_shape_ptDown",
+         "CMS_ttHl_FRm_shape_etaUp",
+         "CMS_ttHl_FRm_shape_etaDown",
         #------------------------------------------------------
-##         "CMS_ttHl_tauESUp",
-##         "CMS_ttHl_tauESDown",
-##         "CMS_ttHl_FRjt_normUp",
-##         "CMS_ttHl_FRjt_normDown",
-##         "CMS_ttHl_FRjt_shapeUp",
-##         "CMS_ttHl_FRjt_shapeDown",
-##         "CMS_ttHl_FRet_shiftUp",
-##         "CMS_ttHl_FRet_shiftDown",
-##         "CMS_ttHl_FRmt_shiftUp",
-##         "CMS_ttHl_FRmt_shiftDown",
-##         "CMS_ttHl_thu_shape_ttH_x1Up",
-##         "CMS_ttHl_thu_shape_ttH_x1Down",
-##         "CMS_ttHl_thu_shape_ttH_y1Up",
-##         "CMS_ttHl_thu_shape_ttH_y1Down",
-##         "CMS_ttHl_thu_shape_ttW_x1Up",
-##         "CMS_ttHl_thu_shape_ttW_x1Down",
-##         "CMS_ttHl_thu_shape_ttW_y1Up",
-##         "CMS_ttHl_thu_shape_ttW_y1Down",
-##         "CMS_ttHl_thu_shape_ttZ_x1Up",
-##         "CMS_ttHl_thu_shape_ttZ_x1Down",
-##         "CMS_ttHl_thu_shape_ttZ_y1Up",
-##         "CMS_ttHl_thu_shape_ttZ_y1Down",
+         "CMS_ttHl_tauESUp",
+         "CMS_ttHl_tauESDown",
+         "CMS_ttHl_FRjt_normUp",
+         "CMS_ttHl_FRjt_normDown",
+         "CMS_ttHl_FRjt_shapeUp",
+         "CMS_ttHl_FRjt_shapeDown",
+         "CMS_ttHl_FRet_shiftUp",
+         "CMS_ttHl_FRet_shiftDown",
+         "CMS_ttHl_FRmt_shiftUp",
+         "CMS_ttHl_FRmt_shiftDown",
+         "CMS_ttHl_thu_shape_ttH_x1Up",
+         "CMS_ttHl_thu_shape_ttH_x1Down",
+         "CMS_ttHl_thu_shape_ttH_y1Up",
+         "CMS_ttHl_thu_shape_ttH_y1Down",
+         "CMS_ttHl_thu_shape_ttW_x1Up",
+         "CMS_ttHl_thu_shape_ttW_x1Down",
+         "CMS_ttHl_thu_shape_ttW_y1Up",
+         "CMS_ttHl_thu_shape_ttW_y1Down",
+         "CMS_ttHl_thu_shape_ttZ_x1Up",
+         "CMS_ttHl_thu_shape_ttZ_x1Down",
+         "CMS_ttHl_thu_shape_ttZ_y1Up",
+         "CMS_ttHl_thu_shape_ttZ_y1Down",
       ],
       max_files_per_job                     = max_files_per_job,
       era                                   = ERA,
@@ -228,6 +224,14 @@ if __name__ == '__main__':
         "mvaDiscr_3l",
         "mTauTauVis",
         "mvaDiscr_3l_1tau",
+        "mvaOutput_noHTT_tt",
+        "mvaOutput_noHTT_ttV",
+        "mvaOutput_noHTT_SUM_M",
+        "mvaOutput_noHTT_SUM_T",
+        "mvaOutput_noHTT_SUM_VT",
+        "mvaOutput_noHTT_1B_M",
+        "mvaOutput_noHTT_1B_T",
+        "mvaOutput_noHTT_1B_VT"
       ],
       select_rle_output                     = True,
       select_root_output                    = False,
@@ -246,13 +250,13 @@ if __name__ == '__main__':
       logging.info(" #jobs of type '%s' = %i" % (job_type, num_jobs))
     job_statistics_summary[idx_job_resubmission] = job_statistics
 
-    if idx_job_resubmission == 0:
-      run_analysis = query_yes_no("Start jobs ?")
-    if run_analysis:
-      analysis.run()
-    else:
-      sys.exit(0)
-    #analysis.run()
+    #if idx_job_resubmission == 0:
+    #  run_analysis = query_yes_no("Start jobs ?")
+    #if run_analysis:
+    #  analysis.run()
+    #else:
+    #  sys.exit(0)
+    analysis.run()
 
     if job_statistics['analyze'] == 0:
       is_last_resubmission = True
