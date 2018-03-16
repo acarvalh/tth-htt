@@ -61,11 +61,20 @@ if mode == "VHbb":
   hadTau_selection = options.tauWP
   applyFakeRateWeights = "3L"
 
-elif mode == "forBDTtraining":
-  if use_prod_ntuples:
-    from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_prodNtuples_2016_FastSim import samples_2016
-  else:
-    from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016_FastSim import samples_2016
+elif "forBDTtraining" in mode :
+  if mode=="forBDTtraining" :
+      if use_prod_ntuples:
+        from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_prodNtuples_2016_FastSim import samples_2016
+      else:
+        from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016_FastSim import samples_2016
+  elif mode=="forBDTtraining_VHbb" :
+      if use_prod_ntuples:
+        from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_prodNtuples_2016 import samples_2016
+      else:
+        from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2015 import samples_2015
+        from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016 import samples_2016
+      for sample_name, sample_info in samples_2016.items():
+          if "Run2016" in sample_name or "TH" in sample_name or "ST" in sample_name or sample_name=="ttHJetTobb_M125": sample_info["use_it"] = False
   hadTau_selection         = "dR03mvaVTight"
   hadTau_selection_relaxed = options.tauWP
   applyFakeRateWeights     = "3L"
