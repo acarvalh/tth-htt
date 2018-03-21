@@ -26,7 +26,7 @@ ERA                  = options.ERA #"2016"
 version              = options.version #"2017Oct24"
 max_job_resubmission = 10
 changeBranchNames    = use_prod_ntuples
-max_files_per_job    = 10 if use_prod_ntuples else 100
+max_files_per_job    = 5 if use_prod_ntuples else 100
 
 samples                            = None
 LUMI                               = None
@@ -49,6 +49,7 @@ if mode == "VHbb":
     from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016 import samples_2016
 
   for sample_name, sample_info in samples_2016.items():
+    if "Run2016" in sample_name : sample_info["use_it"] = False
     if sample_name in [
       "/Tau/Run2016B-PromptReco-v2/MINIAOD",
       "/Tau/Run2016C-PromptReco-v2/MINIAOD",
@@ -60,6 +61,8 @@ if mode == "VHbb":
 
   hadTau_selection = options.tauWP
   applyFakeRateWeights = "3L"
+
+#python tthAnalyzeRun_2los_1tau.py --version "2los_1tau_2018Mar14_BDT_VHbb_TLepVVTTau" --mode "forBDTtraining_VHbb" --tauWP "dR03mvaVVTight" --use_prod_ntuples
 
 elif "forBDTtraining" in mode :
   if mode=="forBDTtraining" :
@@ -75,7 +78,7 @@ elif "forBDTtraining" in mode :
         from tthAnalysis.HiggsToTauTau.tthAnalyzeSamples_2016 import samples_2016
       for sample_name, sample_info in samples_2016.items():
           if "Run2016" in sample_name or "TH" in sample_name or "ST" in sample_name or sample_name=="ttHJetTobb_M125": sample_info["use_it"] = False
-  hadTau_selection         = "dR03mvaVTight"
+  hadTau_selection         = "dR03mvaTight"
   hadTau_selection_relaxed = options.tauWP
   applyFakeRateWeights     = "3L"
 else:
