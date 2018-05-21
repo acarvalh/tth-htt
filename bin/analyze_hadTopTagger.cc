@@ -254,16 +254,12 @@ int main(int argc, char* argv[])
   //else throw cms::Exception("analyze_1l_2tau")
   //  << "Invalid Configuration parameter 'hadTauChargeSelection' = " << hadTauChargeSelection_string << " !!\n";
 
-  bool use_HIP_mitigation_mediumMuonId = cfg_analyze.getParameter<bool>("use_HIP_mitigation_mediumMuonId");
-  std::cout << "use_HIP_mitigation_mediumMuonId = " << use_HIP_mitigation_mediumMuonId << std::endl;
-
   bool isMC = cfg_analyze.getParameter<bool>("isMC");
   bool isMC_tH = ( process_string == "tH" ) ? true : false;
+  bool hasLHE = cfg_analyze.getParameter<bool>("hasLHE");
   std::string central_or_shift = cfg_analyze.getParameter<std::string>("central_or_shift");
   bool apply_trigger_bits = cfg_analyze.getParameter<bool>("apply_trigger_bits");
   //bool apply_hlt_filter = cfg_analyze.getParameter<bool>("apply_hlt_filter");
-  const bool useNonNominal = cfg_analyze.getParameter<bool>("useNonNominal");
-  const bool useNonNominal_jetmet = useNonNominal || ! isMC;
 
   bool isDEBUG = cfg_analyze.getParameter<bool>("isDEBUG");
   if ( isDEBUG ) std::cout << "Warning: DEBUG mode enabled -> trigger selection will not be applied for data !!" << std::endl;
@@ -273,7 +269,7 @@ int main(int argc, char* argv[])
   const int jetBtagSF_option = getBTagWeight_option(central_or_shift, isMC);
   const int jetToLeptonFakeRate_option = getJetToLeptonFR_option(central_or_shift, isMC);
   const int jetToTauFakeRate_option    = getJetToTauFR_option   (central_or_shift, isMC);
-  const int met_option   = useNonNominal_jetmet ? kMEt_central_nonNominal : getMET_option(central_or_shift, isMC);
+  const int met_option   = getMET_option(central_or_shift, isMC);
 
   LeptonFakeRateInterface* leptonFakeRateInterface = 0;
   edm::ParameterSet cfg_leptonFakeRateWeight = cfg_analyze.getParameter<edm::ParameterSet>("leptonFakeRateWeight");
@@ -347,7 +343,6 @@ int main(int argc, char* argv[])
   const bool readGenObjects = false; //isMC && !redoGenMatching;
   RecoMuonReader* muonReader = new RecoMuonReader(era, branchName_muons, readGenObjects);
   std::cout << "Here before RecoMuonReader" << std::endl;
-  muonReader->set_HIP_mitigation(use_HIP_mitigation_mediumMuonId);
   inputTree -> registerReader(muonReader);
   RecoMuonCollectionGenMatcher muonGenMatcher;
   RecoMuonCollectionSelectorLoose preselMuonSelector(era, -1, isDEBUG);
@@ -355,7 +350,7 @@ int main(int argc, char* argv[])
   RecoMuonCollectionSelectorTight tightMuonSelector(era, -1, isDEBUG);
 
   RecoElectronReader* electronReader = new RecoElectronReader(era, branchName_electrons, readGenObjects);
-  electronReader->readUncorrected(useNonNominal);
+  electronReader->readUncorrected(false); // it is always MC
   inputTree -> registerReader(electronReader);
   RecoElectronCollectionGenMatcher electronGenMatcher;
   RecoElectronCollectionCleaner electronCleaner(0.05, isDEBUG);
@@ -370,27 +365,23 @@ int main(int argc, char* argv[])
   hadTauReader->setHadTauPt_central_or_shift(hadTauPt_option);
   inputTree -> registerReader(hadTauReader);
   RecoHadTauCollectionGenMatcher hadTauGenMatcher;
-  RecoHadTauCollectionCleaner hadTauCleaner(0.3, isDEBUG);
-  RecoHadTauCollectionSelectorLoose preselHadTauSelector(era, -1, isDEBUG);
+  RecoHadTauCollectionCleaner hadTauCleaner(0.3);
+  RecoHadTauCollectionSelectorLoose preselHadTauSelector(era);
   if ( hadTauSelection_part2 == "dR03mvaVLoose" || hadTauSelection_part2 == "dR03mvaVVLoose" ) preselHadTauSelector.set(hadTauSelection_part2);
-  preselHadTauSelector.set_min_antiElectron(std::min(hadTauSelection_antiElectron_lead, hadTauSelection_antiElectron_sublead));
-  preselHadTauSelector.set_min_antiMuon(std::min(hadTauSelection_antiMuon_lead, hadTauSelection_antiMuon_sublead));
-  RecoHadTauCollectionSelectorFakeable fakeableHadTauSelector_lead(era, 0, isDEBUG);
-  if ( hadTauSelection_part2 == "dR03mvaVLoose" || hadTauSelection_part2 == "dR03mvaVVLoose" ) fakeableHadTauSelector_lead.set(hadTauSelection_part2);
-  fakeableHadTauSelector_lead.set_min_antiElectron(hadTauSelection_antiElectron_lead);
-  fakeableHadTauSelector_lead.set_min_antiMuon(hadTauSelection_antiMuon_lead);
-  RecoHadTauCollectionSelectorFakeable fakeableHadTauSelector_sublead(era, 1, isDEBUG);
-  if ( hadTauSelection_part2 == "dR03mvaVLoose" || hadTauSelection_part2 == "dR03mvaVVLoose" ) fakeableHadTauSelector_sublead.set(hadTauSelection_part2);
-  fakeableHadTauSelector_sublead.set_min_antiElectron(hadTauSelection_antiElectron_sublead);
-  fakeableHadTauSelector_sublead.set_min_antiMuon(hadTauSelection_antiMuon_sublead);
-  RecoHadTauCollectionSelectorTight tightHadTauSelector_lead(era, 0, isDEBUG);
-  if ( hadTauSelection_part2 != "" ) tightHadTauSelector_lead.set(hadTauSelection_part2);
-  tightHadTauSelector_lead.set_min_antiElectron(hadTauSelection_antiElectron_lead);
-  tightHadTauSelector_lead.set_min_antiMuon(hadTauSelection_antiMuon_lead);
-  RecoHadTauCollectionSelectorTight tightHadTauSelector_sublead(era, 1, isDEBUG);
-  if ( hadTauSelection_part2 != "" ) tightHadTauSelector_sublead.set(hadTauSelection_part2);
-  tightHadTauSelector_sublead.set_min_antiElectron(hadTauSelection_antiElectron_sublead);
-  tightHadTauSelector_sublead.set_min_antiMuon(hadTauSelection_antiMuon_sublead);
+  preselHadTauSelector.set_min_antiElectron(hadTauSelection_antiElectron);
+  preselHadTauSelector.set_min_antiMuon(hadTauSelection_antiMuon);
+  RecoHadTauCollectionSelectorFakeable fakeableHadTauSelector(era);
+  if ( hadTauSelection_part2 == "dR03mvaVLoose" || hadTauSelection_part2 == "dR03mvaVVLoose" ) fakeableHadTauSelector.set(hadTauSelection_part2);
+  fakeableHadTauSelector.set_min_antiElectron(hadTauSelection_antiElectron);
+  fakeableHadTauSelector.set_min_antiMuon(hadTauSelection_antiMuon);
+  RecoHadTauCollectionSelectorTight tightHadTauSelector(era);
+  if ( hadTauSelection_part2 != "" ) tightHadTauSelector.set(hadTauSelection_part2);
+  tightHadTauSelector.set_min_antiElectron(hadTauSelection_antiElectron);
+  tightHadTauSelector.set_min_antiMuon(hadTauSelection_antiMuon);
+  RecoHadTauSelectorTight tightHadTauFilter(era);
+  tightHadTauFilter.set("dR03mvaMedium");
+  tightHadTauFilter.set_min_antiElectron(hadTauSelection_antiElectron);
+  tightHadTauFilter.set_min_antiMuon(hadTauSelection_antiMuon);
 
   RecoJetReader* jetReader = new RecoJetReader(era, isMC, branchName_jets, readGenObjects);
   jetReader->setPtMass_central_or_shift(jetPt_option);
@@ -432,7 +423,7 @@ int main(int argc, char* argv[])
         inputTree -> registerReader(genJetReader);
       }
     //}
-    lheInfoReader = new LHEInfoReader();
+    lheInfoReader = new LHEInfoReader(hasLHE);
     inputTree -> registerReader(lheInfoReader);
   }
 

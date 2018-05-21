@@ -141,9 +141,6 @@ main(int argc,
 
   const std::string hadTauSelection_tauIdWP = cfg_analyze.getParameter<std::string>("hadTauSelection_tauIdWP");
 
-  const bool use_HIP_mitigation_mediumMuonId = cfg_analyze.getParameter<bool>("use_HIP_mitigation_mediumMuonId");
-  std::cout << "use_HIP_mitigation_mediumMuonId = " << use_HIP_mitigation_mediumMuonId << '\n';
-
   const bool isMC               = cfg_analyze.getParameter<bool>("isMC");
   const bool isMC_tH            = process_string == "tH";
   const bool apply_trigger_bits = cfg_analyze.getParameter<bool>("apply_trigger_bits");
@@ -212,7 +209,6 @@ main(int argc,
 
 //--- declare particle collections
   RecoMuonReader * const muonReader = new RecoMuonReader(era, branchName_muons, false);
-  muonReader->set_HIP_mitigation(use_HIP_mitigation_mediumMuonId);
   inputTree->registerReader(muonReader);
   const RecoMuonCollectionSelectorLoose preselMuonSelector(era, -1, isDEBUG);
   const RecoMuonCollectionSelectorFakeable fakeableMuonSelector(era, -1, isDEBUG);
@@ -391,8 +387,8 @@ main(int argc,
 
     const double avg_dr_jet = comp_avg_dr_jet(selJets);
     const double max_dr_jet = comp_max_dr_jet(selJets);
-    const double mbb        = selBJets_medium.size() > 1 ? (selBJets_medium[0]->p4() + selBJets_medium[0]->p4()).mass() : -1.;
-    const double mbb_loose  = selBJets_loose.size() > 1 ? (selBJets_loose[0]->p4() + selBJets_loose[0]->p4()).mass() : -1.;
+    const double mbb        = selBJets_medium.size() > 1 ? (selBJets_medium[0]->p4() + selBJets_medium[1]->p4()).mass() : -1.;
+    const double mbb_loose  = selBJets_loose.size() > 1 ? (selBJets_loose[0]->p4() + selBJets_loose[1]->p4()).mass() : -1.;
     const double btagWeight = get_BtagWeight(selJets);
 
     snm->read(selJets);

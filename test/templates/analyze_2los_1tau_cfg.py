@@ -63,8 +63,6 @@ process.analyze_2los_1tau = cms.PSet(
         )
     ),
 
-    use_HIP_mitigation_mediumMuonId = cms.bool(False),
-
     isMC = cms.bool(True),
     central_or_shift = cms.string('central'),
     lumiScale = cms.double(1.),
@@ -102,5 +100,7 @@ process.analyze_2los_1tau = cms.PSet(
     selEventsFileName_input = cms.string(''),
     selEventsFileName_output = cms.string(''),
     selectBDT = cms.bool(False),
+    useNonNominal = cms.bool(False),
     isDEBUG = cms.bool(False),
+    hasLHE = cms.bool(True),
 )

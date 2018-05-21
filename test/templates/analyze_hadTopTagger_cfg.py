@@ -137,5 +137,5 @@ process.analyze_hadTopTagger = cms.PSet(
 
     selectBDT = cms.bool(True),
     isDEBUG = cms.bool(False),
-    useNonNominal = cms.bool(False),
+    hasLHE = cms.bool(True),
 )

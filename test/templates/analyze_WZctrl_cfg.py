@@ -1,6 +1,7 @@
 import FWCore.ParameterSet.Config as cms
-
 import os
+
+from tthAnalysis.HiggsToTauTau.recommendedMEtFilters_cfi import recommendedMEtFilters
 
 process = cms.PSet()
 
@@ -53,14 +54,14 @@ process.analyze_WZctrl = cms.PSet(
 
     hadTauSelection = cms.string('Tight|dR03mvaLoose'),
 
-    use_HIP_mitigation_bTag = cms.bool(False),
-    use_HIP_mitigation_mediumMuonId = cms.bool(False),
-
     isMC = cms.bool(False),
     central_or_shift = cms.string('central'),
     lumiScale = cms.double(1.),
     apply_genWeight = cms.bool(True),
     apply_trigger_bits = cms.bool(True),
+    apply_hlt_filter = cms.bool(False),
+    apply_met_filters = cms.bool(True),
+    cfgMEtFilter = recommendedMEtFilters,
 
     fillGenEvtHistograms = cms.bool(False),
 
@@ -70,7 +71,13 @@ process.analyze_WZctrl = cms.PSet(
     branchName_jets = cms.string('Jet'),
     branchName_met = cms.string('MET'),
 
+    branchName_genLeptons = cms.string('GenLep'),
+    branchName_genHadTaus = cms.string('GenVisTau'),
+    branchName_genJets = cms.string('GenJet'),
+    redoGenMatching = cms.bool(True),
+
     selEventsFileName_input = cms.string(''),
     selEventsFileName_output = cms.string(''),
     isDEBUG = cms.bool(False),
+    hasLHE = cms.bool(True),
 )

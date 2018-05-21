@@ -87,7 +87,7 @@ if __name__ == '__main__':
       verbose            = idx_job_resubmission > 0,
       dry_run            = dry_run,
       isDebug            = debug,
-      use_home           = use_home,
+      use_home           = args.use_home,
     )
 
     job_statistics = analysis.create()
