@@ -39,7 +39,7 @@
 #include "tthAnalysis/HiggsToTauTau/interface/RecoElectronReader.h" // RecoElectronReader
 #include "tthAnalysis/HiggsToTauTau/interface/RecoMuonReader.h" // RecoMuonReader
 #include "tthAnalysis/HiggsToTauTau/interface/RecoHadTauReader.h" // RecoHadTauReader
-
+#include "tthAnalysis/HiggsToTauTau/interface/RecoMEt.h" // RecoMEt
 #include "tthAnalysis/HiggsToTauTau/interface/RecoJetReaderHTTv2.h" // RecoJetReaderHTTv2
 #include "tthAnalysis/HiggsToTauTau/interface/RecoJetReaderAK12.h" // RecoJetReaderAK12
 #include "tthAnalysis/HiggsToTauTau/interface/RecoJetReaderAK8.h" // RecoJetReaderAK8
@@ -118,8 +118,7 @@ const int hadTauSelection_antiMuon = -1; // not applied
 enum { kGen_bWj1Wj2, kGen_bWj1, kGen_bWj2, kGen_Wj1Wj2, kGen_b, kGen_Wj1, kGen_Wj2, kGen_none };
 bool inAK12 = true;
 bool loopB = true;
-bool cleanLep = true;
-bool selInJets = true;
+bool cleanLep = false;
 size_t cutJetCombo = 20;
 
 const int hadTauSelection_antiElectron_lead = -1; // not applied
@@ -166,6 +165,65 @@ int main(int argc, char* argv[])
   else throw cms::Exception("analyze_hadTopTagger")
     << "Invalid Configuration parameter 'era' = " << era_string << " !!\n";
 
+  vstring triggerNames_1e = cfg_analyze.getParameter<vstring>("triggers_1e");
+  std::cout << "triggerNames_1e " ;
+  for (auto i: triggerNames_1e) std::cout << i << " ";
+  std::cout << std::endl;
+  std::vector<hltPath*> triggers_1e = create_hltPaths(triggerNames_1e);
+  bool use_triggers_1e = cfg_analyze.getParameter<bool>("use_triggers_1e");
+  vstring triggerNames_2e = cfg_analyze.getParameter<vstring>("triggers_2e");
+  std::vector<hltPath*> triggers_2e = create_hltPaths(triggerNames_2e, "triggers_2e");
+  bool use_triggers_2e = cfg_analyze.getParameter<bool>("use_triggers_2e");
+  vstring triggerNames_1e1tau = cfg_analyze.getParameter<vstring>("triggers_1e1tau");
+  std::vector<hltPath*> triggers_1e1tau = create_hltPaths(triggerNames_1e1tau);
+  bool use_triggers_1e1tau = cfg_analyze.getParameter<bool>("use_triggers_1e1tau");
+  vstring triggerNames_1mu = cfg_analyze.getParameter<vstring>("triggers_1mu");
+  std::cout << "triggerNames_1mu " ;
+  for (auto i: triggerNames_1mu) std::cout << i << " ";
+  std::cout << std::endl;
+  std::vector<hltPath*> triggers_1mu = create_hltPaths(triggerNames_1mu);
+  bool use_triggers_1mu = cfg_analyze.getParameter<bool>("use_triggers_1mu");
+  vstring triggerNames_2mu = cfg_analyze.getParameter<vstring>("triggers_2mu");
+  std::vector<hltPath*> triggers_2mu = create_hltPaths(triggerNames_2mu, "triggers_2mu");
+  bool use_triggers_2mu = cfg_analyze.getParameter<bool>("use_triggers_2mu");
+  vstring triggerNames_1mu1tau = cfg_analyze.getParameter<vstring>("triggers_1mu1tau");
+  std::vector<hltPath*> triggers_1mu1tau = create_hltPaths(triggerNames_1mu1tau);
+  std::cout << "triggers_1mu1tau " ;
+  for (auto i: triggerNames_1mu1tau) std::cout << i << " ";
+  std::cout << std::endl;
+  bool use_triggers_1mu1tau = cfg_analyze.getParameter<bool>("use_triggers_1mu1tau");
+  vstring triggerNames_1e1mu = cfg_analyze.getParameter<vstring>("triggers_1e1mu");
+  std::vector<hltPath*> triggers_1e1mu = create_hltPaths(triggerNames_1e1mu);
+  std::cout << "triggers_1e1mu " ;
+  for (auto i: triggerNames_1e1mu) std::cout << i << " ";
+  std::cout << std::endl;
+  bool use_triggers_1e1mu = cfg_analyze.getParameter<bool>("use_triggers_1e1mu");
+  // triple lepton triggers
+  vstring triggerNames_3e = cfg_analyze.getParameter<vstring>("triggers_3e");
+  std::vector<hltPath*> triggers_3e = create_hltPaths(triggerNames_3e, "triggers_3e");
+  bool use_triggers_3e = cfg_analyze.getParameter<bool>("use_triggers_3e");
+  vstring triggerNames_2e1mu = cfg_analyze.getParameter<vstring>("triggers_2e1mu");
+  std::vector<hltPath*> triggers_2e1mu = create_hltPaths(triggerNames_2e1mu, "triggers_2e1mu");
+  bool use_triggers_2e1mu = cfg_analyze.getParameter<bool>("use_triggers_2e1mu");
+  vstring triggerNames_1e2mu = cfg_analyze.getParameter<vstring>("triggers_1e2mu");
+  std::vector<hltPath*> triggers_1e2mu = create_hltPaths(triggerNames_1e2mu, "triggers_1e2mu");
+  bool use_triggers_1e2mu = cfg_analyze.getParameter<bool>("use_triggers_1e2mu");
+  vstring triggerNames_3mu = cfg_analyze.getParameter<vstring>("triggers_3mu");
+  std::vector<hltPath*> triggers_3mu = create_hltPaths(triggerNames_3mu, "triggers_3mu");
+  bool use_triggers_3mu = cfg_analyze.getParameter<bool>("use_triggers_3mu");
+
+  /*
+  bool apply_offline_e_trigger_cuts_1e = cfg_analyze.getParameter<bool>("apply_offline_e_trigger_cuts_1e");
+  bool apply_offline_e_trigger_cuts_1e1tau = cfg_analyze.getParameter<bool>("apply_offline_e_trigger_cuts_1e1tau");
+  bool apply_offline_e_trigger_cuts_1mu = cfg_analyze.getParameter<bool>("apply_offline_e_trigger_cuts_1mu");
+  bool apply_offline_e_trigger_cuts_1mu1tau = cfg_analyze.getParameter<bool>("apply_offline_e_trigger_cuts_1mu1tau");
+
+  bool apply_offline_e_trigger_cuts_3e = cfg_analyze.getParameter<bool>("apply_offline_e_trigger_cuts_3e");
+  bool apply_offline_e_trigger_cuts_2e1mu = cfg_analyze.getParameter<bool>("apply_offline_e_trigger_cuts_2e1mu");
+  bool apply_offline_e_trigger_cuts_1e2mu = cfg_analyze.getParameter<bool>("apply_offline_e_trigger_cuts_1e2mu");
+  bool apply_offline_e_trigger_cuts_3mu = cfg_analyze.getParameter<bool>("apply_offline_e_trigger_cuts_3mu");
+  */
+
   // read leptons and hadronic taus to do cleaning
   std::string leptonSelection_string = cfg_analyze.getParameter<std::string>("leptonSelection").data();
   int leptonSelection = -1;
@@ -202,6 +260,10 @@ int main(int argc, char* argv[])
   bool isMC = cfg_analyze.getParameter<bool>("isMC");
   bool isMC_tH = ( process_string == "tH" ) ? true : false;
   std::string central_or_shift = cfg_analyze.getParameter<std::string>("central_or_shift");
+  bool apply_trigger_bits = cfg_analyze.getParameter<bool>("apply_trigger_bits");
+  //bool apply_hlt_filter = cfg_analyze.getParameter<bool>("apply_hlt_filter");
+  const bool useNonNominal = cfg_analyze.getParameter<bool>("useNonNominal");
+  const bool useNonNominal_jetmet = useNonNominal || ! isMC;
 
   bool isDEBUG = cfg_analyze.getParameter<bool>("isDEBUG");
   if ( isDEBUG ) std::cout << "Warning: DEBUG mode enabled -> trigger selection will not be applied for data !!" << std::endl;
@@ -209,6 +271,19 @@ int main(int argc, char* argv[])
   bool selectBDT = ( cfg_analyze.exists("selectBDT") ) ? cfg_analyze.getParameter<bool>("selectBDT") : false;
   const int jetPt_option     = getJet_option       (central_or_shift, isMC);
   const int jetBtagSF_option = getBTagWeight_option(central_or_shift, isMC);
+  const int jetToLeptonFakeRate_option = getJetToLeptonFR_option(central_or_shift, isMC);
+  const int jetToTauFakeRate_option    = getJetToTauFR_option   (central_or_shift, isMC);
+  const int met_option   = useNonNominal_jetmet ? kMEt_central_nonNominal : getMET_option(central_or_shift, isMC);
+
+  LeptonFakeRateInterface* leptonFakeRateInterface = 0;
+  edm::ParameterSet cfg_leptonFakeRateWeight = cfg_analyze.getParameter<edm::ParameterSet>("leptonFakeRateWeight");
+  leptonFakeRateInterface = new LeptonFakeRateInterface(cfg_leptonFakeRateWeight, jetToLeptonFakeRate_option);
+
+
+  JetToTauFakeRateInterface* jetToTauFakeRateInterface = 0;
+  edm::ParameterSet cfg_hadTauFakeRateWeight = cfg_analyze.getParameter<edm::ParameterSet>("hadTauFakeRateWeight");
+  cfg_hadTauFakeRateWeight.addParameter<std::string>("hadTauSelection", hadTauSelection_part2);
+  jetToTauFakeRateInterface = new JetToTauFakeRateInterface(cfg_hadTauFakeRateWeight, jetToTauFakeRate_option);
 
   std::string branchName_jets = cfg_analyze.getParameter<std::string>("branchName_jets");
   std::string branchName_jetsHTTv2 = cfg_analyze.getParameter<std::string>("branchName_jetsHTTv2");
@@ -258,7 +333,6 @@ int main(int argc, char* argv[])
   EventInfo eventInfo(isSignal, isMC, isMC_tH);
   EventInfoReader eventInfoReader(&eventInfo);
   inputTree -> registerReader(&eventInfoReader);
-  const bool useNonNominal = false;//cfg_analyze.getParameter<bool>("useNonNominal");
   const int hadTauPt_option            = getHadTauPt_option     (central_or_shift, isMC);
 
   edm::ParameterSet cfg_dataToMCcorrectionInterface;
@@ -288,6 +362,9 @@ int main(int argc, char* argv[])
   RecoElectronCollectionSelectorLoose preselElectronSelector(era, -1, isDEBUG);
   RecoElectronCollectionSelectorFakeable fakeableElectronSelector(era, -1, isDEBUG);
   RecoElectronCollectionSelectorTight tightElectronSelector(era, -1, isDEBUG);
+  // assume apply_offline_e_trigger_cuts* alwyas true
+  fakeableElectronSelector.disable_offline_e_trigger_cuts();
+  tightElectronSelector.disable_offline_e_trigger_cuts();
 
   RecoHadTauReader* hadTauReader = new RecoHadTauReader(era, branchName_hadTaus, readGenObjects);
   hadTauReader->setHadTauPt_central_or_shift(hadTauPt_option);
@@ -325,6 +402,11 @@ int main(int argc, char* argv[])
   RecoJetCollectionSelectorBtagMedium jetSelectorBtagMedium(era);
   RecoJetCollectionCleaner jetCleaner(0.6, isDEBUG); //to clean against AK12
   RecoJetCollectionCleaner jetCleanerLep(0.2, isDEBUG); //to clean against leptons and hadronic taus
+
+//--- declare missing transverse energy
+  RecoMEtReader* metReader = new RecoMEtReader(era, isMC, branchName_met);
+  metReader->setMEt_central_or_shift(met_option);
+  inputTree -> registerReader(metReader);
 
   RecoJetReaderHTTv2* jetReaderHTTv2 = new RecoJetReaderHTTv2(era, branchName_jetsHTTv2, branchName_subjetsHTTv2);
   inputTree -> registerReader(jetReaderHTTv2);
@@ -380,29 +462,29 @@ int main(int argc, char* argv[])
     bdt_filler->register_variable<float_type>(
       ///* // computed by (*hadTopTaggerFill)(selBJet, selWJet1, selWJet2);
       "m_bWj1Wj2", "m_Wj1Wj2", "m_bWj1", "m_bWj2",
-      "m_Wj1Wj2_div_m_bWj1Wj2",
-      "pT_b", "eta_b", //"phi_b", "mass_b",
+      //"m_Wj1Wj2_div_m_bWj1Wj2",
+      "pT_b", //"eta_b", //"phi_b", "mass_b",
       "kinFit_pT_b", //"kinFit_eta_b", //"kinFit_phi_b", "kinFit_mass_b",
-      "pT_Wj1", "eta_Wj1", //"phi_Wj1", "mass_Wj1",
+      "pT_Wj1", //"eta_Wj1", //"phi_Wj1", "mass_Wj1",
       "kinFit_pT_Wj1", //"kinFit_eta_Wj1", //"kinFit_phi_Wj1", "kinFit_mass_Wj1",
-      "pT_Wj2", "eta_Wj2", //"phi_Wj2", "mass_Wj2",
+      "pT_Wj2", //"eta_Wj2", //"phi_Wj2", "mass_Wj2",
       "kinFit_pT_Wj2", //"kinFit_eta_Wj2", //"kinFit_phi_Wj2", "kinFit_mass_Wj2",
-      "cosTheta_leadWj_restTop","cosTheta_subleadWj_restTop",
-      "cosTheta_Kin_leadWj_restTop","cosTheta_Kin_subleadWj_restTop",
-      "cosTheta_leadEWj_restTop","cosTheta_subleadEWj_restTop",
-      "cosTheta_Kin_leadEWj_restTop","cosTheta_Kin_subleadEWj_restTop",
-      "cosThetaW_rest","cosThetaKinW_rest","cosThetaW_lab","cosThetaKinW_lab",
-      "cosThetab_rest","cosThetaKinb_rest","cosThetab_lab","cosThetaKinb_lab",
-      "Dphi_Wj1_Wj2_lab","Dphi_KinWj1_KinWj2_lab",
-      "Dphi_Wb_rest","Dphi_KinWb_rest","Dphi_Wb_lab","Dphi_KinWb_lab",
-      "cosThetaWj1_restW","cosThetaKinWj_restW",
+      //"cosTheta_leadWj_restTop","cosTheta_subleadWj_restTop",
+      //"cosTheta_Kin_leadWj_restTop","cosTheta_Kin_subleadWj_restTop",
+      //"cosTheta_leadEWj_restTop","cosTheta_subleadEWj_restTop",
+      //"cosTheta_Kin_leadEWj_restTop","cosTheta_Kin_subleadEWj_restTop",
+      "cosThetaW_rest","cosThetaKinW_rest", //"cosThetaW_lab","cosThetaKinW_lab",
+      //"cosThetab_rest","cosThetaKinb_rest", //"cosThetab_lab","cosThetaKinb_lab",
+      //"Dphi_Wj1_Wj2_lab","Dphi_KinWj1_KinWj2_lab",
+      "Dphi_Wb_rest", //"Dphi_KinWb_rest","Dphi_Wb_lab","Dphi_KinWb_lab",
+      "cosThetaWj1_restW", "cosThetaKinWj_restW",
       "dR_bWj1", "dR_bWj2", "dR_Wj1Wj2", "dR_bW",
       "statusKinFit", "nllKinFit", "alphaKinFit", //"logPKinFit", "logPErrKinFit",
-      "pT_bWj1Wj2", "pT_Wj1Wj2",
+      "pT_bWj1Wj2", "pT_Wj1Wj2", "pT_Wj1Wj2_kin",
       //*/
       "tau32Top", "massTop",
       "tau21W", "massW_SD",
-      "genTopPt", "genTopEta",
+      //"genTopPt", "genTopEta",
       "genFatPtAll", "genFatEtaAll",
       "drT_gen", "drB_gen", "drW_gen", "drWj1_gen", "drWj2_gen",
       "etaB_gen",  "etaWj1_gen", "etaWj2_gen",
@@ -413,15 +495,18 @@ int main(int argc, char* argv[])
       "HTTv2_area", "HTTv2_Ropt", "HTTv2_RoptCalc",
       "genTopMassFromW", "genTopMassFromWj", "genWMassFromWj",
       "genAntiTopMassFromW", "genAntiTopMassFromWj", "genAntiWMassFromWj",
-      "genWMass", "genAntiWMass"
+      "genWMass", "genAntiWMass","genWeight",
+      //
+      "weight_fakeRate_3L", "weight_fakeRate_4L", "weight_fakeRate_2L"
     );
 
 
     bdt_filler->register_variable<int_type>(
       "typeTop", "collectionSize", "bjet_tag_position", "bWj1Wj2_isGenMatched", "counter",
       "fatjet_isGenMatched", "b_isGenMatched", "Wj1_isGenMatched", "Wj2_isGenMatched",
-      "nbjets", "nbjets_loose", "njets", "passJetSel",
-      "nlep", "ntau"
+      "passJetSel","passJetMassSel",
+      "passHadGenHadW",
+      "pass_3l", "pass_2lss", "pass_1l_2tau", "pass_2lss_1tau", "pass_2los_1tau"
       //"b_isGenMatched", "Wj1_isGenMatched", "Wj2_isGenMatched",
       //"bWj1Wj2_isGenMatched"
     );
@@ -461,15 +546,19 @@ int main(int argc, char* argv[])
   int cat3_cat1 = 0 ;
   int cat3_cat2_cat1 = 0;
 
-  std::cout << "before enereted event loop " << std::endl;
+  int count_pass_3l = 0;
+  int count_pass_2lss = 0;
+  int count_pass_1l_2tau = 0;
+  int count_pass_1l_2tau_test = 0;
+  int count_pass_2lss_1tau = 0;
+  int count_pass_2los_1tau = 0;
+
   while(inputTree -> hasNextEvent() && (! run_lumi_eventSelector || (run_lumi_eventSelector && ! run_lumi_eventSelector -> areWeDone())))
   {
     //if (countFatTop > 50) continue;
     if ( isDEBUG ) {
       std::cout << "processing run = " << eventInfo.run << ", ls = " << eventInfo.lumi << ", event = " << eventInfo.event << std::endl;
     }
-
-    std::cout << "enereted event loop " << std::endl;
 
     if(inputTree -> canReport(reportEvery))
     {
@@ -480,13 +569,13 @@ int main(int argc, char* argv[])
                 << ") file (" << selectedEntries << " Entries selected)\n";
     }
     ++analyzedEntries;
+    if (analyzedEntries > 100) break;
     histogram_analyzedEntries->Fill(0.);
 
     if (run_lumi_eventSelector && !(*run_lumi_eventSelector)(eventInfo))
     {
       continue;
     }
-
     //--- build collections of electrons, muons and hadronic taus;
     //    resolve overlaps in order of priority: muon, electron,
     std::vector<RecoMuon> muons = muonReader->read();
@@ -513,77 +602,111 @@ int main(int argc, char* argv[])
     else if ( leptonSelection == kTight    ) selElectrons = tightElectrons;
     else assert(0);
 
+    std::vector<const RecoLepton*> preselLeptonsFull = mergeLeptonCollections(preselElectrons, preselMuons, isHigherConePt);
+    std::vector<const RecoLepton*> fakeableLeptonsFull = mergeLeptonCollections(fakeableElectrons, fakeableMuons, isHigherConePt);
+    std::vector<const RecoLepton*> tightLeptonsFull = mergeLeptonCollections(tightElectrons, tightMuons, isHigherConePt);
+
+    std::vector<const RecoLepton*> preselLeptons = pickFirstNobjects(preselLeptonsFull, 3);
+    std::vector<const RecoLepton*> fakeableLeptons = pickFirstNobjects(fakeableLeptonsFull, 3);
+    std::vector<const RecoLepton*> tightLeptons = getIntersection(fakeableLeptons, tightLeptonsFull, isHigherConePt);
+    std::vector<const RecoLepton*> selLeptons = selectObjects(leptonSelection, preselLeptons, fakeableLeptons, tightLeptons);
+
+    bool passesTight_lepton_lead = false;
+    if (selLeptons.size() > 0) passesTight_lepton_lead = isMatched(*selLeptons[0], tightElectrons) || isMatched(*selLeptons[0], tightMuons);
+    bool passesTight_lepton_sublead = false;
+    if (selLeptons.size() > 1) passesTight_lepton_sublead = isMatched(*selLeptons[1], tightElectrons) || isMatched(*selLeptons[1], tightMuons);
+
+    // Xanda: I am not sure we need this in this code
+    double prob_fake_lepton_lead = 1.;
+    double prob_fake_lepton_sublead = 1.;
+    if(leptonFakeRateInterface) {
+      if (selLeptons.size() > 0) {
+        if      ( std::abs(selLeptons[0]->pdgId()) == 11 )
+          prob_fake_lepton_lead = leptonFakeRateInterface->getWeight_e(selLeptons[0]->cone_pt(), selLeptons[0]->absEta());
+        else if ( std::abs(selLeptons[0]->pdgId()) == 13 )
+          prob_fake_lepton_lead = leptonFakeRateInterface->getWeight_mu(selLeptons[0]->cone_pt(), selLeptons[0]->absEta());
+        else assert(0);
+      }
+      if (selLeptons.size() > 1) {
+        if      ( std::abs(selLeptons[1]->pdgId()) == 11 )
+          {prob_fake_lepton_sublead = leptonFakeRateInterface->getWeight_e(selLeptons[1]->cone_pt(), selLeptons[1]->absEta());}
+        else if ( std::abs(selLeptons[1]->pdgId()) == 13 )
+          {prob_fake_lepton_sublead = leptonFakeRateInterface->getWeight_mu(selLeptons[1]->cone_pt(), selLeptons[1]->absEta());}
+        else assert(0);
+      }
+    }
+
     std::vector<RecoHadTau> hadTaus = hadTauReader->read();
     std::vector<const RecoHadTau*> hadTau_ptrs = convert_to_ptrs(hadTaus);
     std::vector<const RecoHadTau*> cleanedHadTaus = hadTauCleaner(hadTau_ptrs, preselMuons, preselElectrons);
-    std::vector<const RecoHadTau*> preselHadTaus = preselHadTauSelector(cleanedHadTaus, isHigherPt);
-    std::vector<const RecoHadTau*> fakeableHadTaus_lead = fakeableHadTauSelector_lead(preselHadTaus);
-    std::vector<const RecoHadTau*> fakeableHadTaus_sublead = hadTauCleaner(fakeableHadTauSelector_sublead(preselHadTaus), fakeableHadTaus_lead);
-    assert(fakeableHadTaus_lead.size() <= 1 && fakeableHadTaus_sublead.size() <= 1);
-    std::vector<const RecoHadTau*> fakeableHadTaus;
-    if ( fakeableHadTaus_lead.size()    >= 1 ) fakeableHadTaus.push_back(fakeableHadTaus_lead[0]);
-    if ( fakeableHadTaus_sublead.size() >= 1 ) fakeableHadTaus.push_back(fakeableHadTaus_sublead[0]);
-    std::vector<const RecoHadTau*> tightHadTaus_lead = tightHadTauSelector_lead(preselHadTaus);
-    std::vector<const RecoHadTau*> tightHadTaus_sublead = hadTauCleaner(tightHadTauSelector_sublead(preselHadTaus), tightHadTaus_lead);
-    assert(tightHadTaus_lead.size() <= 1 && tightHadTaus_sublead.size() <= 1);
-    std::vector<const RecoHadTau*> tightHadTaus;
-    if ( tightHadTaus_lead.size()    >= 1 ) tightHadTaus.push_back(tightHadTaus_lead[0]);
-    if ( tightHadTaus_sublead.size() >= 1 ) tightHadTaus.push_back(tightHadTaus_sublead[0]);
-    std::vector<const RecoHadTau*> selHadTaus;
-    if      ( hadTauSelection == kLoose    ) selHadTaus = preselHadTaus;
-    else if ( hadTauSelection == kFakeable ) selHadTaus = fakeableHadTaus;
-    else if ( hadTauSelection == kTight    ) selHadTaus = tightHadTaus;
-    else assert(0);
-    selHadTaus = pickFirstNobjects(selHadTaus, 2);
+    std::vector<const RecoHadTau*> preselHadTausFull = preselHadTauSelector(cleanedHadTaus, isHigherPt);
+    std::vector<const RecoHadTau*> fakeableHadTausFull = fakeableHadTauSelector(preselHadTausFull, isHigherPt);
+    std::vector<const RecoHadTau*> tightHadTausFull = tightHadTauSelector(fakeableHadTausFull, isHigherPt);
+
+    std::vector<const RecoHadTau*> preselHadTaus = pickFirstNobjects(preselHadTausFull, 2);
+    std::vector<const RecoHadTau*> fakeableHadTaus = pickFirstNobjects(fakeableHadTausFull, 2);
+    std::vector<const RecoHadTau*> tightHadTaus = getIntersection(fakeableHadTaus, tightHadTausFull, isHigherPt);
+    std::vector<const RecoHadTau*> selHadTaus = selectObjects(hadTauSelection, preselHadTaus, fakeableHadTaus, tightHadTaus);
+
+    bool passesTight_hadTau_lead = false;
+    if ( selHadTaus.size() > 0) passesTight_hadTau_lead = isMatched(*selHadTaus[0], tightHadTaus);
+    bool passesTight_hadTau_sublead = false;
+    if ( selHadTaus.size() > 1) passesTight_hadTau_sublead = isMatched(*selHadTaus[1], tightHadTaus);
+
+    double prob_fake_hadTau_lead = 1.;
+    double prob_fake_hadTau_sublead = 1.;
+    if(jetToTauFakeRateInterface) {
+    if ( selHadTaus.size() > 0) prob_fake_hadTau_lead = jetToTauFakeRateInterface->getWeight_lead(selHadTaus[0]->pt(), selHadTaus[0]->absEta());
+    if ( selHadTaus.size() > 1) prob_fake_hadTau_sublead = jetToTauFakeRateInterface->getWeight_sublead(selHadTaus[1]->pt(), selHadTaus[1]->absEta());
+    }
 
     //std::cout << "before load jets"  << std::endl;
 //--- build collections of jets and select subset of jets passing b-tagging criteria
     std::vector<RecoJet> jets = jetReader->read();
     std::vector<const RecoJet*> jet_ptrs = convert_to_ptrs(jets);
     std::vector<const RecoJet*> selJets;
-    if (cleanLep) {
+    if (cleanLep && (fakeableMuons.size() + fakeableElectrons.size() + preselHadTaus.size()) > 0) {
       std::vector<const RecoJet*> cleanedJetsAK4 = jetCleanerLep(jet_ptrs, fakeableMuons, fakeableElectrons, preselHadTaus);
       selJets = jetSelector(cleanedJetsAK4, isHigherPt);
     } else selJets = jetSelector(jet_ptrs, isHigherPt);
     std::vector<const RecoJet*> selBJets_loose = jetSelectorBtagLoose(selJets);
     std::vector<const RecoJet*> selBJets_medium = jetSelectorBtagMedium(selJets);
-    //std::cout << "after load jets"  << std::endl;
 //--- build collections of jets reconstructed by hep-top-tagger (HTTv2) algorithm
     std::vector<RecoJetHTTv2> jetsHTTv2 = jetReaderHTTv2->read();
     std::vector<const RecoJetHTTv2*> jet_ptrsHTTv2raw = convert_to_ptrs(jetsHTTv2);
     std::vector<const RecoJetHTTv2*> jet_ptrsHTTv2;
-    if (cleanLep) {
+    if (cleanLep && (fakeableMuons.size() + fakeableElectrons.size() + preselHadTaus.size()) > 0) {
       std::vector<const RecoJetHTTv2*> cleanedJetsHTTv2 = jetCleanerHTTv2(jet_ptrsHTTv2raw, fakeableMuons, fakeableElectrons, preselHadTaus);
       jet_ptrsHTTv2 =  jetSelectorHTTv2(cleanedJetsHTTv2, isHigherPt);
     } else jet_ptrsHTTv2 =  jetSelectorHTTv2(jet_ptrsHTTv2raw, isHigherPt);
-    //std::cout << "after load HTT "<< jet_ptrsHTTv2raw.size()<< " " <<  jet_ptrsHTTv2 .size() << std::endl;
+    //std::vector<const RecoJetHTTv2*> jet_ptrsHTTv2 = jetSelectorHTTv2(jet_ptrsHTTv2raw, isHigherPt);
 //--- build collections of jets reconstructed by anti-kT algorithm with dR=1.2 (AK12)
     std::vector<RecoJetAK12> jetsAK12 = jetReaderAK12->read();
     std::vector<const RecoJetAK12*> jet_ptrsAK12raw = convert_to_ptrs(jetsAK12);
     std::vector<const RecoJetAK12*> jet_ptrsAK12;
-    if (cleanLep) {
+    if (cleanLep && (fakeableMuons.size() + fakeableElectrons.size() + preselHadTaus.size()) > 0) {
     std::vector<const RecoJetAK12*> cleanedJetsAK12 = jetCleanerAK12(jet_ptrsAK12raw, fakeableMuons, fakeableElectrons, preselHadTaus);
     jet_ptrsAK12 = jetSelectorAK12(cleanedJetsAK12, isHigherPt);
     } else jet_ptrsAK12 = jetSelectorAK12(jet_ptrsAK12raw, isHigherPt);
-    //std::cout << "after load ak12"  << std::endl;
 //--- build collections of jets reconstructed by anti-kT algorithm with dR=0.8 (AK8)
     std::vector<RecoJetAK8> jetsAK8 = jetReaderAK8->read();
     std::vector<const RecoJetAK8*> jet_ptrsAK8raw = convert_to_ptrs(jetsAK8);
     std::vector<const RecoJetAK8*> jet_ptrsAK8;
-    if (cleanLep) {
+    if (cleanLep && (fakeableMuons.size() + fakeableElectrons.size() + preselHadTaus.size()) > 0) {
       std::vector<const RecoJetAK8*> cleanedJetsAK8 = jetCleanerAK8(jet_ptrsAK8raw, fakeableMuons, fakeableElectrons, preselHadTaus);
       jet_ptrsAK8 = jetSelectorAK8(cleanedJetsAK8, isHigherPt);
     } else jet_ptrsAK8 = jetSelectorAK8(jet_ptrsAK8raw , isHigherPt);
-    //std::cout << "after load ak8"  << std::endl;
 
     // cleaned RecoJet collection from AK12 as well -- to keep b-tag ordering consistent in cat2
     std::vector<const RecoJet*> cleanedJets;
-    if (inAK12) cleanedJets = jetCleaner(selJets, jet_ptrsAK12);
+    if (inAK12 && jet_ptrsAK12.size() > 0) cleanedJets = jetCleaner(selJets, jet_ptrsAK12);
     else cleanedJets = jetCleaner(selJets, jet_ptrsAK8);
+
+    if (selJets.size() < 3 && jet_ptrsHTTv2.size() < 1 && jet_ptrsAK12.size() < 1 && cleanedJets.size() < 1 ) continue;
 
     // natural selection of all ttH(multilepton categories)
     bool passJetSel = false;
-    if ( selJets.size() >= 4 &&  (selBJets_loose.size() >= 2 || selBJets_medium.size() >= 1) && selInJets) {passJetSel = true; countpassJetSel++; } //else continue;
+    if ( selJets.size() >= 3 &&  (selBJets_loose.size() >= 2 || selBJets_medium.size() >= 1)) {passJetSel = true; countpassJetSel++; } //else continue;
 
 //--- build collections of generator level particles (after some cuts are applied, to safe computing time)
     std::vector<GenJet> genJets;
@@ -606,20 +729,290 @@ int main(int argc, char* argv[])
       (*selEventsFile) << eventInfo.run << ':' << eventInfo.lumi << ':' << eventInfo.event << '\n';
     }
 
-//--- build collections of generator level particles
+    bool isTriggered_1e = hltPaths_isTriggered(triggers_1e) || (isMC && !apply_trigger_bits);
+    bool isTriggered_1e1tau = hltPaths_isTriggered(triggers_1e1tau) || (isMC && !apply_trigger_bits);
+    bool isTriggered_1mu = hltPaths_isTriggered(triggers_1mu) || (isMC && !apply_trigger_bits);
+    bool isTriggered_1mu1tau = hltPaths_isTriggered(triggers_1mu1tau) || (isMC && !apply_trigger_bits);
+
+    bool selTrigger_1e = use_triggers_1e && isTriggered_1e;
+    bool selTrigger_1e1tau = use_triggers_1e1tau && isTriggered_1e1tau;
+    bool selTrigger_1mu = use_triggers_1mu && isTriggered_1mu;
+    bool selTrigger_1mu1tau = use_triggers_1mu1tau && isTriggered_1mu1tau;
+
+    bool isTriggered_2e = hltPaths_isTriggered(triggers_2e) || (isMC && !apply_trigger_bits);
+    bool isTriggered_2mu = hltPaths_isTriggered(triggers_2mu) || (isMC && !apply_trigger_bits);
+    bool isTriggered_1e1mu = hltPaths_isTriggered(triggers_1e1mu) || (isMC && !apply_trigger_bits);
+
+    bool selTrigger_2e = use_triggers_2e && isTriggered_2e;
+    bool selTrigger_2mu = use_triggers_2mu && isTriggered_2mu;
+    bool selTrigger_1e1mu = use_triggers_1e1mu && isTriggered_1e1mu;
+
+    bool isTriggered_3e = hltPaths_isTriggered(triggers_3e) || (isMC && !apply_trigger_bits);
+    bool isTriggered_2e1mu = hltPaths_isTriggered(triggers_2e1mu) || (isMC && !apply_trigger_bits);
+    bool isTriggered_1e2mu = hltPaths_isTriggered(triggers_1e2mu) || (isMC && !apply_trigger_bits);
+    bool isTriggered_3mu = hltPaths_isTriggered(triggers_3mu) || (isMC && !apply_trigger_bits);
+
+    bool selTrigger_3e = use_triggers_3e && isTriggered_3e;
+    bool selTrigger_2e1mu = use_triggers_2e1mu && isTriggered_2e1mu;
+    bool selTrigger_1e2mu = use_triggers_1e2mu && isTriggered_1e2mu;
+    bool selTrigger_3mu = use_triggers_3mu && isTriggered_3mu;
+
+    bool passtrigger_1l_2tau = (selTrigger_1e || selTrigger_1e1tau || selTrigger_1mu|| selTrigger_1mu1tau);
+    bool passtrigger_2l = (selTrigger_1e || selTrigger_2e || selTrigger_1mu || selTrigger_2mu || selTrigger_1e1mu) ;
+    bool passtrigger_3l = (selTrigger_1e || selTrigger_1mu ||
+     selTrigger_2e || selTrigger_1e1mu || selTrigger_2mu   ||
+     selTrigger_3e || selTrigger_2e1mu || selTrigger_1e2mu || selTrigger_3mu);
+
+    /////////////////////////////////////////////////////
+    // add analyses flags
+
+    double weight_fakeRate_3L = getWeight_3L(
+      prob_fake_lepton_lead, passesTight_lepton_lead,
+      prob_fake_hadTau_lead, passesTight_hadTau_lead,
+      prob_fake_hadTau_sublead, passesTight_hadTau_sublead);
+
+    double weight_fakeRate_4L = getWeight_4L(
+        prob_fake_lepton_lead, passesTight_lepton_lead,
+        prob_fake_lepton_sublead, passesTight_lepton_sublead,
+        prob_fake_hadTau_lead, passesTight_hadTau_lead,
+        prob_fake_hadTau_sublead, passesTight_hadTau_sublead
+      );
+
+    double weight_fakeRate_2L = getWeight_2L(
+        prob_fake_lepton_lead, passesTight_lepton_lead,
+        prob_fake_lepton_sublead, passesTight_lepton_sublead
+      );
+
+    bool pass_3l = true;
+    bool pass_2lss = true;
+    bool pass_1l_2tau = true;
+    bool pass_1l_2tau_test = true;
+    bool pass_2lss_1tau = true;
+    bool pass_2los_1tau = true;
+
+    if (!passtrigger_3l) pass_3l = false;
+    if (!passtrigger_2l) {pass_2lss = false; pass_2lss_1tau = false; pass_2los_1tau = false;}
+    if (!passtrigger_1l_2tau) pass_1l_2tau = false;
+
+    bool isTriggered_SingleElectron = isTriggered_1e;
+    bool isTriggered_SingleMuon = isTriggered_1mu;
+
+    bool selTrigger_SingleElectron = selTrigger_1e;
+    //bool selTrigger_SingleMuon = selTrigger_1mu;
+    bool selTrigger_Tau = selTrigger_1e1tau || selTrigger_1mu1tau;
+
+    // there are no tau triggers now
+    //bool selTrigger_Tau = selTrigger_1e1tau || selTrigger_1mu1tau;
+    std::cout<<" before trigger      "<<pass_3l<< " "<<pass_2lss<< " "<<pass_1l_2tau<< " "<<pass_2lss_1tau<< " "<<pass_2los_1tau<<std::endl;
+    if ( selTrigger_SingleElectron && isTriggered_SingleMuon ) pass_1l_2tau_test = false;
+    if ( selTrigger_Tau && (isTriggered_SingleMuon || isTriggered_SingleElectron) ) pass_1l_2tau_test = false;
+    // #TOFIX: those two are always false --- this is to be applied only on data !!!!
+    //if ( !((fakeableElectrons.size() >= 1 && (selTrigger_1e  || selTrigger_1e1tau )) ||
+    //        (fakeableMuons.size()     >= 1 && (selTrigger_1mu || selTrigger_1mu1tau))) ) pass_1l_2tau = false;
+    //std::cout<<" triggers_1e/mu "<<selTrigger_Tau<< " "<<isTriggered_SingleMuon<< " "<<isTriggered_SingleElectron << std::endl;
+    if (pass_1l_2tau_test) count_pass_1l_2tau_test++;
+
+    std::cout<<" before minimum jets "<<pass_3l<< " "<<pass_2lss<< " "<<pass_1l_2tau<< " "<<pass_2lss_1tau<< " "<<pass_2los_1tau<< " " << (int)selJets.size() << std::endl;
+    if (!((int)selJets.size() >= 4)){pass_2lss = false;}
+    if (!((int)selJets.size() >= 3)){pass_2lss_1tau = false; pass_2los_1tau = false; pass_1l_2tau = false;}
+    if (!((int)selJets.size() >= 2)){pass_3l = false;}
+
+    //if (!hltFilter(trigger_bits, selLeptons, selHadTaus)){pass_1l_2tau = false;}
+    //if (!hltFilter(trigger_bits, selLeptons, {})) {pass_3l = false; pass_2lss = false;}
+
+    bool passAnalysis = (pass_3l || pass_2lss || pass_1l_2tau || pass_2lss_1tau || pass_2los_1tau);
+
+    bool failsLowMassVeto = false;
+    for ( std::vector<const RecoLepton*>::const_iterator lepton1 = preselLeptonsFull.begin();
+      lepton1 != preselLeptonsFull.end(); ++lepton1 ) {
+      for ( std::vector<const RecoLepton*>::const_iterator lepton2 = lepton1 + 1;
+        lepton2 != preselLeptonsFull.end(); ++lepton2 ) {
+        double mass = ((*lepton1)->p4() + (*lepton2)->p4()).mass();
+        if ( mass < 12. ) {
+          failsLowMassVeto = true;
+        }
+      }
+    }
+
+    const double minPt_lead = 25.;
+    const double minPt_sublead = 15.;
+    const double maxAbsEta_lept = 2.1;
+
+    std::cout<<" before count analysis "
+    <<pass_3l<< " "<<pass_2lss<< " "<<pass_1l_2tau<< " "<<pass_2lss_1tau<< " "<<pass_2los_1tau << " "
+    << selLeptons.size() << " " << failsLowMassVeto << " " << selBJets_loose.size() << " " << selBJets_medium.size() << " " <<
+    (selBJets_loose.size() >= 2 || selBJets_medium.size() >= 1) << " " << passAnalysis << " " <<
+    (selLeptons.size() >= 1 && !failsLowMassVeto  && (selBJets_loose.size() >= 2 || selBJets_medium.size() >= 1) &&  passAnalysis) <<std::endl;
+    if (
+      selLeptons.size() >= 1 &&
+      !failsLowMassVeto  &&
+      (selBJets_loose.size() >= 2 || selBJets_medium.size() >= 1) &&
+      passAnalysis // one of the channels passed trigger and minimum jets selection
+    )
+    {
+      const RecoLepton* selLepton_lead = selLeptons[0];
+      std::cout<<" basic                     "<<pass_3l<< " "<<pass_2lss<< " "<<pass_1l_2tau<< " "<<pass_2lss_1tau<< " "<<pass_2los_1tau << " " << selLepton_lead->cone_pt() <<std::endl;
+      if (selLepton_lead->cone_pt() > minPt_lead )
+      {
+        std::cout<<" leading lep pass pt cut "<<pass_3l<< " "<<pass_2lss<< " "<<pass_1l_2tau<< " "<<pass_2lss_1tau<< " "<<pass_2los_1tau << " " << selHadTaus.size() <<std::endl;
+        if ( selLeptons.size() == 1 )
+        { // require exactly one lepton passing tight selection criteria, to avoid overlap with other channels
+          // only on 1l_2tau
+          const double minPt_lead_E_1l_2tau = 30.;
+          if (selLepton_lead->is_electron() && !(selLepton_lead->cone_pt() > minPt_lead_E_1l_2tau)) pass_1l_2tau = false;
+          else if (!(selLepton_lead->absEta() < maxAbsEta_lept))  pass_1l_2tau = false;
+
+          if (!(selHadTaus.size() >= 2)) pass_1l_2tau = false;
+          else
+          {
+            const double minPt_hadTau_lead    = 30.;
+            const double minPt_hadTau_sublead = 20.;
+            if (selHadTaus[0]->charge()*selHadTaus[1]->charge() > 0) pass_1l_2tau = false;
+            else if ( !(selHadTaus[0]->pt() > minPt_hadTau_lead) || !(selHadTaus[1]->pt() > minPt_hadTau_sublead) ) pass_1l_2tau = false;
+          }
+          std::cout<<" passed 1l2tau         "<<pass_3l<< " "<<pass_2lss<< " "<<pass_1l_2tau<< " "<<pass_2lss_1tau<< " "<<pass_2los_1tau<<std::endl;
+        } else pass_1l_2tau = false;
+
+        if ( selLeptons.size() >= 2 )
+        {
+          bool isSameFlavor_OS = false;
+          double massSameFlavor_OS = -1.;
+          for ( std::vector<const RecoLepton*>::const_iterator lepton1 = fakeableLeptons.begin(); //TODO probably use preselected leptons OR use the full collection of fakeable leptons
+          lepton1 != fakeableLeptons.end(); ++lepton1 )
+          {
+            for ( std::vector<const RecoLepton*>::const_iterator lepton2 = lepton1 + 1;
+            lepton2 != fakeableLeptons.end(); ++lepton2 )
+            {
+              if ( (*lepton1)->pdgId() == -(*lepton2)->pdgId() )
+              { // pair of same flavor leptons of opposite charge
+                isSameFlavor_OS = true;
+                double mass = ((*lepton1)->p4() + (*lepton2)->p4()).mass();
+                if ( std::fabs(mass - z_mass) < std::fabs(massSameFlavor_OS - z_mass) ) massSameFlavor_OS = mass;
+              }
+            }
+          }
+          if ( isSameFlavor_OS && std::fabs(massSameFlavor_OS - z_mass) < z_window ) // failsZbosonMassVeto
+          {
+            pass_3l = false;
+            pass_2lss = false;
+            pass_2lss_1tau = false;
+            pass_2los_1tau = false;
+            std::cout<<" failed Zmass veto "<<pass_3l<< " "<<pass_2lss<< " "<<pass_1l_2tau<< " "<<pass_2lss_1tau<< " "<<pass_2los_1tau<<std::endl;
+          } else
+            {
+              std::cout<<" passed Zmass veto "<<pass_3l<< " "<<pass_2lss<< " "<<pass_1l_2tau<< " "<<pass_2lss_1tau<< " "<<pass_2los_1tau<<std::endl;
+              RecoMEt met = metReader->read();
+              Particle::LorentzVector mht_p4 = compMHT(fakeableLeptons, {}, selJets);
+              double met_LD = compMEt_LD(met.p4(), mht_p4);
+
+              bool failsTightChargeCut = false;
+              for ( std::vector<const RecoLepton*>::const_iterator lepton = fakeableLeptons.begin();
+              lepton != fakeableLeptons.end(); ++lepton ) {
+                if ( (*lepton)->is_electron() ) {
+                  const RecoElectron* electron = dynamic_cast<const RecoElectron*>(*lepton);
+                  assert(electron);
+                  if ( electron->tightCharge() < 2 ) failsTightChargeCut = true;
+                }
+                if ( (*lepton)->is_muon() ) {
+                  const RecoMuon* muon = dynamic_cast<const RecoMuon*>(*lepton);
+                  assert(muon);
+                  if ( muon->tightCharge() < 2 ) failsTightChargeCut = true;
+                }
+              }
+              if ( failsTightChargeCut ){pass_2lss = false; pass_2lss_1tau = false;}
+              std::cout<<" tight charge      "<<pass_3l<< " "<<pass_2lss<< " "<<pass_1l_2tau<< " "<<pass_2lss_1tau<< " "<<pass_2los_1tau<<std::endl;
+
+              const RecoLepton* selLepton_sublead = selLeptons[1];
+
+              if (!(selLepton_sublead->cone_pt() > minPt_sublead))
+              {
+                std::cout<<" pass sub lep pt "<<pass_3l<< " "<<pass_2lss<< " "<<pass_1l_2tau<< " "<<pass_2lss_1tau<< " "<<pass_2los_1tau<<std::endl;
+                pass_3l = false;
+                pass_2lss = false;
+                const double minPt_sublead_E_2l_1tau = 10.;
+                if (selHadTaus.size() >= 1)
+                {
+                  if (selLepton_sublead->is_electron()) { pass_2lss_1tau = false; pass_2los_1tau = false; }
+                  else if ( !(selLepton_sublead->cone_pt() > minPt_sublead_E_2l_1tau) ) { pass_2lss_1tau = false; pass_2los_1tau = false; }
+                }
+              }
+              if ( ((selLepton_lead->is_electron() && selLepton_sublead->is_electron()) ) && met_LD < 0.2 )
+              {
+                 pass_2lss_1tau = false; pass_2los_1tau = false;
+                 // || (selLepton_lead->is_muon() && selLepton_sublead->is_muon()) removed following gitlab
+              }
+              std::cout<<" pass met          "<<pass_3l<< " "<<pass_2lss<< " "<<pass_1l_2tau<< " "<<pass_2lss_1tau<< " "<<pass_2los_1tau<< " " << selLeptons.size() << std::endl;
+              bool isLeptonCharge_SS = selLepton_lead->charge()*selLepton_sublead->charge() > 0;
+              if ( selLeptons.size() != 2 ) pass_2lss = false;
+              if ( isLeptonCharge_SS ) pass_2lss = false;
+              if ( selHadTaus.size() >= 1  && (pass_2lss_1tau || pass_2los_1tau))
+              {
+                if (isLeptonCharge_SS) pass_2lss_1tau = false;
+                if (!isLeptonCharge_SS) pass_2los_1tau = false;
+              } else {pass_2los_1tau = false; pass_2lss_1tau = false;}
+              std::cout<<" pass charge OS/SS "<<pass_3l<< " "<<pass_2lss<< " "<<pass_1l_2tau<< " "<<pass_2lss_1tau<< " "<<pass_2los_1tau<<std::endl;
+            if ( selLeptons.size() >= 3 && pass_3l)
+            {
+              double met_LD_cut = 0.;
+              if      ( selJets.size() >= 4 ) met_LD_cut = -1.; // MET LD cut not applied
+              else if ( isSameFlavor_OS     ) met_LD_cut =  0.3;
+              else                            met_LD_cut =  0.2;
+              if ( met_LD_cut > 0 && met_LD < met_LD_cut ) pass_3l = false;
+              else if ( !(selLeptons[2]->cone_pt() > 10) ) pass_3l = false;
+              else {
+                int sumLeptonCharge = selLepton_lead->charge() + selLepton_sublead->charge() + selLeptons[2]->charge();
+                bool isCharge_SS = std::abs(sumLeptonCharge) >  1;
+                if (isCharge_SS || selHadTaus.size() > 0 )  pass_3l = false;
+              }
+            } else pass_3l = false;
+            std::cout<<" pass 3l met and pt  "<<pass_3l<< " "<<pass_2lss<< " "<<pass_1l_2tau<< " "<<pass_2lss_1tau<< " "<<pass_2los_1tau<<std::endl;
+          } // close if nor fail Z mass cut on leptons
+        } // close on two tight leptons
+      } else
+      {
+        pass_3l = false;
+        pass_2lss = false;
+        pass_1l_2tau = false;
+        pass_2lss_1tau = false;
+        pass_2los_1tau = false;
+      }
+    } else
+    {
+      pass_3l = false;
+      pass_2lss = false;
+      pass_1l_2tau = false;
+      pass_2lss_1tau = false;
+      pass_2los_1tau = false;
+    }
+    std::cout<<" pass all analysis  "<<pass_3l<< " "<<pass_2lss<< " "<<pass_1l_2tau<< " "<<pass_2lss_1tau<< " "<<pass_2los_1tau<<std::endl;
+    std::cout<<"  ------------------------   "<<std::endl;
+    if (pass_3l) count_pass_3l++;
+    if (pass_2lss) count_pass_2lss++;
+    if (pass_1l_2tau) count_pass_1l_2tau++;
+    if (pass_2lss_1tau) count_pass_2lss_1tau++;
+    if (pass_2los_1tau) count_pass_2los_1tau++;
+
+    // problably missing according to gitlab
+    //2lss: (muon: (muon.muonBestTrack()->ptError() / muon.muonBestTrack()->pt()) < 0.2,
+    //     electron: (isGsfCtfScPixChargeConsistent() + isGsfScPixChargeConsistent()) > 1)
+    //2lss1tau: At least 1 tau passing "byLooseIsolationMVArun2v1DBdR03oldDMwLT", at most one tau passing "byMediumIsolationMVArun2v1DBdR03oldDMwLT" (to avoid overlap with the 2l+2tau channel)
+    //In MC, require MC matching of the Teptons
+
+		//std::cout << "\nTreeEntry "<<analyzedEntries << " passed selection conditions "<< genWJets.size() << std::endl;
+    //std::cout << "Size of jet collections "
+    //  <<jet_ptrsHTTv2.size()<< " "<< jet_ptrsAK8.size() << " "<< jet_ptrsAK12.size() << " " << cleanedJets.size() << " " << selJets.size() << std::endl;
+
+    //--- build collections of generator level particles
     std::vector<GenParticle> genTopQuarks = genTopQuarkReader->read();
     std::vector<GenParticle> genBJets = genBJetReader->read();
     std::vector<GenParticle> genWBosons = genWBosonReader->read();
     std::vector<GenParticle> genWJets = genWJetReader->read();
     std::vector<GenParticle> genQuarkFromTop = genQuarkFromTopReader->read();
 
-    std::cout << "Size of genjet collections "
-      <<genQuarkFromTop.size()<< " "<< genWJets.size() << " " << genWBosons.size() << std::endl;
-    if (genQuarkFromTop.size() < 2) continue;
-
-		std::cout << "\nTreeEntry "<<analyzedEntries << " passed selection conditions "<< genWJets.size() << std::endl;
-    std::cout << "Size of jet collections "
-      <<jet_ptrsHTTv2.size()<< " "<< jet_ptrsAK8.size() << " "<< jet_ptrsAK12.size() << " " << cleanedJets.size() << " " << selJets.size() << std::endl;
+    //std::cout << "Size of genjet collections "
+    //  <<genQuarkFromTop.size()<< " "<< genWJets.size() << " " << genWBosons.size() << std::endl;
+    bool passHadGenHadW = false;
+    if (genQuarkFromTop.size() < 2) passHadGenHadW = true; // put a flag here instead
 
     Particle::LorentzVector unfittedHadTopP4, selBJet, selWJet1, selWJet2 ;
     bool isGenMatched = false;
@@ -627,8 +1020,8 @@ int main(int argc, char* argv[])
     bool b_isGenMatched = false;
     bool wj1_isGenMatched = false;
     bool wj2_isGenMatched = false;
-    double genTopPt = -1.;
-    double genTopEta = -1.;
+    //double genTopPt = -1.;
+    //double genTopEta = -1.;
     double genFatPtAll = -1.;
     double drT_gen = -1.;
     double drW_gen = -1.;
@@ -662,6 +1055,7 @@ int main(int argc, char* argv[])
     bool cat1 = false;
     bool cat2 = false;
     bool cat3 = false;
+    bool passJetMassSel = false;
 
     // it returns the gen-triplets organized in top/anti-top
     std::map<int, Particle::LorentzVector> genVar = isGenMatchedJetTripletVar(genTopQuarks, genBJets, genWBosons, genQuarkFromTop, kGenTop); // genWJets,
@@ -676,13 +1070,13 @@ int main(int argc, char* argv[])
         genTopMassFromWj = (genVar[kGenTopWj1]+genVar[kGenTopWj2]+genVar[kGenTopB]).mass();
         genWMassFromWj = (genVar[kGenTopWj1]+genVar[kGenTopWj2]).mass();
         genWMass = genVar[kGenTopW].mass();
-        std::cout<<" mass W/T  "<< genVar[kGenTop].mass() << " "<< (genVar[kGenTopW]+genVar[kGenTopB]).mass() << " (" << genVar[kGenTopW].mass() <<") " << " (" << genWMassFromWj <<") " <<std::endl;
+        //std::cout<<" mass W/T  "<< genVar[kGenTop].mass() << " "<< (genVar[kGenTopW]+genVar[kGenTopB]).mass() << " (" << genVar[kGenTopW].mass() <<") " << " (" << genWMassFromWj <<") " <<std::endl;
       } else if (genVarAnti[kGenTopWj1].px() > 0){
         genAntiTopMassFromW = (genVarAnti[kGenTopW]+genVarAnti[kGenTopB]).mass();
         genAntiTopMassFromWj = (genVarAnti[kGenTopWj1]+genVarAnti[kGenTopWj2]+genVarAnti[kGenTopB]).mass();
         genAntiWMassFromWj = (genVarAnti[kGenTopWj1]+genVarAnti[kGenTopWj2]).mass();
         genAntiWMass = genVarAnti[kGenTopW].mass();
-        std::cout<<" mass anti W/T  "<< genVarAnti[kGenTop].mass() << " "<< (genVarAnti[kGenTopW]+genVarAnti[kGenTopB]).mass() << " (" << genVarAnti[kGenTopW].mass() <<") " << " (" << genAntiWMassFromWj <<") "  <<std::endl;
+        //std::cout<<" mass anti W/T  "<< genVarAnti[kGenTop].mass() << " "<< (genVarAnti[kGenTopW]+genVarAnti[kGenTopB]).mass() << " (" << genVarAnti[kGenTopW].mass() <<") " << " (" << genAntiWMassFromWj <<") "  <<std::endl;
       }
     } else if (genQuarkFromTop.size() == 4) {
 
@@ -690,20 +1084,19 @@ int main(int argc, char* argv[])
         genTopMassFromW = (genVar[kGenTopW]+genVar[kGenTopB]).mass();
         genTopMassFromWj = (genVar[kGenTopWj1]+genVar[kGenTopWj2]+genVar[kGenTopB]).mass();
         genWMassFromWj = (genVar[kGenTopWj1]+genVar[kGenTopWj2]).mass();
-        std::cout<<" mass W/T  "<< genVar[kGenTop].mass() << " "<< (genVar[kGenTopW]+genVar[kGenTopB]).mass() << " (" << genVar[kGenTopW].mass() << ") " << " (" << genWMassFromWj << ") "  <<std::endl;
+        //std::cout<<" mass W/T  "<< genVar[kGenTop].mass() << " "<< (genVar[kGenTopW]+genVar[kGenTopB]).mass() << " (" << genVar[kGenTopW].mass() << ") " << " (" << genWMassFromWj << ") "  <<std::endl;
       }
 
       if ( genVarAnti[kGenTopWj1].px() > 0 ) {
         genAntiTopMassFromW = (genVarAnti[kGenTopW]+genVarAnti[kGenTopB]).mass();
         genAntiTopMassFromWj = (genVarAnti[kGenTopWj1]+genVarAnti[kGenTopWj2]+genVarAnti[kGenTopB]).mass();
         genAntiWMassFromWj = (genVarAnti[kGenTopWj1]+genVarAnti[kGenTopWj2]).mass();
-      std::cout<<" mass anti W/T  "<< genVarAnti[kGenTop].mass() << " "<< (genVarAnti[kGenTopW]+genVarAnti[kGenTopB]).mass() << " (" << genVarAnti[kGenTopW].mass() << ") " << " (" << genAntiWMassFromWj << ") "<<std::endl;
+      //std::cout<<" mass anti W/T  "<< genVarAnti[kGenTop].mass() << " "<< (genVarAnti[kGenTopW]+genVarAnti[kGenTopB]).mass() << " (" << genVarAnti[kGenTopW].mass() << ") " << " (" << genAntiWMassFromWj << ") "<<std::endl;
       }
 
     } else std::cout<<" unusual genQuarkFromTop.size()  "<< genQuarkFromTop.size() <<std::endl;
-    if (genAntiTopMassFromWj > 0 && (genAntiWMassFromWj > 125.)) throw cms::Exception("analyze_hadTopTagger")
-      <<"            mass anti W/T  "<< genVarAnti[kGenTop].mass() << "                "<< (genVarAnti[kGenTopW]+genVarAnti[kGenTopB]).mass() << " " << genAntiTopMassFromWj << "      (" << genVarAnti[kGenTopW].mass() << ") " << " (" << genAntiWMassFromWj << ") " << genQuarkFromTop.size() << " !!\n";
-      //  mass anti W/T  171.5                171.697 137.421      (78.25)  (78.2831) 4 !!
+    //if (genAntiTopMassFromWj > 0 && (genAntiWMassFromWj > 125.)) throw cms::Exception("analyze_hadTopTagger")
+    //  <<"            mass anti W/T  "<< genVarAnti[kGenTop].mass() << "                "<< (genVarAnti[kGenTopW]+genVarAnti[kGenTopB]).mass() << " " << genAntiTopMassFromWj << "      (" << genVarAnti[kGenTopW].mass() << ") " << " (" << genAntiWMassFromWj << ") " << genQuarkFromTop.size() << " !!\n";
 
 
     // to be used at analysis level
@@ -719,8 +1112,9 @@ int main(int argc, char* argv[])
       for ( std::vector<const RecoJetHTTv2*>::const_iterator jetIter = jet_ptrsHTTv2.begin();
         jetIter != jet_ptrsHTTv2.end(); ++jetIter ) {
           genFatPtAll = -1.;
-          genTopEta = -2.5;
+          genFatEtaAll = -2.5;
           unfittedHadTopP4 = (*jetIter)->p4();
+          if ( unfittedHadTopP4.M() > 95 && unfittedHadTopP4.M() < 225 ) passJetMassSel = true;
           HTTv2_area = (*jetIter)->area();
           HTTv2_Ropt = (*jetIter)->Ropt();
           HTTv2_RoptCalc = (*jetIter)->RoptCalc();
@@ -733,7 +1127,7 @@ int main(int argc, char* argv[])
           double btag_discType1 = -1;
 
           // loop on bjetCandidate version 1 :
-          bool foundtruth = false;
+          //bool foundtruth = false;
           //for (int bb = 0; bb < 3; bb++) {
           //  if (foundtruth) continue;
           //  for (int wj1 = 0; wj1 < 3; wj1++) {
@@ -776,9 +1170,9 @@ int main(int argc, char* argv[])
             selWJet2 = recSubJet[btag_order[2]]->p4();
             btag_orderType1 = 1;
             btag_discType1 = recSubJet[btag_order[0]]->BtagCSV();
-            std::cout<<"btag discr  ";
-            for (auto i: btag_disc) std::cout << i << " ";
-            std::cout<<" position of highest  "<< btag_order[0] << " (" << btag_discType1 <<") "<< foundtruth <<std::endl;
+            //std::cout<<"btag discr  ";
+            //for (auto i: btag_disc) std::cout << i << " ";
+            //std::cout<<" position of highest  "<< btag_order[0] << " (" << btag_discType1 <<") "<< foundtruth <<std::endl;
 
             std::map<int, bool> genMatchingTop = isGenMatchedJetTriplet(
               selBJet, selWJet1, selWJet2,
@@ -790,16 +1184,16 @@ int main(int argc, char* argv[])
               genVarAnti[kGenTop], genVarAnti[kGenTopB], genVarAnti[kGenTopW], genVarAnti[kGenTopWj1], genVarAnti[kGenTopWj2],
               kGenAntiTop, typeTop, unfittedHadTopP4
             );
-            if(genMatchingTop[kGenMatchedTriplet]) { genTopPt = genVar[kGenTop].pt();  genTopEta = genVar[kGenTop].eta();}
-            if(genMatchingAntiTop[kGenMatchedTriplet]) { genTopPt = genVarAnti[kGenTop].pt();  genTopEta = genVarAnti[kGenTop].eta();}
+            //if(genMatchingTop[kGenMatchedTriplet]) { genTopPt = genVar[kGenTop].pt();  genTopEta = genVar[kGenTop].eta();}
+            //if(genMatchingAntiTop[kGenMatchedTriplet]) { genTopPt = genVarAnti[kGenTop].pt();  genTopEta = genVarAnti[kGenTop].eta();}
 
             isGenMatched = (genMatchingTop[kGenMatchedTriplet] || genMatchingAntiTop[kGenMatchedTriplet]);
             fatjet_isGenMatched = (genMatchingTop[kGenMatchedFatJet] || genMatchingAntiTop[kGenMatchedFatJet]);
             b_isGenMatched = (genMatchingTop[kGenMatchedBJet] || genMatchingAntiTop[kGenMatchedBJet]);
             wj1_isGenMatched = (genMatchingTop[kGenMatchedWJet1] || genMatchingAntiTop[kGenMatchedWJet1]);
             wj2_isGenMatched = (genMatchingTop[kGenMatchedWJet2] || genMatchingAntiTop[kGenMatchedWJet2]);
-            if (b_isGenMatched) foundtruth = true; // if loop on subjets
-            if (isGenMatched) {hadtruth1++; cat1 = true; foundtruth = true;}
+            //if (b_isGenMatched) foundtruth = true; // if loop on subjets
+            if (isGenMatched) {hadtruth1++; cat1 = true; } // foundtruth = true;
           //}}} // end loop on subjets version 1
           //} // end loop on subjets version 2
           // debug gen-matching
@@ -873,8 +1267,8 @@ int main(int argc, char* argv[])
             ("btagDisc",             btag_discType1)
             ("qg_Wj1",                -1.)
             ("qg_Wj2",                -1.)
-            ("genTopPt",             genTopPt)
-            ("genTopEta",            std::fabs(genTopEta))
+            //("genTopPt",             genTopPt)
+            //("genTopEta",            std::fabs(genTopEta))
             ("genFatPtAll", genFatPtAll)
             ("genFatEtaAll",         std::fabs(genFatEtaAll))
             ("drT_gen",       drT_gen)
@@ -904,12 +1298,8 @@ int main(int argc, char* argv[])
             ("Wj1_isGenMatched", wj1_isGenMatched)
             ("Wj2_isGenMatched", wj2_isGenMatched)
             ("counter",        analyzedEntries)
-            ("nbjets",  selBJets_medium.size())
-            ("nbjets_loose",  selBJets_loose.size())
-            ("njets",  selJets.size())
-            ("nlep",  selElectrons.size()+selMuons.size())
-            ("ntau",  selHadTaus.size())
             ("passJetSel", passJetSel)
+            ("passJetMassSel", passJetMassSel)
             ("HTTv2_area", HTTv2_area)
             ("HTTv2_Ropt", HTTv2_Ropt)
             ("HTTv2_RoptCalc", HTTv2_RoptCalc)
@@ -921,6 +1311,16 @@ int main(int argc, char* argv[])
             ("genAntiWMassFromWj", genAntiWMassFromWj )
             ("genWMass", genWMass)
             ("genAntiWMass", genAntiWMass)
+            ("genWeight", eventInfo.genWeight) // to count nevents with neg weights
+            ("weight_fakeRate_3L", weight_fakeRate_3L)
+            ("weight_fakeRate_4L", weight_fakeRate_4L)
+            ("weight_fakeRate_2L", weight_fakeRate_2L)
+            ("passHadGenHadW", passHadGenHadW)
+            ("pass_3l", pass_3l)
+            ("pass_2lss", pass_2lss)
+            ("pass_1l_2tau", pass_1l_2tau)
+            ("pass_2lss_1tau", pass_2lss_1tau)
+            ("pass_2los_1tau", pass_2los_1tau)
                 .fill();
           }
         } // end typeTop == 1
@@ -937,11 +1337,12 @@ int main(int argc, char* argv[])
     // classify between 2 and 3
     if (inAK12) { // typeTop == 2 and
       if (jet_ptrsAK12.size() > 0 && cleanedJets.size() > 0) {countFatAK12++; typeTop = 2;}
-      std::cout<<" typeTop = "<<typeTop<<std::endl;
+      //std::cout<<" typeTop = "<<typeTop<<std::endl;
       for ( std::vector<const RecoJetAK12*>::const_iterator jetIter = jet_ptrsAK12.begin();
         jetIter != jet_ptrsAK12.end(); ++jetIter ) {
           for ( unsigned int bjetCandidate = 0; bjetCandidate < bToLoop; bjetCandidate++ ) { // cleanedJets.size()
               unfittedHadTopP4 = (*jetIter)->p4() + (*cleanedJets[bjetCandidate]).p4();
+              if ( unfittedHadTopP4.M() > 95 && unfittedHadTopP4.M() < 225 ) passJetMassSel = true;
               selBJet = (*cleanedJets[bjetCandidate]).p4();
               if((*jetIter)->subJet1() && (*jetIter)->subJet2()) {
               selWJet1 = (*jetIter)->subJet1()->p4();
@@ -957,8 +1358,8 @@ int main(int argc, char* argv[])
                 genVarAnti[kGenTop], genVarAnti[kGenTopB], genVarAnti[kGenTopW], genVarAnti[kGenTopWj1], genVarAnti[kGenTopWj2],
                 kGenAntiTop, typeTop, (*jetIter)->p4()
               );
-              if(genMatchingTop[kGenMatchedTriplet]) { genTopPt = genVar[kGenTop].pt();  genTopEta = genVar[kGenTop].eta();}
-              if(genMatchingAntiTop[kGenMatchedTriplet]) { genTopPt = genVarAnti[kGenTop].pt();  genTopEta = genVarAnti[kGenTop].eta();}
+              //if(genMatchingTop[kGenMatchedTriplet]) { genTopPt = genVar[kGenTop].pt();  genTopEta = genVar[kGenTop].eta();}
+              //if(genMatchingAntiTop[kGenMatchedTriplet]) { genTopPt = genVarAnti[kGenTop].pt();  genTopEta = genVarAnti[kGenTop].eta();}
 
               isGenMatched = (genMatchingTop[kGenMatchedTriplet] || genMatchingAntiTop[kGenMatchedTriplet]);
               fatjet_isGenMatched = (genMatchingTop[kGenMatchedFatJet] || genMatchingAntiTop[kGenMatchedFatJet]);
@@ -1036,8 +1437,8 @@ int main(int argc, char* argv[])
                 ("btagDisc",             (*cleanedJets[bjetCandidate]).BtagCSV())
                 ("qg_Wj1",                -1.)
                 ("qg_Wj2",                -1.)
-                ("genTopPt",             genTopPt)
-                ("genTopEta",             std::fabs(genTopEta))
+                //("genTopPt",             genTopPt)
+                //("genTopEta",             std::fabs(genTopEta))
                 ("genFatPtAll", genFatPtAll)
                 ("genFatEtaAll",         std::fabs(genFatEtaAll))
                 ("drT_gen",       drT_gen)
@@ -1067,12 +1468,8 @@ int main(int argc, char* argv[])
                 ("Wj1_isGenMatched", wj1_isGenMatched)
                 ("Wj2_isGenMatched", wj2_isGenMatched)
                 ("counter",       analyzedEntries)
-                ("nbjets",  selBJets_medium.size())
-                ("nbjets_loose",  selBJets_loose.size())
-                ("njets",  selJets.size())
-                ("nlep",  selElectrons.size()+selMuons.size())
-                ("ntau",  selHadTaus.size())
                 ("passJetSel", passJetSel)
+                ("passJetMassSel", passJetMassSel)
                 ("HTTv2_area", HTTv2_area)
                 ("HTTv2_Ropt", HTTv2_Ropt)
                 ("HTTv2_RoptCalc", HTTv2_RoptCalc)
@@ -1084,6 +1481,16 @@ int main(int argc, char* argv[])
                 ("genAntiWMassFromWj", genAntiWMassFromWj )
                 ("genWMass", genWMass)
                 ("genAntiWMass", genAntiWMass)
+                ("genWeight", eventInfo.genWeight) // to count nevents with neg weights
+                ("weight_fakeRate_3L", weight_fakeRate_3L)
+                ("weight_fakeRate_4L", weight_fakeRate_4L)
+                ("weight_fakeRate_2L", weight_fakeRate_2L)
+                ("passHadGenHadW", passHadGenHadW)
+                ("pass_3l", pass_3l)
+                ("pass_2lss", pass_2lss)
+                ("pass_1l_2tau", pass_1l_2tau)
+                ("pass_2lss_1tau", pass_2lss_1tau)
+                ("pass_2los_1tau", pass_2los_1tau)
                     .fill();
               }
             } else { std::cout<<" type2 akt12 did not had subjets "<<std::endl; continue;}
@@ -1095,6 +1502,7 @@ int main(int argc, char* argv[])
           jetIter != jet_ptrsAK8.end(); ++jetIter ) {
             for ( unsigned int bjetCandidate = 0; bjetCandidate < bToLoop; bjetCandidate++ ) { // cleanedJets.size()
                 unfittedHadTopP4 = (*jetIter)->p4() + (*cleanedJets[bjetCandidate]).p4();
+                if ( unfittedHadTopP4.M() > 95 && unfittedHadTopP4.M() < 225 ) passJetMassSel = true;
                 selBJet = (*cleanedJets[bjetCandidate]).p4();
                 if((*jetIter)->subJet1() && (*jetIter)->subJet2()) {
                 selWJet1 = (*jetIter)->subJet1()->p4();
@@ -1110,8 +1518,8 @@ int main(int argc, char* argv[])
                   genVarAnti[kGenTop], genVarAnti[kGenTopB], genVarAnti[kGenTopW], genVarAnti[kGenTopWj1], genVarAnti[kGenTopWj2],
                   kGenAntiTop, typeTop, (*jetIter)->p4()
                 );
-                if(genMatchingTop[kGenMatchedTriplet]) { genTopPt = genVar[kGenTop].pt();  genTopEta = genVar[kGenTop].eta();}
-                if(genMatchingAntiTop[kGenMatchedTriplet]) { genTopPt = genVarAnti[kGenTop].pt();  genTopEta = genVarAnti[kGenTop].eta();}
+                //if(genMatchingTop[kGenMatchedTriplet]) { genTopPt = genVar[kGenTop].pt();  genTopEta = genVar[kGenTop].eta();}
+                //if(genMatchingAntiTop[kGenMatchedTriplet]) { genTopPt = genVarAnti[kGenTop].pt();  genTopEta = genVarAnti[kGenTop].eta();}
 
                 isGenMatched = (genMatchingTop[kGenMatchedTriplet] || genMatchingAntiTop[kGenMatchedTriplet]);
                 fatjet_isGenMatched = (genMatchingTop[kGenMatchedFatJet] || genMatchingAntiTop[kGenMatchedFatJet]);
@@ -1183,8 +1591,8 @@ int main(int argc, char* argv[])
                   ("btagDisc",             (*cleanedJets[bjetCandidate]).BtagCSV())
                   ("qg_Wj1",                -1.)
                   ("qg_Wj2",                -1.)
-                  ("genTopPt",             genTopPt)
-                  ("genTopEta",             genTopEta)
+                  //("genTopPt",             genTopPt)
+                  //("genTopEta",             genTopEta)
                   ("genFatPtAll", genFatPtAll)
                   ("genFatEtaAll",         std::fabs(genFatEtaAll))
                   ("drT_gen",       drT_gen)
@@ -1214,12 +1622,8 @@ int main(int argc, char* argv[])
                   ("Wj1_isGenMatched", wj1_isGenMatched)
                   ("Wj2_isGenMatched", wj2_isGenMatched)
                   ("counter",        analyzedEntries)
-                  ("nbjets",  selBJets_medium.size())
-                  ("nbjets_loose",  selBJets_loose.size())
-                  ("njets",  selJets.size())
-                  ("nlep",  selElectrons.size()+selMuons.size())
-                  ("ntau",  selHadTaus.size())
                   ("passJetSel", passJetSel)
+                  ("passJetMassSel", passJetMassSel)
                   ("HTTv2_area", HTTv2_area)
                   ("HTTv2_Ropt", HTTv2_Ropt)
                   ("HTTv2_RoptCalc", HTTv2_RoptCalc)
@@ -1231,6 +1635,16 @@ int main(int argc, char* argv[])
                   ("genAntiWMassFromWj", genAntiWMassFromWj )
                   ("genWMass", genWMass)
                   ("genAntiWMass", genAntiWMass)
+                  ("genWeight", eventInfo.genWeight) // to count nevents with neg weights
+                  ("weight_fakeRate_3L", weight_fakeRate_3L)
+                  ("weight_fakeRate_4L", weight_fakeRate_4L)
+                  ("weight_fakeRate_2L", weight_fakeRate_2L)
+                  ("passHadGenHadW", passHadGenHadW)
+                  ("pass_3l", pass_3l)
+                  ("pass_2lss", pass_2lss)
+                  ("pass_1l_2tau", pass_1l_2tau)
+                  ("pass_2lss_1tau", pass_2lss_1tau)
+                  ("pass_2los_1tau", pass_2los_1tau)
                       .fill();
                 }
               } else { std::cout<<" type2 akt8 did not had subjets "<<std::endl; continue;}
@@ -1247,7 +1661,7 @@ int main(int argc, char* argv[])
           std::vector<double> btag_disc = getBdiscr(selJets);
           auto btag_order_selJets = calRank(btag_disc);
           typeTop = 3;
-          std::cout<<" typeTop = "<<typeTop<<std::endl;
+          //std::cout<<" typeTop = "<<typeTop<<std::endl;
           countResolved++;
           for ( unsigned int bjetCandidate = 0; bjetCandidate < selJets.size(); bjetCandidate++ )  {
             for ( std::vector<const RecoJet*>::const_iterator selWJet1Candidate = selJets.begin();
@@ -1272,8 +1686,8 @@ int main(int argc, char* argv[])
                     genVarAnti[kGenTop], genVarAnti[kGenTopB], genVarAnti[kGenTopW], genVarAnti[kGenTopWj1], genVarAnti[kGenTopWj2],
                     kGenAntiTop
                   );
-                  if(genMatchingTop[kGenMatchedTriplet]) { genTopPt = genVar[kGenTop].pt();  genTopEta = genVar[kGenTop].eta();}
-                  if(genMatchingAntiTop[kGenMatchedTriplet]) { genTopPt = genVarAnti[kGenTop].pt();  genTopEta = genVarAnti[kGenTop].eta();}
+                  //if(genMatchingTop[kGenMatchedTriplet]) { genTopPt = genVar[kGenTop].pt();  genTopEta = genVar[kGenTop].eta();}
+                  //if(genMatchingAntiTop[kGenMatchedTriplet]) { genTopPt = genVarAnti[kGenTop].pt();  genTopEta = genVarAnti[kGenTop].eta();}
 
                   isGenMatched = (genMatchingTop[kGenMatchedTriplet] || genMatchingAntiTop[kGenMatchedTriplet]);
                   fatjet_isGenMatched = (genMatchingTop[kGenMatchedFatJet] || genMatchingAntiTop[kGenMatchedFatJet]);
@@ -1322,6 +1736,9 @@ int main(int argc, char* argv[])
                     drwj1_wj2_gen = deltaR(genVarAnti[kGenTopWj1], genVarAnti[kGenTopWj2]);
                   }
 
+                  unfittedHadTopP4 = selBJet+selWJet1+selWJet2;
+                  if ( unfittedHadTopP4.M() > 95 && unfittedHadTopP4.M() < 225 ) passJetMassSel = true;
+
                   if ( bdt_filler ) {
                     (*hadTopTaggerFill)(selBJet, selWJet1, selWJet2);
                     const std::map<std::string, double>& mvaInputs =  hadTopTaggerFill->mvaInputs();
@@ -1339,8 +1756,8 @@ int main(int argc, char* argv[])
                   ("btagDisc",             (*selJets[bjetCandidate]).BtagCSV())
                   ("qg_Wj1",               (*selWJet1Candidate)->QGDiscr())
                   ("qg_Wj2",               (*selWJet2Candidate)->QGDiscr())
-                  ("genTopPt",             genTopPt)
-                  ("genTopEta",             genTopEta)
+                  //("genTopPt",             genTopPt)
+                  //("genTopEta",             genTopEta)
                   ("genFatPtAll", genFatPtAll)
                   ("genFatEtaAll",         std::fabs(genFatEtaAll))
                   ("drT_gen",       drT_gen)
@@ -1370,12 +1787,8 @@ int main(int argc, char* argv[])
                   ("Wj1_isGenMatched", wj1_isGenMatched)
                   ("Wj2_isGenMatched", wj2_isGenMatched)
                   ("counter",         analyzedEntries)
-                  ("nbjets",  selBJets_medium.size())
-                  ("nbjets_loose",  selBJets_loose.size())
-                  ("njets",  selJets.size())
-                  ("nlep",  selElectrons.size()+selMuons.size())
-                  ("ntau",  selHadTaus.size())
                   ("passJetSel", passJetSel)
+                  ("passJetMassSel", passJetMassSel)
                   ("HTTv2_area", HTTv2_area)
                   ("HTTv2_Ropt", HTTv2_Ropt)
                   ("HTTv2_RoptCalc", HTTv2_RoptCalc)
@@ -1387,6 +1800,16 @@ int main(int argc, char* argv[])
                   ("genAntiWMassFromWj", genAntiWMassFromWj )
                   ("genWMass", genWMass)
                   ("genAntiWMass", genAntiWMass)
+                  ("genWeight", eventInfo.genWeight) // to count nevents with neg weights
+                  ("weight_fakeRate_3L", weight_fakeRate_3L)
+                  ("weight_fakeRate_4L", weight_fakeRate_4L)
+                  ("weight_fakeRate_2L", weight_fakeRate_2L)
+                  ("passHadGenHadW", passHadGenHadW)
+                  ("pass_3l", pass_3l)
+                  ("pass_2lss", pass_2lss)
+                  ("pass_1l_2tau", pass_1l_2tau)
+                  ("pass_2lss_1tau", pass_2lss_1tau)
+                  ("pass_2los_1tau", pass_2los_1tau)
                       .fill();
                  }
               }
@@ -1415,6 +1838,14 @@ int main(int argc, char* argv[])
   std::cout << "+ closest genTop > 200 " << countFatTopPt200 << " " << countFatTopbmatch << " " << countFatTopWj1match << " " << countFatTopWj2match <<std::endl;
 
   std::cout << countFatWpt130 << "fatW  " << countFatWjets << " " << " " << countFatW <<std::endl;
+
+
+  std::cout <<std::endl<< "pass_3l  " << count_pass_3l <<std::endl;
+  std::cout << "pass_2lss  " << count_pass_2lss <<std::endl;
+  std::cout << "pass_1l_2tau  " << count_pass_1l_2tau <<std::endl;
+  std::cout << "pass_2lss_1tau  " << count_pass_2lss_1tau <<std::endl;
+  std::cout << "2los_1tau  " << count_pass_2los_1tau <<std::endl;
+  std::cout <<std::endl<< "count_pass_1l_2tau_test  " << count_pass_1l_2tau_test <<std::endl;
 
   std::cout << "max num. Entries = " << inputTree -> getCumulativeMaxEventCount()
             << " (limited by " << maxEvents << ") processed in "

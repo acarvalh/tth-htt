@@ -5,9 +5,9 @@ RecoJetSelectorHTTv2::RecoJetSelectorHTTv2(int era,
                                  bool debug)
   : min_pt_(200.)
   , max_absEta_(2.4) // reccomended to use btag on the subjets
-  , subJet1_min_jetId_(0) // it is a bool, it shall be > 0 to be true
-  , subJet2_min_jetId_(0) // it is a bool, it shall be > 0 to be true
-  , subJet3_min_jetId_(0) // it is a bool, it shall be > 0 to be true
+  , subJet1_min_jetId_(1) // it is a bool, it shall be > 0 to be true
+  , subJet2_min_jetId_(1) // it is a bool, it shall be > 0 to be true
+  , subJet3_min_jetId_(1) // it is a bool, it shall be > 0 to be true
   , subJet1_min_pt_(30.)
   , subJet2_min_pt_(30.)
   , subJet3_min_pt_(30.)
@@ -45,21 +45,21 @@ RecoJetSelectorHTTv2::set_subJet3_min_jetId(int subJet3_min_jetId)
 }
 
 void
-RecoJetSelectorHTTv2::set_subJet1_min_pt(int subJet1_min_jetId)
+RecoJetSelectorHTTv2::set_subJet1_min_pt(double subJet1_min_pt)
 {
-  subJet1_min_jetId_ = subJet1_min_jetId;
+  subJet1_min_pt_ = subJet1_min_pt;
 }
 
 void
-RecoJetSelectorHTTv2::set_subJet2_min_pt(int subJet2_min_jetId)
+RecoJetSelectorHTTv2::set_subJet2_min_pt(double subJet2_min_pt)
 {
-  subJet2_min_jetId_ = subJet2_min_jetId;
+  subJet2_min_pt_ = subJet2_min_pt;
 }
 
 void
-RecoJetSelectorHTTv2::set_subJet3_min_pt(int subJet3_min_jetId)
+RecoJetSelectorHTTv2::set_subJet3_min_pt(double subJet3_min_pt)
 {
-  subJet3_min_jetId_ = subJet3_min_jetId;
+  subJet3_min_pt_ = subJet3_min_pt;
 }
 
 double
@@ -92,19 +92,19 @@ RecoJetSelectorHTTv2::get_subJet3_min_jetId() const
   return subJet3_min_jetId_;
 }
 
-int
+double
 RecoJetSelectorHTTv2::get_subJet1_min_pt() const
 {
   return subJet1_min_pt_;
 }
 
-int
+double
 RecoJetSelectorHTTv2::get_subJet2_min_pt() const
 {
   return subJet2_min_pt_;
 }
 
-int
+double
 RecoJetSelectorHTTv2::get_subJet3_min_pt() const
 {
   return subJet3_min_pt_;
@@ -113,21 +113,25 @@ RecoJetSelectorHTTv2::get_subJet3_min_pt() const
 bool
 RecoJetSelectorHTTv2::operator()(const RecoJetHTTv2 & jet) const
 {
+  if ( (jet.subJet1()) && (jet.subJet2()) && (jet.subJet3()) )
+  {
   const bool passes =
     jet.pt()     >= min_pt_     &&
     jet.absEta() <= max_absEta_ &&
-    jet.subJet1()->IDPassed()  > subJet1_min_jetId_ &&
-    jet.subJet2()->IDPassed()  > subJet2_min_jetId_ &&
-    jet.subJet3()->IDPassed()  > subJet3_min_jetId_ &&
+    jet.subJet1()->IDPassed()  == subJet1_min_jetId_ &&
+    jet.subJet2()->IDPassed()  == subJet2_min_jetId_ &&
+    jet.subJet3()->IDPassed()  == subJet3_min_jetId_ &&
     jet.subJet1()->pt()  >= subJet1_min_pt_ &&
     jet.subJet2()->pt()  >= subJet2_min_pt_ &&
     jet.subJet3()->pt()  >= subJet3_min_pt_
   ;
   if(debug_)
   {
+
     std::cout << "<RecoJetSelector::operator()>:\n jet: " << jet << " "
                  "(" << (passes ? "passes" : "fails") << ")\n"
     ;
   }
   return passes;
+  } else return false;
 }

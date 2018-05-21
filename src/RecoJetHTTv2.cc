@@ -104,31 +104,6 @@ RecoJetHTTv2::tau3() const
   return tau3_;
 }
 
-/*
-Double_t
-RecoJetHTTv2::mass() const
-{
-  return mass_;
-}
-
-Double_t
-RecoJetHTTv2::pt() const
-{
-  return pt_;
-}
-
-Double_t
-RecoJetHTTv2::eta() const
-{
-  return eta_;
-}
-
-Double_t
-RecoJetHTTv2::phi() const
-{
-  return phi_;
-}
-*/
 std::ostream &
 operator<<(std::ostream & stream,
            const RecoJetHTTv2 & jet)
@@ -140,10 +115,6 @@ operator<<(std::ostream & stream,
             " tau1 = " << jet.tau1()                 << ","
             " tau2 = " << jet.tau2()                 << ","
             " tau3 = " << jet.tau3()                 << ",\n"
-						//" mass = " << jet.mass()                 << ","
-						//" pt = " << jet.pt()                     << ","
-						//" eta = " << jet.eta()                   << ","
-						//" phi = " << jet.phi()                   << ",\n"
             " subjets:";
   stream << ",\n  idx1 = " << jet.subJet1();
   if(jet.subJet1())

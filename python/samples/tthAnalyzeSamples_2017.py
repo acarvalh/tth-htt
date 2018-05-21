@@ -1577,4 +1577,3 @@ samples_2017["/ZZZ_TuneCP5_13TeV-amcatnlo-pythia8/RunIIFall17MiniAOD-94X_mc2017_
     ]
   ),
 ])
-

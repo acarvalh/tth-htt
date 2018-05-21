@@ -20,9 +20,9 @@ public:
   void set_subJet1_min_jetId(int subJet1_min_jetId); // bool: eta cut in subjets is already here (also pt>20 GeV)
   void set_subJet2_min_jetId(int subJet2_min_jetId);
   void set_subJet3_min_jetId(int subJet3_min_jetId);
-  void set_subJet1_min_pt(int subJet1_min_pt); // reccomendation in documentation is 30 GeV
-  void set_subJet2_min_pt(int subJet2_min_pt);
-  void set_subJet3_min_pt(int subJet3_min_pt);
+  void set_subJet1_min_pt(double subJet1_min_pt); // reccomendation in documentation is 30 GeV
+  void set_subJet2_min_pt(double subJet2_min_pt);
+  void set_subJet3_min_pt(double subJet3_min_pt);
   /**
    * @brief Get cut thresholds
    */
@@ -31,9 +31,9 @@ public:
   int get_subJet1_min_jetId() const;
   int get_subJet2_min_jetId() const;
   int get_subJet3_min_jetId() const;
-  int get_subJet1_min_pt() const;
-  int get_subJet2_min_pt() const;
-  int get_subJet3_min_pt() const;
+  double get_subJet1_min_pt() const;
+  double get_subJet2_min_pt() const;
+  double get_subJet3_min_pt() const;
 
   /**
    * @brief
@@ -48,9 +48,9 @@ protected:
   Int_t subJet1_min_jetId_;     ///< lower cut threshold on jet ID value
   Int_t subJet2_min_jetId_;     ///< lower cut threshold on jet ID value
   Int_t subJet3_min_jetId_;     ///< lower cut threshold on jet ID value
-  Int_t subJet1_min_pt_;     ///< lower cut threshold on jet pt value
-  Int_t subJet2_min_pt_;     ///< lower cut threshold on jet pt value
-  Int_t subJet3_min_pt_;     ///< lower cut threshold on jet pt value
+  Double_t subJet1_min_pt_;     ///< lower cut threshold on jet pt value
+  Double_t subJet2_min_pt_;     ///< lower cut threshold on jet pt value
+  Double_t subJet3_min_pt_;     ///< lower cut threshold on jet pt value
   bool debug_;
 };
 

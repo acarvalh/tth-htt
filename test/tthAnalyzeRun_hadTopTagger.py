@@ -8,7 +8,7 @@ from tthAnalysis.HiggsToTauTau.runConfig import tthAnalyzeParser, filter_samples
 # E.g.: ./tthAnalyzeRun_hadTopTagger.py -v 2017Dec13 -e 2017
 
 parser = tthAnalyzeParser()
-parser.add_tau_id_wp('dR03mvaLoose')
+parser.add_tau_id_wp('dR03mvaMedium')
 parser.add_files_per_job()
 parser.add_use_home()
 args = parser.parse_args()
@@ -30,12 +30,22 @@ tau_id_wp     = args.tau_id_wp
 files_per_job = args.files_per_job
 use_home      = args.use_home
 
+print ("files per job",files_per_job)
 # Use the arguments
 max_job_resubmission = resubmission_limit if resubmit else 1
 hadTau_selection     = "Tight|%s" % tau_id_wp
 
 if era == "2017":
   from tthAnalysis.HiggsToTauTau.samples.tthAnalyzeSamples_2017_sync import samples_2017 as samples
+  #from tthAnalysis.HiggsToTauTau.samples.tthAnalyzeSamples_2017 import samples_2017 as samples
+  #for sample_name, sample_info in samples.items():
+  #    if sample_name not in [
+  #      "/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM",
+  #      "/TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v2/MINIAODSIM",
+  #      "/TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM", ## not to be used for training -- placeholder
+  #      "/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM",
+  #      "/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM"
+  #    ] : sample_info["use_it"] = False
   from tthAnalysis.HiggsToTauTau.analysisSettings import lumi_2017 as lumi
 else:
   raise ValueError("Invalid era: %s" % era)
