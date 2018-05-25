@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
-
 import os
+from tthAnalysis.HiggsToTauTau.recommendedMEtFilters_cfi import recommendedMEtFilters
 
 process = cms.PSet()
 
@@ -88,11 +88,11 @@ process.analyze_hadTopTagger = cms.PSet(
     ),
 
     leptonSelection = cms.string('Tight'),
-    apply_leptonGenMatching = cms.bool(True),
+    apply_leptonGenMatching = cms.bool(False),
     leptonChargeSelection = cms.string('SS'),
 
     hadTauSelection = cms.string('Tight|dR03mvaMedium'),
-    apply_hadTauGenMatching = cms.bool(True),
+    apply_hadTauGenMatching = cms.bool(False),
 
     chargeSumSelection = cms.string('OS'),
 
@@ -104,7 +104,9 @@ process.analyze_hadTopTagger = cms.PSet(
     central_or_shift = cms.string('central'),
     lumiScale = cms.double(1.),
     apply_genWeight = cms.bool(True),
-    apply_trigger_bits = cms.bool(False),
+    apply_trigger_bits = cms.bool(True),
+    apply_met_filters = cms.bool(True),
+    cfgMEtFilter = recommendedMEtFilters,
 
     branchName_electrons = cms.string('Electron'),
     branchName_muons = cms.string('Muon'),
@@ -118,9 +120,8 @@ process.analyze_hadTopTagger = cms.PSet(
     branchName_subjetsAK8 = cms.string('SubJet'),
     branchName_met = cms.string('MET'),
 
-    #branchName_genLeptons1 = cms.string('GenLep'),
-    #branchName_genLeptons2 = cms.string(''),
-    #branchName_genHadTaus = cms.string('GenVisTau'),
+    branchName_genLeptons = cms.string('GenLep'),
+    branchName_genHadTaus = cms.string('GenVisTau'),
     branchName_genJets = cms.string('GenJet'),
     redoGenMatching = cms.bool(True),
 
@@ -133,7 +134,13 @@ process.analyze_hadTopTagger = cms.PSet(
     selEventsFileName_input = cms.string(''),
     ##selEventsFileName_input = cms.string('/home/veelken/CMSSW_9_4_4/src/tthAnalysis/HiggsToTauTau/test/selEvents_hadTopTagger_gen.txt'),
     ##selEventsFileName_output = cms.string('')
-    selEventsFileName_output = cms.string('/home/acaan/CMSSW_9_4_4/src/tthAnalysis/HiggsToTauTau/test/selEvents_hadTopTagger.txt'),
+    selEventsFileName_output = cms.string('/home/acaan/VHbbNtuples_8_0_x/CMSSW_9_4_6_patch1/src/tthAnalysis/HiggsToTauTau/selEvents_hadTopTagger.txt'),
+    selEventsFileName_output_1l_2tau = cms.string('/home/acaan/VHbbNtuples_8_0_x/CMSSW_9_4_6_patch1/src/tthAnalysis/HiggsToTauTau/selEvents_hadTopTagger_1l_2tau.txt'),
+    selEventsFileName_output_2lss_1tau = cms.string('/home/acaan/VHbbNtuples_8_0_x/CMSSW_9_4_6_patch1/src/tthAnalysis/HiggsToTauTau/selEvents_hadTopTagger_2lss_1tau.txt'),
+    selEventsFileName_output_2los_1tau = cms.string('/home/acaan/VHbbNtuples_8_0_x/CMSSW_9_4_6_patch1/src/tthAnalysis/HiggsToTauTau/selEvents_hadTopTagger_2los_1tau.txt'),
+    selEventsFileName_output_2lss = cms.string('/home/acaan/VHbbNtuples_8_0_x/CMSSW_9_4_6_patch1/src/tthAnalysis/HiggsToTauTau/selEvents_hadTopTagger_2lss.txt'),
+    selEventsFileName_output_3l = cms.string('/home/acaan/VHbbNtuples_8_0_x/CMSSW_9_4_6_patch1/src/tthAnalysis/HiggsToTauTau/selEvents_hadTopTagger_3l.txt'),
+    selEventsFileName_output_summary = cms.string('/home/acaan/VHbbNtuples_8_0_x/CMSSW_9_4_6_patch1/src/tthAnalysis/HiggsToTauTau/selEvents_hadTopTagger_summary.txt'),
 
     selectBDT = cms.bool(True),
     isDEBUG = cms.bool(False),

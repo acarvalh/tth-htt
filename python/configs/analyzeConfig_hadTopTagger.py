@@ -18,7 +18,7 @@ class analyzeConfig_hadTopTagger(analyzeConfig):
                verbose = False, dry_run = False, isDebug = False, use_home = True):
     analyzeConfig.__init__(self, configDir, outputDir, executable_analyze, "hadTopTagger", [ "central" ],
       max_files_per_job, era, use_lumi, lumi, check_input_files, running_method, num_parallel_jobs,
-      [], trigger = [], verbose = verbose, dry_run = dry_run, isDebug = isDebug, use_home = use_home)
+      [], triggers = [ "3mu", "1e2mu", "2e1mu", "3e", "2mu", "1e1mu", "2e", "1mu", "1e", "1mu1tau", "1e1tau", "2tau"], verbose = verbose, dry_run = dry_run, isDebug = isDebug, use_home = use_home)
 
     self.samples = samples
 
@@ -96,7 +96,7 @@ class analyzeConfig_hadTopTagger(analyzeConfig):
 
         cfg_key = getKey(self.channel, process_name, jobId)
         cfgFile_modified_path = os.path.join(self.dirs[key_dir][DKEY_CFGS], "analyze_%s_cfg.py" % cfg_key)
-        logFile_path = os.path.join(self.dirs[key_dir][DKEY_LOGS], "analyze_%s_%s_%i.log" % cfg_key)
+        logFile_path = os.path.join(self.dirs[key_dir][DKEY_LOGS], "analyze_%s.log" % cfg_key)
         histogramFile_path = os.path.join(self.dirs[key_dir][DKEY_HIST], "%s.root" % key_analyze_job)
 
         self.jobOptions_analyze[key_analyze_job] = {
