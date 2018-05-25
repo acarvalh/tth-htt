@@ -30,23 +30,16 @@ tau_id_wp     = args.tau_id_wp
 files_per_job = args.files_per_job
 use_home      = args.use_home
 
-print ("files per job",files_per_job)
 # Use the arguments
 max_job_resubmission = resubmission_limit if resubmit else 1
 hadTau_selection     = "Tight|%s" % tau_id_wp
 
 if era == "2017":
   from tthAnalysis.HiggsToTauTau.samples.tthAnalyzeSamples_2017_sync import samples_2017 as samples
-  #from tthAnalysis.HiggsToTauTau.samples.tthAnalyzeSamples_2017 import samples_2017 as samples
-  #for sample_name, sample_info in samples.items():
-  #    if sample_name not in [
-  #      "/ttHToNonbb_M125_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM",
-  #      "/TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v2/MINIAODSIM",
-  #      "/TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM", ## not to be used for training -- placeholder
-  #      "/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM",
-  #      "/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM"
-  #    ] : sample_info["use_it"] = False
   from tthAnalysis.HiggsToTauTau.analysisSettings import lumi_2017 as lumi
+  #for sample_name, sample_info in samples.items():
+  #  if sample_info["type"] == "mc":
+  #    sample_info["triggers"] = [ "3mu", "1e2mu", "2e1mu", "3e", "2mu", "1e1mu", "2e", "1mu", "1e", "1mu1tau", "1e1tau", "2tau"]
 else:
   raise ValueError("Invalid era: %s" % era)
 
