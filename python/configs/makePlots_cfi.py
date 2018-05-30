@@ -13,7 +13,7 @@ process.makePlots = cms.PSet(
     apply_automatic_rebinning = cms.bool(True),
     minEvents_automatic_rebinning = cms.double(0.5),
     applyAutoBlinding = cms.bool(True),
-    DivideByBinwidth = cms.bool(False),
+    divideByBinWidth = cms.bool(False),
     processData = cms.string("data_obs"),
     processesBackground = cms.vstring(
         ##"TT",
@@ -22,6 +22,7 @@ process.makePlots = cms.PSet(
         "TTZ",
         "EWK",
         "Rares",
+        "conversions",
         "fakes_data"
     ),
     processSignal = cms.string("signal"),
@@ -51,7 +52,9 @@ process.makePlots = cms.PSet(
             TTZ = cms.string("1.0 +/- 0.20"),
             EWK = cms.string("1.0 +/- 0.20"),
             Rares = cms.string("1.0 +/- 0.20"),
-            fakes_data = cms.string("1.0 +/- 0.20")
+            conversions = cms.string("1.0 +/- 0.20"),
+            fakes_data = cms.string("1.0 +/- 0.20"),
+            VH = cms.string("1.0 +/- 0.20"),
         ),
         shape = cms.PSet(
             CMS_ttHl_btag_HF = cms.string("0.00 +/- 1.00"),
@@ -67,8 +70,8 @@ process.makePlots = cms.PSet(
     ),
     showUncertainty = cms.bool(False),
 
-    labelOnTop = cms.string("CMS Preliminary; ttH, H #rightarrow #tau#tau; %1.1f fb^{-1} at #sqrt{s} = 13 TeV"),    
-    intLumiData = cms.double(35.9), # in units of fb^-1
+    labelOnTop = cms.string("CMS Preliminary; ttH, H #rightarrow #tau#tau; %1.1f fb^{-1} at #sqrt{s} = 13 TeV"),
+    intLumiData = cms.double(41.5), # in units of fb^-1 #TODO make it era-dependent
 
     outputFileName = cms.string("plots/makePlots.png")
 )

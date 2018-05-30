@@ -4,6 +4,7 @@
 #include "tthAnalysis/HiggsToTauTau/interface/RecoMEtReader.h" // RecoMEtReader
 #include "tthAnalysis/HiggsToTauTau/interface/GenLeptonReader.h" // GenLeptonReader
 #include "tthAnalysis/HiggsToTauTau/interface/GenHadTauReader.h" // GenHadTauReader
+#include "tthAnalysis/HiggsToTauTau/interface/GenPhotonReader.h" // GenPhotonReader
 #include "tthAnalysis/HiggsToTauTau/interface/GenJetReader.h" // GenJetReader
 #include "tthAnalysis/HiggsToTauTau/interface/LHEInfoReader.h" // LHEInfoReader
 #include "tthAnalysis/HiggsToTauTau/interface/EventInfoReader.h" // EventInfoReader
@@ -104,16 +105,19 @@ struct numerator_and_denominatorHistManagers
     , electronHistManager_genLepton_(nullptr)
     , electronHistManager_genHadTauOrLepton_(nullptr)
     , electronHistManager_genJet_(nullptr)
+    , electronHistManager_genPhoton_(nullptr)   // GEN PHOTON MATCH
     , muonHistManager_(nullptr)
     , muonHistManager_genHadTau_(nullptr)
     , muonHistManager_genLepton_(nullptr)
     , muonHistManager_genHadTauOrLepton_(nullptr)
     , muonHistManager_genJet_(nullptr)
+    , muonHistManager_genPhoton_(nullptr)     // GEN PHOTON MATCH
     , evtHistManager_LeptonFakeRate_(nullptr)
     , evtHistManager_LeptonFakeRate_genHadTau_(nullptr)
     , evtHistManager_LeptonFakeRate_genLepton_(nullptr)
     , evtHistManager_LeptonFakeRate_genHadTauOrLepton_(nullptr)
     , evtHistManager_LeptonFakeRate_genJet_(nullptr)
+    , evtHistManager_LeptonFakeRate_genPhoton_(nullptr)  // GEN PHOTON MATCH
   {
     if(isInclusive_)
     {
@@ -151,18 +155,20 @@ struct numerator_and_denominatorHistManagers
     delete electronHistManager_genLepton_;
     delete electronHistManager_genHadTauOrLepton_;
     delete electronHistManager_genJet_;
+    delete electronHistManager_genPhoton_;           // GEN PHOTON MATCH
     delete muonHistManager_;
     delete muonHistManager_genHadTau_;
     delete muonHistManager_genLepton_;
     delete muonHistManager_genHadTauOrLepton_;
     delete muonHistManager_genJet_;
+    delete muonHistManager_genPhoton_;               // GEN PHOTON MATCH
     delete evtHistManager_LeptonFakeRate_;
     delete evtHistManager_LeptonFakeRate_genHadTau_;
     delete evtHistManager_LeptonFakeRate_genLepton_;
     delete evtHistManager_LeptonFakeRate_genHadTauOrLepton_;
     delete evtHistManager_LeptonFakeRate_genJet_;
+    delete evtHistManager_LeptonFakeRate_genPhoton_; // GEN PHOTON MATCH
   }
-
   std::string
   getLabel() const
   {
@@ -176,6 +182,7 @@ struct numerator_and_denominatorHistManagers
     const std::string process_and_genMatchedLepton         = process_ + "l";
     const std::string process_and_genMatchedHadTauOrLepton = process_ + "l_plus_t";
     const std::string process_and_genMatchedJet            = process_ + "j";
+    const std::string process_and_genMatchedPhoton         = process_ + "g";    // GEN PHOTON MATCH
 
     const auto mkCfg = [this](const std::string & process) -> edm::ParameterSet
     {
@@ -199,6 +206,9 @@ struct numerator_and_denominatorHistManagers
 
         electronHistManager_genJet_ = new ElectronHistManager(mkCfg(process_and_genMatchedJet));
         electronHistManager_genJet_->bookHistograms(dir);
+
+        electronHistManager_genPhoton_ = new ElectronHistManager(mkCfg(process_and_genMatchedPhoton));  // GEN PHOTON MATCH
+        electronHistManager_genPhoton_->bookHistograms(dir);                                            // GEN PHOTON MATCH
       }
     }
     else if(lepton_type_ == kMuon)
@@ -218,6 +228,9 @@ struct numerator_and_denominatorHistManagers
 
         muonHistManager_genJet_ = new MuonHistManager(mkCfg(process_and_genMatchedJet));
         muonHistManager_genJet_->bookHistograms(dir);
+
+        muonHistManager_genPhoton_ = new MuonHistManager(mkCfg(process_and_genMatchedPhoton));  // GEN PHOTON MATCH
+        muonHistManager_genPhoton_->bookHistograms(dir);                                        // GEN PHOTON MATCH
       }
     }
     else
@@ -241,9 +254,11 @@ struct numerator_and_denominatorHistManagers
 
       evtHistManager_LeptonFakeRate_genJet_ = new EvtHistManager_LeptonFakeRate(mkCfg(process_and_genMatchedJet));
       evtHistManager_LeptonFakeRate_genJet_->bookHistograms(dir);
+
+      evtHistManager_LeptonFakeRate_genPhoton_ = new EvtHistManager_LeptonFakeRate(mkCfg(process_and_genMatchedPhoton));  // GEN PHOTON MATCH
+      evtHistManager_LeptonFakeRate_genPhoton_->bookHistograms(dir);                                                      // GEN PHOTON MATCH
     }
   }
-
   void
   fillHistograms(const RecoLepton & lepton,
                  double met,
@@ -270,6 +285,7 @@ struct numerator_and_denominatorHistManagers
         {
           if(electron.genHadTau())                         electronHistManager_genHadTau_->fillHistograms(electron, evtWeight);
           if(                        electron.genLepton()) electronHistManager_genLepton_->fillHistograms(electron, evtWeight);
+          if(electron.genPhoton() && !electron.genLepton() && (electron.genPhoton()->pt() > (0.5*electron.pt())) ) electronHistManager_genPhoton_->fillHistograms(electron, evtWeight);        // GEN PHOTON MATCH
           if(electron.genHadTau() || electron.genLepton()) electronHistManager_genHadTauOrLepton_->fillHistograms(electron, evtWeight);
           else                                             electronHistManager_genJet_->fillHistograms(electron, evtWeight);
         }
@@ -285,6 +301,7 @@ struct numerator_and_denominatorHistManagers
         {
           if(muon.genHadTau()                    ) muonHistManager_genHadTau_->fillHistograms(muon, evtWeight);
           if(                    muon.genLepton()) muonHistManager_genLepton_->fillHistograms(muon, evtWeight);
+          if(muon.genPhoton() && !muon.genLepton() && (muon.genPhoton()->pt() > (0.5*muon.pt())) ) muonHistManager_genPhoton_->fillHistograms(muon, evtWeight);                        // GEN PHOTON MATCH  
           if(muon.genHadTau() || muon.genLepton()) muonHistManager_genHadTauOrLepton_->fillHistograms(muon, evtWeight);
           else                                     muonHistManager_genJet_->fillHistograms(muon, evtWeight);
         }
@@ -299,6 +316,7 @@ struct numerator_and_denominatorHistManagers
       {
         if(lepton.genHadTau())                       evtHistManager_LeptonFakeRate_genHadTau_->fillHistograms(met, mT, mT_fix, evtWeight);
         if(                      lepton.genLepton()) evtHistManager_LeptonFakeRate_genLepton_->fillHistograms(met, mT, mT_fix, evtWeight);
+        if(                      lepton.genPhoton()) evtHistManager_LeptonFakeRate_genPhoton_->fillHistograms(met, mT, mT_fix, evtWeight);   // GEN PHOTON MATCH
         if(lepton.genHadTau() || lepton.genLepton()) evtHistManager_LeptonFakeRate_genHadTauOrLepton_->fillHistograms(met, mT, mT_fix, evtWeight);
         else                                         evtHistManager_LeptonFakeRate_genJet_->fillHistograms(met, mT, mT_fix, evtWeight);
       }
@@ -330,18 +348,21 @@ private:
   ElectronHistManager * electronHistManager_genLepton_;
   ElectronHistManager * electronHistManager_genHadTauOrLepton_;
   ElectronHistManager * electronHistManager_genJet_;
+  ElectronHistManager * electronHistManager_genPhoton_; // GEN PHOTON MATCH
 
   MuonHistManager * muonHistManager_;
   MuonHistManager * muonHistManager_genHadTau_;
   MuonHistManager * muonHistManager_genLepton_;
   MuonHistManager * muonHistManager_genHadTauOrLepton_;
   MuonHistManager * muonHistManager_genJet_;
+  MuonHistManager * muonHistManager_genPhoton_; // GEN PHOTON MATCH
 
   EvtHistManager_LeptonFakeRate * evtHistManager_LeptonFakeRate_;
   EvtHistManager_LeptonFakeRate * evtHistManager_LeptonFakeRate_genHadTau_;
   EvtHistManager_LeptonFakeRate * evtHistManager_LeptonFakeRate_genLepton_;
   EvtHistManager_LeptonFakeRate * evtHistManager_LeptonFakeRate_genHadTauOrLepton_;
   EvtHistManager_LeptonFakeRate * evtHistManager_LeptonFakeRate_genJet_;
+  EvtHistManager_LeptonFakeRate * evtHistManager_LeptonFakeRate_genPhoton_; // GEN PHOTON MATCH
 };
 
 void
@@ -428,7 +449,6 @@ main(int argc,
   const bool isDEBUG              = cfg_analyze.getParameter<bool>("isDEBUG");
   const bool apply_met_filters    = cfg_analyze.getParameter<bool>("apply_met_filters");
   
-
   const vstring triggerNames_1e = cfg_analyze.getParameter<vstring>("triggers_1e");
   const vstring triggerNames_2e = cfg_analyze.getParameter<vstring>("triggers_2e");
   const vstring triggerNames_1mu = cfg_analyze.getParameter<vstring>("triggers_1mu");
@@ -507,6 +527,7 @@ main(int argc,
 
   const std::string branchName_genLeptons = cfg_analyze.getParameter<std::string>("branchName_genLeptons");
   const std::string branchName_genHadTaus = cfg_analyze.getParameter<std::string>("branchName_genHadTaus");
+  const std::string branchName_genPhotons = cfg_analyze.getParameter<std::string>("branchName_genPhotons");
   const std::string branchName_genJets    = cfg_analyze.getParameter<std::string>("branchName_genJets");
 
   const edm::ParameterSet cfgMEtFilter = cfg_analyze.getParameter<edm::ParameterSet>("cfgMEtFilter");
@@ -614,6 +635,7 @@ main(int argc,
   GenLeptonReader * genLeptonReader = nullptr;
   GenHadTauReader * genHadTauReader = nullptr;
   GenJetReader * genJetReader       = nullptr;
+  GenPhotonReader * genPhotonReader = nullptr;
   LHEInfoReader * lheInfoReader     = nullptr;
   if(isMC)
   {
@@ -628,6 +650,11 @@ main(int argc,
       {
         genHadTauReader = new GenHadTauReader(branchName_genHadTaus);
         inputTree->registerReader(genHadTauReader);
+      }
+      if(! branchName_genPhotons.empty())
+      {
+        genPhotonReader = new GenPhotonReader(branchName_genPhotons);
+        inputTree->registerReader(genPhotonReader);
       }
       if(! branchName_genJets.empty())
       {
@@ -867,6 +894,7 @@ main(int argc,
     std::vector<GenLepton> genElectrons;
     std::vector<GenLepton> genMuons;
     std::vector<GenHadTau> genHadTaus;
+    std::vector<GenPhoton> genPhotons;
     std::vector<GenJet> genJets;
     if(isMC && fillGenEvtHistograms)
     {
@@ -888,6 +916,10 @@ main(int argc,
       {
         genHadTaus = genHadTauReader->read();
       }
+      if(genPhotonReader)
+      {
+        genPhotons = genPhotonReader->read();
+      }
       if(genJetReader)
       {
         genJets = genJetReader->read();
@@ -897,7 +929,7 @@ main(int argc,
 //--- fill generator level histograms (before cuts)
     if(isMC)
     {
-      genEvtHistManager_beforeCuts->fillHistograms(genElectrons, genMuons, genHadTaus, genJets);
+      genEvtHistManager_beforeCuts->fillHistograms(genElectrons, genMuons, genHadTaus, genPhotons, genJets);
     }
 
 //--- build reco level collections of electrons, muons and hadronic taus;
@@ -949,6 +981,10 @@ main(int argc,
       {
         genHadTaus = genHadTauReader->read();
       }
+      if(genPhotonReader)
+      {
+        genPhotons = genPhotonReader->read();
+      }
       if(genJetReader)
       {
         genJets = genJetReader->read();
@@ -964,6 +1000,7 @@ main(int argc,
 
       electronGenMatcher.addGenLeptonMatch(preselElectrons, genLeptons, 0.2);
       electronGenMatcher.addGenHadTauMatch(preselElectrons, genHadTaus, 0.2);
+      electronGenMatcher.addGenPhotonMatch(preselElectrons, genPhotons, 0.2);
       electronGenMatcher.addGenJetMatch   (preselElectrons, genJets,    0.2);
 
       jetGenMatcher.addGenLeptonMatch(selJets_dR07, genLeptons, 0.2);
@@ -982,6 +1019,7 @@ main(int argc,
       printCollection("preselElectrons", preselElectrons);
       printCollection("preselMuons", preselMuons);
       // printCollection("selJets_dR04", selJets_dR04);
+      printCollection("uncleaned jets", jet_ptrs);
       printCollection("selJets_dR07", selJets_dR07);
     }
   
@@ -990,7 +1028,7 @@ main(int argc,
     {
       if(run_lumi_eventSelector)
       {
-        std::cout << "event FAILS (presel.e + presel.mu != 1) cut\n";
+        std::cout << "event " << eventInfo.str() << " FAILS (presel.e + presel.mu != 1) cut\n";
       }
       continue;
     }
@@ -1035,7 +1073,7 @@ main(int argc,
           {
             if(run_lumi_eventSelector)
               {
-                std::cout << "event FAILS MEtFilter\n";
+                std::cout << "event " << eventInfo.str() << " FAILS MEtFilter\n";
               }
             continue;
           }
@@ -1058,12 +1096,13 @@ main(int argc,
     std::vector<const RecoJet *> selJets;
 
  // ----- MUON BLOCK ----
-    for(const hltPath_LeptonFakeRate * const hltPath_iter: triggers_mu){ // loop over triggers_mu (given in descendng order of thresholds in the config)    
+    for(const hltPath_LeptonFakeRate * const hltPath_iter: triggers_mu){ // loop over triggers_mu (given in descendng order of thresholds in the config)   
+      hltPath_iter->setIsTriggered(false); // resetting the bool to false 
       if(! (hltPath_iter->getValue() >= 1))
         {
           if(run_lumi_eventSelector)
             {
-              std::cout << "event FAILS this mu trigger"            "\n"
+              std::cout << "event " << eventInfo.str() << " FAILS this mu trigger"            "\n"
                 "HLT Path name "     << *hltPath_iter            << "\n"
                 "Trigger bit value " << hltPath_iter->getValue() << '\n';
             }
@@ -1077,7 +1116,7 @@ main(int argc,
           {
             if(run_lumi_eventSelector)
               {
-                std::cout << "event FAILS global muon cone and reco pt cuts\n";
+                std::cout << "event " << eventInfo.str() << " FAILS global muon cone and reco pt cuts\n";
               }
             continue;
           }
@@ -1151,9 +1190,10 @@ main(int argc,
 
 // ----- ELECTRON BLOCK ----
     for(const hltPath_LeptonFakeRate * const hltPath_iter: triggers_e){ // loop over triggers_e (given in descendng order of thresholds in the config) 
+      hltPath_iter->setIsTriggered(false); // resetting the bool to false 
       if(! (hltPath_iter->getValue() >= 1)){ 
         if(run_lumi_eventSelector){
-          std::cout << "event FAILS this e trigger" "\n"
+          std::cout << "event " << eventInfo.str() << " FAILS this e trigger" "\n"
             "HLT Path name " << *hltPath_iter  << "\n"
             "Trigger bit value " << hltPath_iter->getValue() << '\n';
              }
@@ -1541,7 +1581,7 @@ main(int argc,
     {
       if(run_lumi_eventSelector)
       {
-        std::cout << "event FAILS as there is no presel.lepton+Jet pair in the event satisfying all requirements\n";
+        std::cout << "event " << eventInfo.str() << " FAILS as there is no presel.lepton+Jet pair in the event satisfying all requirements\n";
       }
       continue;
     }
@@ -1553,7 +1593,7 @@ main(int argc,
 //--- fill generator level histograms (after cuts)
     if(isMC)
     {
-      genEvtHistManager_afterCuts->fillHistograms(genElectrons, genMuons, genHadTaus, genJets);
+      genEvtHistManager_afterCuts->fillHistograms(genElectrons, genMuons, genHadTaus, genPhotons, genJets);
       lheInfoHistManager->fillHistograms(*lheInfoReader, evtWeight);
     }
 
@@ -1578,6 +1618,7 @@ main(int argc,
   delete metReader;
   delete genLeptonReader;
   delete genHadTauReader;
+  delete genPhotonReader;
   delete genJetReader;
   delete lheInfoReader;
   delete metFilterReader;

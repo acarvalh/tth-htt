@@ -39,6 +39,7 @@ process.analyze_1l_2tau = cms.PSet(
     apply_offline_e_trigger_cuts_1mu1tau = cms.bool(True),
 
     leptonSelection = cms.string('Tight'),
+    lep_mva_cut = cms.double(0.75), # CV: used for tight lepton selection only
     apply_leptonGenMatching = cms.bool(False),
 
     hadTauSelection = cms.string('Tight|dR03mvaTight'),
@@ -47,12 +48,12 @@ process.analyze_1l_2tau = cms.PSet(
 
     applyFakeRateWeights = cms.string("disabled"), # either "disabled", "3L" or "2tau"
     leptonFakeRateWeight = cms.PSet(
-        inputFileName = cms.string("tthAnalysis/HiggsToTauTau/data/FR_lep_ttH_mva_2016_data.root"),
-        histogramName_e = cms.string("FR_mva075_el_data_comb"),
-        histogramName_mu = cms.string("FR_mva075_mu_data_comb"),
+        inputFileName = cms.string("tthAnalysis/HiggsToTauTau/data/FR_lep_ttH_mva_2017_Tallinn_2018May22.root"),
+        histogramName_e = cms.string("FR_mva090_el_data_comb"),
+        histogramName_mu = cms.string("FR_mva090_mu_data_comb"),
     ),
     hadTauFakeRateWeight = cms.PSet(
-        inputFileName = cms.string("tthAnalysis/HiggsToTauTau/data/FR_tau_2016.root"),
+        inputFileName = cms.string("tthAnalysis/HiggsToTauTau/data/FR_tau_2017_v1.root"),
         lead = cms.PSet(
             absEtaBins = cms.vdouble(-1., 1.479, 9.9),
             graphName = cms.string("jetToTauFakeRate/$hadTauSelection/$etaBin/jetToTauFakeRate_mc_hadTaus_pt"),
@@ -73,7 +74,6 @@ process.analyze_1l_2tau = cms.PSet(
     central_or_shift = cms.string('central'),
     lumiScale = cms.double(1.),
     apply_genWeight = cms.bool(True),
-    apply_trigger_bits = cms.bool(True),
     apply_hlt_filter = cms.bool(False),
     apply_met_filters = cms.bool(True),
     cfgMEtFilter = recommendedMEtFilters,
@@ -96,6 +96,7 @@ process.analyze_1l_2tau = cms.PSet(
 
     branchName_genLeptons = cms.string('GenLep'),
     branchName_genHadTaus = cms.string('GenVisTau'),
+    branchName_genPhotons = cms.string('GenPhoton'),
     branchName_genJets = cms.string('GenJet'),
     redoGenMatching = cms.bool(True),
 

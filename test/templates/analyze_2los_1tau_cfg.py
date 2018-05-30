@@ -41,6 +41,7 @@ process.analyze_2los_1tau = cms.PSet(
     apply_offline_e_trigger_cuts_1e1mu = cms.bool(True),
 
     leptonSelection = cms.string('Tight'),
+    lep_mva_cut = cms.double(0.75), # CV: used for tight lepton selection only
     apply_leptonGenMatching = cms.bool(True),
 
     hadTauSelection = cms.string('Tight|dR03mvaVTight'),
@@ -53,7 +54,7 @@ process.analyze_2los_1tau = cms.PSet(
         histogramName_mu = cms.string("FR_mva075_mu_data_comb")
     ),
     hadTauFakeRateWeight = cms.PSet(
-        inputFileName = cms.string("tthAnalysis/HiggsToTauTau/data/FR_tau_2016.root"),
+        inputFileName = cms.string("tthAnalysis/HiggsToTauTau/data/FR_tau_2017_v1.root"),
         lead = cms.PSet(
             absEtaBins = cms.vdouble(-1., 1.479, 9.9),
             graphName = cms.string("jetToTauFakeRate/$hadTauSelection/$etaBin/jetToTauFakeRate_mc_hadTaus_pt"),
@@ -67,7 +68,6 @@ process.analyze_2los_1tau = cms.PSet(
     central_or_shift = cms.string('central'),
     lumiScale = cms.double(1.),
     apply_genWeight = cms.bool(True),
-    apply_trigger_bits = cms.bool(False),
     apply_hlt_filter = cms.bool(False),
     apply_hadTauFakeRateSF = cms.bool(False),
 
@@ -81,6 +81,7 @@ process.analyze_2los_1tau = cms.PSet(
 
     branchName_genLeptons = cms.string('GenLep'),
     branchName_genHadTaus = cms.string('GenVisTau'),
+    branchName_genPhotons = cms.string('GenPhoton'),
     branchName_genJets = cms.string('GenJet'),
     branchName_jetsHTTv2 = cms.string('HTTV2'),
     branchName_subjetsHTTv2 = cms.string('HTTV2Subjets'),

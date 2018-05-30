@@ -53,7 +53,6 @@ process.analyze_charge_flip = cms.PSet(
     central_or_shift = cms.string('central'),
     lumiScale = cms.double(1.),
     apply_genWeight = cms.bool(True),
-    apply_trigger_bits = cms.bool(True),
 
     branchName_electrons = cms.string('Electron'),
     branchName_muons = cms.string('Muon'),
@@ -61,9 +60,10 @@ process.analyze_charge_flip = cms.PSet(
 
     branchName_genLeptons = cms.string('GenLep'),
     branchName_genHadTaus = cms.string('GenVisTau'),
+    branchName_genPhotons = cms.string('GenPhoton'),
     branchName_genJets = cms.string('GenJet'),
     redoGenMatching = cms.bool(True),
-    
+
     fillGenEvtHistograms = cms.bool(False),
 
     selEventsFileName_input = cms.string(''),

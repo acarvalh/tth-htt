@@ -40,16 +40,55 @@ class analyzeConfig_0l_2tau(analyzeConfig):
   for documentation of further Args.
 
   """
-  def __init__(self, configDir, outputDir, executable_analyze, cfgFile_analyze, samples, hadTau_selection,
-               hadTau_charge_selections, applyFakeRateWeights, central_or_shifts,
-               max_files_per_job, era, use_lumi, lumi, check_input_files, running_method, num_parallel_jobs,
-               executable_addBackgrounds, executable_addBackgroundJetToTauFakes, histograms_to_fit,
-               select_rle_output = False, verbose = False, dry_run = False, isDebug = False,
-               hlt_filter = False, use_home = True):
-    analyzeConfig.__init__(self, configDir, outputDir, executable_analyze, "0l_2tau", central_or_shifts,
-      max_files_per_job, era, use_lumi, lumi, check_input_files, running_method, num_parallel_jobs,
-      histograms_to_fit, triggers = [ '2tau' ], verbose = verbose, dry_run = dry_run, isDebug = isDebug,
-      use_home = use_home)
+  def __init__(self,
+        configDir,
+        outputDir,
+        executable_analyze,
+        cfgFile_analyze,
+        samples,
+        lep_mva_wp,
+        hadTau_selection,
+        hadTau_charge_selections,
+        applyFakeRateWeights,
+        central_or_shifts,
+        max_files_per_job,
+        era,
+        use_lumi,
+        lumi,
+        check_input_files,
+        running_method,
+        num_parallel_jobs,
+        executable_addBackgrounds,
+        executable_addBackgroundJetToTauFakes,
+        histograms_to_fit,
+        select_rle_output = False,
+        verbose           = False,
+        dry_run           = False,
+        isDebug           = False,
+        hlt_filter        = False,
+        use_home          = True,
+      ):
+    analyzeConfig.__init__(self,
+      configDir          = configDir,
+      outputDir          = outputDir,
+      executable_analyze = executable_analyze,
+      channel            = "0l_2tau",
+      lep_mva_wp         = lep_mva_wp,
+      central_or_shifts  = central_or_shifts,
+      max_files_per_job  = max_files_per_job,
+      era                = era,
+      use_lumi           = use_lumi,
+      lumi               = lumi,
+      check_input_files  = check_input_files,
+      running_method     = running_method,
+      num_parallel_jobs  = num_parallel_jobs,
+      histograms_to_fit  = histograms_to_fit,
+      triggers           = [ '2tau' ],
+      verbose            = verbose,
+      dry_run            = dry_run,
+      isDebug            = isDebug,
+      use_home           = use_home,
+    )
 
     self.samples = samples
 
@@ -79,10 +118,10 @@ class analyzeConfig_0l_2tau(analyzeConfig):
     self.executable_addBackgrounds = executable_addBackgrounds
     self.executable_addFakes = executable_addBackgroundJetToTauFakes
 
-    self.nonfake_backgrounds = [ "TT", "TTW", "TTZ", "EWK", "Rares" ]
+    self.nonfake_backgrounds = [ "TT", "TTW", "TTWW", "TTZ", "EWK", "Rares" ]
     self.prep_dcard_processesToCopy = [ "data_obs" ] + self.nonfake_backgrounds + [ "fakes_data", "fakes_mc" ]
     ##self.make_plots_backgrounds = self.nonfake_backgrounds + [ "fakes_data" ]
-    self.make_plots_backgrounds = [ "TTW", "TTZ", "EWK", "Rares", "fakes_data" ]
+    self.make_plots_backgrounds = [ "TTW", "TTZ", "TTWW", "EWK", "Rares", "fakes_data" ]
 
     self.cfgFile_analyze = os.path.join(self.template_dir, cfgFile_analyze)
     self.histogramDir_prep_dcard = "0l_2tau_OS_Tight"
@@ -108,20 +147,23 @@ class analyzeConfig_0l_2tau(analyzeConfig):
     jobOptions['histogramDir'] = getHistogramDir(
       jobOptions['hadTauSelection'], hadTau_frWeight, jobOptions['hadTauChargeSelection']
     )
-    if jobOptions['hadTauSelection'].find("Fakeable") != -1 and jobOptions['applyFakeRateWeights'] in [ "2tau" ]:
-      fitFunctionName = None
-      if self.era == "2017":
-        # TODO: update the FR file for 2017 analysis
-        jobOptions['hadTauFakeRateWeight.inputFileName'] = 'tthAnalysis/HiggsToTauTau/data/FR_tau_2016_vvLoosePresel.root'
-        # CV: use data/MC corrections determined for dR03mvaLoose discriminator for 2016 data
-        fitFunctionName = "jetToTauFakeRate/dR03mvaLoose/$etaBin/fitFunction_data_div_mc_hadTaus_pt"
-      else:
-        raise ValueError("Invalid parameter 'era' = %s !!" % self.era)
-      jobOptions['hadTauFakeRateWeight.lead.fitFunctionName'] = fitFunctionName
-      jobOptions['hadTauFakeRateWeight.sublead.fitFunctionName'] = fitFunctionName
+
+    jobOptions['hadTauFakeRateWeight.inputFileName'] = self.hadTauFakeRateWeight_inputFile
+    graphName = 'jetToTauFakeRate/%s/$etaBin/jetToTauFakeRate_mc_hadTaus_pt' % self.hadTau_selection_part2
+    jobOptions['hadTauFakeRateWeight.lead.graphName'] = graphName
+    jobOptions['hadTauFakeRateWeight.sublead.graphName'] = graphName
+    fitFunctionName = 'jetToTauFakeRate/%s/$etaBin/fitFunction_data_div_mc_hadTaus_pt' % self.hadTau_selection_part2
+    jobOptions['hadTauFakeRateWeight.lead.fitFunctionName'] = fitFunctionName
+    jobOptions['hadTauFakeRateWeight.sublead.fitFunctionName'] = fitFunctionName
     if jobOptions['hadTauSelection'].find("mcClosure") != -1:
       jobOptions['hadTauFakeRateWeight.applyFitFunction_lead'] = False
       jobOptions['hadTauFakeRateWeight.applyFitFunction_sublead'] = False
+    if jobOptions['hadTauSelection'].find("Tight") != -1 and self.applyFakeRateWeights not in [ "2tau" ] and not self.isBDTtraining:
+      jobOptions['hadTauFakeRateWeight.applyGraph_lead'] = False
+      jobOptions['hadTauFakeRateWeight.applyFitFunction_lead'] = True
+      jobOptions['hadTauFakeRateWeight.applyGraph_sublead'] = False
+      jobOptions['hadTauFakeRateWeight.applyFitFunction_sublead'] = True
+      jobOptions['apply_hadTauFakeRateSF'] = True
 
     lines = super(analyzeConfig_0l_2tau, self).createCfg_analyze(jobOptions, sample_info)
     create_cfg(self.cfgFile_analyze, jobOptions['cfgFile_modified'], lines)
@@ -267,6 +309,7 @@ class analyzeConfig_0l_2tau(analyzeConfig):
                   'histogramFile'            : histogramFile_path,
                   'logFile'                  : logFile_path,
                   'selEventsFileName_output' : rleOutputFile_path,
+                  'lep_mva_cut'              : self.lep_mva_cut,
                   'hadTauSelection'          : hadTauSelection,
                   'apply_hadTauGenMatching'  : self.apply_hadTauGenMatching,
                   'hadTauChargeSelection'    : hadTau_charge_selection,

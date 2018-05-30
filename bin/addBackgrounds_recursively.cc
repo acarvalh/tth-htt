@@ -19,6 +19,7 @@
 
 #include "tthAnalysis/HiggsToTauTau/interface/histogramAuxFunctions.h"
 #include "tthAnalysis/HiggsToTauTau/interface/addBackgroundsAuxFunctions.h" // getSubdirectories, getSubdirectoryNames
+#include "tthAnalysis/HiggsToTauTau/interface/generalAuxFunctions.h" // format_vstring
 
 #include <TFile.h>
 #include <TH1.h>
@@ -54,6 +55,7 @@ namespace
       const TDirectory* subdir_input = dynamic_cast<TDirectory*>((const_cast<TDirectory*>(dir))->Get(process_input->data()));
       if ( !subdir_input ) allProcessesExist = false;
     }
+    // std::cout << "allProcessesExist = " << allProcessesExist << std::endl;
     if ( allProcessesExist ) {
       std::cout << "processing directory = " << dirName << std::endl;
 
@@ -61,6 +63,7 @@ namespace
       std::string the_process_input = processes_input.front();
       const TDirectory* the_subdir_input = dynamic_cast<TDirectory*>((const_cast<TDirectory*>(dir))->Get(the_process_input.data()));      
       assert(the_subdir_input);
+      // the_subdir_input->ls();
       
       std::set<std::string> histograms;
       TList* list = the_subdir_input->GetListOfKeys();
@@ -133,6 +136,11 @@ namespace
 	  subdir != subdirs.end(); ++subdir ) {
       processSubdirectory_recursively(fs, *subdir, dirName + "/" + (*subdir)->GetName(), processes_input, process_output, histogramsToCopy, central_or_shifts);
     }
+    for(const TDirectory* subdir: subdirs)
+    {
+      delete subdir;
+      subdir = 0;
+    }
   }
 }
 
@@ -168,6 +176,7 @@ int main(int argc, char* argv[])
   std::string process_output = cfgAddBackgrounds.getParameter<std::string>("process_output");
 
   vstring histogramsToCopy = cfgAddBackgrounds.getParameter<vstring>("histogramsToCopy");
+  std::cout<< "histogramsToCopy = " << format_vstring(histogramsToCopy) << std::endl;
 
   vstring central_or_shifts = cfgAddBackgrounds.getParameter<vstring>("sysShifts");
   central_or_shifts.push_back(""); // CV: add central value

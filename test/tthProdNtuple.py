@@ -12,12 +12,12 @@ mode_choices = [ 'all', 'all_except_forBDTtraining', 'forBDTtraining', 'sync', '
 parser = tthAnalyzeParser()
 parser.add_modes(mode_choices)
 parser.add_nonnominal()
-parser.add_tau_id_wp()
+parser.add_tau_id_wp('dR03mvaVVLoose')
 parser.add_files_per_job(20)
 parser.add_use_home(False)
-parser.add_argument('-p', '--disable-preselection',
-  dest = 'disable_preselection', action = 'store_false', default = True,
-  help = 'R|Disable preselection (read this script for the list of cuts)',
+parser.add_argument('-p', '--enable-preselection',
+  dest = 'enable_preselection', action = 'store_true', default = False,
+  help = 'R|Enable preselection (read this script for the list of cuts)',
 )
 args = parser.parse_args()
 
@@ -26,12 +26,13 @@ era                = args.era
 version            = args.version
 dry_run            = args.dry_run
 resubmission_limit = args.resubmission_limit
-resubmit           = not args.disable_resubmission
 no_exec            = args.no_exec
 auto_exec          = args.auto_exec
 check_input_files  = args.check_input_files
 debug              = args.debug
 sample_filter      = args.filter
+num_parallel_jobs  = args.num_parallel_jobs
+running_method     = args.running_method
 
 # Additional arguments
 mode           = args.mode
@@ -40,13 +41,16 @@ files_per_job  = args.files_per_job
 use_home       = args.use_home
 
 # Custom arguments
-preselection = args.disable_preselection
+preselection = args.enable_preselection
 pileup       = os.path.join(
   os.environ['CMSSW_BASE'], 'src/tthAnalysis/HiggsToTauTau/data/pileup_%s.root' % era
 )
+golden_json_2017  = os.path.join(
+  os.environ['CMSSW_BASE'], 'src/tthAnalysis/NanoAOD/data',
+  'Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_v1.txt'
+)
 
 # Use the arguments
-max_job_resubmission = resubmission_limit if resubmit else 1
 version              = "%s_w%sPresel_%s_%s" % (
   version, ("" if preselection else "o"), "nonNom" if use_nonnominal else "nom", mode
 )
@@ -60,6 +64,7 @@ else:
 
 if era == "2017":
   samples = samples_2017
+  golden_json = golden_json_2017
 else:
   raise ValueError("Invalid era: %s" % era)
 
@@ -73,14 +78,9 @@ for sample_key, sample_entry in samples.items():
   else:
     raise ValueError("Internal logic error")
 
-if mode not in [ 'forBDTtraining' ]:
-  leptonSelection   = 'Fakeable'
-  hadTauSelection   = 'Fakeable'
-  hadTauWP          = 'dR03mvaVLoose'
-else:
-  leptonSelection   = 'Loose'
-  hadTauSelection   = 'Loose'
-  hadTauWP          = 'dR03mvaVVLoose'
+leptonSelection      = 'Loose'
+hadTauSelection      = 'Loose'
+hadTauSelectionAndWP = '%s|%s' % (hadTauSelection, args.tau_id_wp)
 
 if preselection:
   preselection_cuts = {
@@ -108,10 +108,7 @@ if __name__ == '__main__':
     format = '%(asctime)s - %(levelname)s: %(message)s'
   )
 
-  if args.tau_id_wp:
-    logging.info("Changing tau ID WP: %s -> %s" % (hadTauWP, args.tau_id_wp))
-    hadTauWP = args.tau_id_wp
-  hadTauSelectionAndWP = '%s|%s' % (hadTauSelection, hadTauWP)
+  logging.info("Preselection: %s" % ("enabled" if preselection else "disabled"))
 
   if sample_filter:
     samples = filter_samples(samples, sample_filter)
@@ -133,10 +130,11 @@ if __name__ == '__main__':
       leptonSelection       = leptonSelection,
       hadTauSelection       = hadTauSelectionAndWP,
       check_input_files     = check_input_files,
-      running_method        = "sbatch",
+      running_method        = running_method,
       version               = version,
-      num_parallel_jobs     = 8,
+      num_parallel_jobs     = num_parallel_jobs,
       pileup                = pileup,
+      golden_json           = golden_json,
       verbose               = resubmission_idx > 0,
       dry_run               = dry_run,
       isDebug               = debug,

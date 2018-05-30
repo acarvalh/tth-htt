@@ -6,6 +6,7 @@
 #include "tthAnalysis/HiggsToTauTau/interface/GenLeptonReader.h" // GenLeptonReader
 #include "tthAnalysis/HiggsToTauTau/interface/GenHadTauReader.h" // GenHadTauReader
 #include "tthAnalysis/HiggsToTauTau/interface/GenJetReader.h" // GenJetReader
+#include "tthAnalysis/HiggsToTauTau/interface/GenPhotonReader.h" // GenPhotonReader
 #include "tthAnalysis/HiggsToTauTau/interface/EventInfoReader.h" // EventInfoReader
 #include "tthAnalysis/HiggsToTauTau/interface/convert_to_ptrs.h" // convert_to_ptrs
 #include "tthAnalysis/HiggsToTauTau/interface/ParticleCollectionCleaner.h" // Reco*CollectionCleaner
@@ -122,6 +123,7 @@ main(int argc,
   const std::string branchName_met        = cfg_produceNtuple.getParameter<std::string>("branchName_met");
   const std::string branchName_genLeptons = cfg_produceNtuple.getParameter<std::string>("branchName_genLeptons");
   const std::string branchName_genHadTaus = cfg_produceNtuple.getParameter<std::string>("branchName_genHadTaus");
+  const std::string branchName_genPhotons = cfg_produceNtuple.getParameter<std::string>("branchName_genPhotons");
   const std::string branchName_genJets    = cfg_produceNtuple.getParameter<std::string>("branchName_genJets");
 
   const int minNumLeptons             = cfg_produceNtuple.getParameter<int>("minNumLeptons");
@@ -240,7 +242,6 @@ main(int argc,
   jetReader->read_BtagWeight_systematics(isMC);
   jetReader->setBranchAddresses(inputTree);
   const RecoJetCollectionGenMatcher jetGenMatcher;
-  const RecoJetCollectionCleaner jetCleaner(0.4, isDEBUG);
   const RecoJetSelector jetSelector(era);
   RecoJetCollectionSelectorBtagLoose jetSelectorBtagLoose(era, -1, isDEBUG);
   RecoJetCollectionSelectorBtagMedium jetSelectorBtagMedium(era, -1, isDEBUG);
@@ -269,6 +270,7 @@ main(int argc,
 //--- declare generator level information
   GenLeptonReader * genLeptonReader = nullptr;
   GenHadTauReader * genHadTauReader = nullptr;
+  GenPhotonReader * genPhotonReader = nullptr;
   GenJetReader * genJetReader = nullptr;
   if(isMC)
   {
@@ -276,7 +278,9 @@ main(int argc,
     genLeptonReader->setBranchAddresses(inputTree);
     genHadTauReader = new GenHadTauReader(branchName_genHadTaus);
     genHadTauReader->setBranchAddresses(inputTree);
-    genJetReader = new GenJetReader(branchName_genJets);
+    genPhotonReader = new GenPhotonReader(branchName_genPhotons);
+    genPhotonReader->setBranchAddresses(inputTree);
+    genJetReader = new GenJetReader(branchName_genJets, true);
     genJetReader->setBranchAddresses(inputTree);
   }
 
@@ -330,6 +334,7 @@ main(int argc,
 
   GenParticleWriter * genLeptonWriter = nullptr;
   GenParticleWriter * genHadTauWriter = nullptr;
+  GenParticleWriter * genPhotonWriter = nullptr;
   GenParticleWriter * genJetWriter = nullptr;
   if(isMC)
   {
@@ -340,6 +345,10 @@ main(int argc,
     genHadTauWriter = new GenParticleWriter(branchName_genHadTaus);
     genHadTauWriter->setBranches(outputTree);
     std::cout << "writing GenHadTau objects to branch = '" << branchName_genHadTaus << "'\n";
+
+    genPhotonWriter = new GenParticleWriter(branchName_genPhotons);
+    genPhotonWriter->setBranches(outputTree);
+    std::cout << "writing GenPhoton objects to branch = '" << branchName_genPhotons << "'\n";
 
     genJetWriter = new GenParticleWriter(branchName_genJets);
     genJetWriter->setBranches(outputTree);
@@ -379,6 +388,8 @@ main(int argc,
     Form("drop %s_*", branchName_genLeptons.data()),
     Form("drop n%s", branchName_genHadTaus.data()),
     Form("drop %s_*", branchName_genHadTaus.data()),
+    Form("drop n%s", branchName_genPhotons.data()),
+    Form("drop %s_*", branchName_genPhotons.data()),
     Form("drop n%s", branchName_genJets.data()),
     Form("drop %s_*", branchName_genJets.data()),
     Form("drop maxPermutations_*"),
@@ -476,10 +487,12 @@ main(int argc,
     const std::vector<RecoJet> jets = jetReader->read();
     const std::vector<const RecoJet *> jet_ptrs = convert_to_ptrs(jets);
     // Karl: do not clean w.r.t the taus b/c their definition changes across the analyses
-    //       we are better off if we keep a bit more jets per event
-    const std::vector<const RecoJet *> cleanedJets = jetCleaner(jet_ptrs, fakeableMuons, fakeableElectrons);
+    //       we are better off if we keep a bit more jets per event;
+    //       we also decided to remove cleaning w.r.t fakeable leptons, b/c the jet cleaning
+    //       has now become channel-dependent (i.e. we clean w.r.t the *selected* fakeable
+    //       objects, not w.r.t the whole collection)
     std::vector<const RecoJet *> selJets;
-    for(const RecoJet * cleanedJet: cleanedJets)
+    for(const RecoJet * cleanedJet: jet_ptrs)
     {
       // Karl: there are no JEC uncertainties for non-nominal (i.e. MET-adjusted) jet pT
       const double cleanedJet_pt_max = useNonNominal_jetmet ? cleanedJet->pt() : cleanedJet->maxPt();
@@ -588,6 +601,7 @@ main(int argc,
     std::vector<GenLepton> genElectrons;
     std::vector<GenLepton> genMuons;
     std::vector<GenHadTau> genHadTaus;
+    std::vector<GenPhoton> genPhotons;
     std::vector<GenJet> genJets;
     if(isMC)
     {
@@ -604,6 +618,7 @@ main(int argc,
         }
       }
       genHadTaus = genHadTauReader->read();
+      genPhotons = genPhotonReader->read();
       genJets = genJetReader->read();
 
 //--- match reconstructed to generator level particles
@@ -613,6 +628,7 @@ main(int argc,
 
       electronGenMatcher.addGenLeptonMatch(preselElectrons, genLeptons, 0.2);
       electronGenMatcher.addGenHadTauMatch(preselElectrons, genHadTaus, 0.2);
+      electronGenMatcher.addGenPhotonMatch(preselElectrons, genPhotons, 0.2);
       electronGenMatcher.addGenJetMatch   (preselElectrons, genJets,    0.2);
 
       hadTauGenMatcher.addGenLeptonMatch(selHadTaus, genLeptons, 0.2);
@@ -639,6 +655,7 @@ main(int argc,
     {
       genLeptonWriter->write(convert_to_GenParticle(genLeptons));
       genHadTauWriter->write(convert_to_GenParticle(genHadTaus));
+      genPhotonWriter->write(convert_to_GenParticle(genPhotons));
       genJetWriter   ->write(convert_to_GenParticle(genJets));
     }
 
@@ -671,6 +688,11 @@ main(int argc,
   delete jetReader;
   delete metReader;
 
+  delete genLeptonReader;
+  delete genHadTauReader;
+  delete genPhotonReader;
+  delete genJetReader;
+
   delete muonWriter;
   delete electronWriter;
   delete hadTauWriter;
@@ -679,6 +701,7 @@ main(int argc,
 
   delete genLeptonWriter;
   delete genHadTauWriter;
+  delete genPhotonWriter;
   delete genJetWriter;
 
 //--- copy histograms keeping track of number of processed events from input files to output file

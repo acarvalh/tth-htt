@@ -29,6 +29,7 @@
 #include "tthAnalysis/HiggsToTauTau/interface/RecoJetReader.h" // RecoJetReader
 #include "tthAnalysis/HiggsToTauTau/interface/GenLeptonReader.h" // GenLeptonReader
 #include "tthAnalysis/HiggsToTauTau/interface/GenHadTauReader.h" // GenHadTauReader
+#include "tthAnalysis/HiggsToTauTau/interface/GenPhotonReader.h" // GenPhotonReader
 #include "tthAnalysis/HiggsToTauTau/interface/GenJetReader.h" // GenJetReader
 #include "tthAnalysis/HiggsToTauTau/interface/LHEInfoReader.h" // LHEInfoReader
 #include "tthAnalysis/HiggsToTauTau/interface/convert_to_ptrs.h" // convert_to_ptrs
@@ -161,7 +162,6 @@ int main(int argc, char* argv[])
   std::string central_or_shift = cfg_analyze.getParameter<std::string>("central_or_shift");
   bool isCentral = ( central_or_shift == "central" ) ? true : false;
   double lumiScale = ( process_string != "data_obs" ) ? cfg_analyze.getParameter<double>("lumiScale") : 1.;
-  bool apply_trigger_bits = cfg_analyze.getParameter<bool>("apply_trigger_bits"); 
   bool apply_genWeight = cfg_analyze.getParameter<bool>("apply_genWeight"); 
   
   const int electronPt_option          = getElectronPt_option   (central_or_shift, isMC);
@@ -198,6 +198,7 @@ int main(int argc, char* argv[])
 
   std::string branchName_genLeptons = cfg_analyze.getParameter<std::string>("branchName_genLeptons");
   std::string branchName_genHadTaus = cfg_analyze.getParameter<std::string>("branchName_genHadTaus");
+  std::string branchName_genPhotons = cfg_analyze.getParameter<std::string>("branchName_genPhotons");
   std::string branchName_genJets = cfg_analyze.getParameter<std::string>("branchName_genJets");
 
   bool redoGenMatching = cfg_analyze.getParameter<bool>("redoGenMatching");
@@ -261,6 +262,7 @@ int main(int argc, char* argv[])
 //--- declare generator level information
   GenLeptonReader* genLeptonReader = 0;
   GenHadTauReader* genHadTauReader = 0;
+  GenPhotonReader* genPhotonReader = 0;
   GenJetReader* genJetReader = 0;
   LHEInfoReader* lheInfoReader = 0;
   if ( isMC ) {
@@ -272,6 +274,10 @@ int main(int argc, char* argv[])
       if ( branchName_genHadTaus != "" ) {
         genHadTauReader = new GenHadTauReader(branchName_genHadTaus);
         inputTree -> registerReader(genHadTauReader);
+      }
+      if ( branchName_genPhotons != "" ) {
+        genPhotonReader = new GenPhotonReader(branchName_genPhotons);
+        inputTree -> registerReader(genPhotonReader);
       }
       if ( branchName_genJets != "" ) {
         genJetReader = new GenJetReader(branchName_genJets);
@@ -414,6 +420,7 @@ int main(int argc, char* argv[])
     std::vector<GenLepton> genElectrons;
     std::vector<GenLepton> genMuons;
     std::vector<GenHadTau> genHadTaus;
+    std::vector<GenPhoton> genPhotons;
     std::vector<GenJet> genJets;
     if ( isMC && fillGenEvtHistograms ) {
       if ( genLeptonReader ) {
@@ -428,17 +435,20 @@ int main(int argc, char* argv[])
       if ( genHadTauReader ) {
         genHadTaus = genHadTauReader->read();
       }
+      if ( genPhotonReader ) {
+        genPhotons = genPhotonReader->read();
+      }
       if ( genJetReader ) {
         genJets = genJetReader->read();
       }
     }
 
     if ( isMC ) {
-      genEvtHistManager_beforeCuts->fillHistograms(genElectrons, genMuons, genHadTaus, genJets);
+      genEvtHistManager_beforeCuts->fillHistograms(genElectrons, genMuons, genHadTaus, genPhotons, genJets);
     }
 
-    bool isTriggered_1e = hltPaths_isTriggered(triggers_1e) || (isMC && !apply_trigger_bits);
-    bool isTriggered_2e = hltPaths_isTriggered(triggers_2e) || (isMC && !apply_trigger_bits);
+    bool isTriggered_1e = hltPaths_isTriggered(triggers_1e);
+    bool isTriggered_2e = hltPaths_isTriggered(triggers_2e);
     
     bool selTrigger_1e = use_triggers_1e && isTriggered_1e;
     bool selTrigger_2e = use_triggers_2e && isTriggered_2e;
@@ -522,6 +532,9 @@ int main(int argc, char* argv[])
       if ( genHadTauReader ) {
         genHadTaus = genHadTauReader->read();
       }
+      if ( genPhotonReader ) {
+        genPhotons = genPhotonReader->read();
+      }
       if ( genJetReader ) {
         genJets = genJetReader->read();
       }
@@ -535,6 +548,7 @@ int main(int argc, char* argv[])
 
       electronGenMatcher.addGenLeptonMatch(preselElectrons, genLeptons, 0.2);
       electronGenMatcher.addGenHadTauMatch(preselElectrons, genHadTaus, 0.2);
+      electronGenMatcher.addGenPhotonMatch(preselElectrons, genPhotons, 0.2);
       electronGenMatcher.addGenJetMatch(preselElectrons, genJets, 0.2);
     }
 
@@ -757,11 +771,6 @@ int main(int argc, char* argv[])
         kElectron, selElectron_lead_p4.pt(), selElectron_lead_p4.eta(), 
 	kElectron, selElectron_sublead_p4.pt(), selElectron_sublead_p4.eta());
 
-//--- apply trigger efficiency turn-on curves to Spring16 non-reHLT MC
-      /*if ( !apply_trigger_bits ) {
-	evtWeight *= dataToMCcorrectionInterface->getWeight_leptonTriggerEff();
-      }*/
-
 //--- apply data/MC corrections for trigger efficiency,
 //    and efficiencies for lepton to pass loose identification and isolation criteria      
       evtWeight *= dataToMCcorrectionInterface->getSF_leptonTriggerEff();
@@ -841,7 +850,7 @@ int main(int argc, char* argv[])
     else if ( isCharge_OS ) preselElectronHistManagerOS.fillHistograms(preselElectrons, evtWeight);
 
     if ( isMC ) {
-      genEvtHistManager_afterCuts->fillHistograms(genElectrons, genMuons, genHadTaus, genJets);
+      genEvtHistManager_afterCuts->fillHistograms(genElectrons, genMuons, genHadTaus, genPhotons, genJets);
       lheInfoHistManager->fillHistograms(*lheInfoReader, evtWeight);
     }
 
@@ -872,6 +881,7 @@ int main(int argc, char* argv[])
   delete jetReader;
   delete genLeptonReader;
   delete genHadTauReader;
+  delete genPhotonReader;
   delete genJetReader;
   delete lheInfoReader;
 

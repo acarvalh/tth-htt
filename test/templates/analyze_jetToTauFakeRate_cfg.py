@@ -59,7 +59,6 @@ process.analyze_jetToTauFakeRate = cms.PSet(
     central_or_shift = cms.string('central'),
     lumiScale = cms.double(1.),
     apply_genWeight = cms.bool(True),
-    apply_trigger_bits = cms.bool(False),
     apply_hlt_filter = cms.bool(False),
     apply_met_filters = cms.bool(True),
     cfgMEtFilter = recommendedMEtFilters,
@@ -74,6 +73,7 @@ process.analyze_jetToTauFakeRate = cms.PSet(
 
     branchName_genLeptons = cms.string('GenLep'),
     branchName_genHadTaus = cms.string('GenVisTau'),
+    branchName_genPhotons = cms.string('GenPhoton'),
     branchName_genJets = cms.string('GenJet'),
     redoGenMatching = cms.bool(True),
 
