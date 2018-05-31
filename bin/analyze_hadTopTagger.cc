@@ -403,10 +403,22 @@ int main(int argc, char* argv[])
   if ( hadTauSelection_part2 == "dR03mvaVLoose" || hadTauSelection_part2 == "dR03mvaVVLoose" ) fakeableHadTauSelector.set(hadTauSelection_part2);
   fakeableHadTauSelector.set_min_antiElectron(hadTauSelection_antiElectron);
   fakeableHadTauSelector.set_min_antiMuon(hadTauSelection_antiMuon);
+
+  RecoHadTauCollectionSelectorTight looseHadTauSelector(era);
+  looseHadTauSelector.set("dR03mvaLoose");
+  looseHadTauSelector.set_min_antiElectron(hadTauSelection_antiElectron);
+  looseHadTauSelector.set_min_antiMuon(hadTauSelection_antiMuon);
+
   RecoHadTauCollectionSelectorTight tightHadTauSelector(era);
-  if ( hadTauSelection_part2 != "" ) tightHadTauSelector.set(hadTauSelection_part2);
+  tightHadTauSelector.set("dR03mvaMedium");
   tightHadTauSelector.set_min_antiElectron(hadTauSelection_antiElectron);
   tightHadTauSelector.set_min_antiMuon(hadTauSelection_antiMuon);
+
+  //RecoHadTauSelectorTight looseHadTauFilter(era);
+  //looseHadTauFilter.set("dR03mvaLoose");
+  //looseHadTauFilter.set_min_antiElectron(hadTauSelection_antiElectron);
+  //looseHadTauFilter.set_min_antiMuon(hadTauSelection_antiMuon);
+
   RecoHadTauSelectorTight tightHadTauFilter(era);
   tightHadTauFilter.set("dR03mvaMedium");
   tightHadTauFilter.set_min_antiElectron(hadTauSelection_antiElectron);
@@ -606,6 +618,15 @@ int main(int argc, char* argv[])
   int count_pass_2lss_1tau = 0;
   int count_pass_2los_1tau = 0;
 
+  int pass_3l_0 = 0;
+  int pass_3l_1 = 0;
+  int pass_3l_2 = 0;
+  int pass_3l_3 = 0;
+  int pass_3l_4 = 0;
+  int pass_3l_5 = 0;
+  int pass_3l_6 = 0;
+  int pass_3l_7 = 0;
+
   std::ostream* selEventsFile_summary = ( selEventsFileName_output_summary != "" ) ? new std::ofstream(selEventsFileName_output_summary.data(), std::ios::out) : 0;
   std::cout << "selEventsFileName_output_summary = " << selEventsFileName_output_summary << std::endl;
 
@@ -699,10 +720,12 @@ int main(int argc, char* argv[])
     std::vector<const RecoHadTau*> preselHadTausFull = preselHadTauSelector(cleanedHadTaus, isHigherPt);
     std::vector<const RecoHadTau*> fakeableHadTausFull = fakeableHadTauSelector(preselHadTausFull, isHigherPt);
     std::vector<const RecoHadTau*> tightHadTausFull = tightHadTauSelector(fakeableHadTausFull, isHigherPt);
+    std::vector<const RecoHadTau*> looseHadTausFull = looseHadTauSelector(fakeableHadTausFull, isHigherPt);
 
     std::vector<const RecoHadTau*> preselHadTaus = pickFirstNobjects(preselHadTausFull, 2);
     std::vector<const RecoHadTau*> fakeableHadTaus = pickFirstNobjects(fakeableHadTausFull, 2);
     std::vector<const RecoHadTau*> tightHadTaus = getIntersection(fakeableHadTaus, tightHadTausFull, isHigherPt);
+    std::vector<const RecoHadTau*> looseHadTaus = getIntersection(fakeableHadTaus, looseHadTausFull, isHigherPt);
     std::vector<const RecoHadTau*> selHadTaus = selectObjects(hadTauSelection, preselHadTaus, fakeableHadTaus, tightHadTaus);
 
     bool passesTight_hadTau_lead = false;
@@ -864,7 +887,6 @@ int main(int argc, char* argv[])
 	   (fakeableElectrons.size() >= 1 && fakeableMuons.size() >= 1 && (selTrigger_1e1mu || selTrigger_1mu || selTrigger_1e)) ||
 	   (fakeableMuons.size() >= 2 && (selTrigger_2mu   || selTrigger_1mu))) ) {pass_2lss_1tau = false; pass_2los_1tau = false; pass_2lss = false;}
 
-
     //bool isTriggered_SingleElectron = isTriggered_1e;
     //bool isTriggered_SingleMuon = isTriggered_1mu;
 
@@ -916,6 +938,24 @@ int main(int argc, char* argv[])
       }
     }
 
+    if (!failsLowMassVeto)
+    {
+      pass_3l = false;
+      pass_2lss = false;
+      pass_1l_2tau = false;
+      pass_2lss_1tau = false;
+      pass_2los_1tau = false;
+    }
+
+    if (!(selBJets_loose.size() >= 2 || selBJets_medium.size() >= 1))
+    {
+      pass_3l = false;
+      pass_2lss = false;
+      pass_1l_2tau = false;
+      pass_2lss_1tau = false;
+      pass_2los_1tau = false;
+    }
+
     const double minPt_lead = 25.;
     const double minPt_sublead = 15.;
     const double maxAbsEta_lept = 2.1;
@@ -926,41 +966,34 @@ int main(int argc, char* argv[])
     (selBJets_loose.size() >= 2 || selBJets_medium.size() >= 1) << " " << passAnalysis << " " <<
     (selLeptons.size() >= 1 && !failsLowMassVeto  && (selBJets_loose.size() >= 2 || selBJets_medium.size() >= 1) &&  passAnalysis) <<std::endl;
 
+    if (pass_3l) pass_3l_0++;
     if (
-      selLeptons.size() >= 1 &&
-      !failsLowMassVeto  &&
-      (selBJets_loose.size() >= 2 || selBJets_medium.size() >= 1) &&
-      passAnalysis // one of the channels passed trigger and minimum jets selection
+      selLeptons.size() >= 1 && passAnalysis // one of the channels passed trigger and minimum jets selection
     )
     {
 
       const RecoLepton* selLepton_lead = selLeptons[0];
       const leptonGenMatchEntry& selLepton_genMatch = getLeptonGenMatch(leptonGenMatch_definitions, selLepton_lead);
-      std::cout<< " gen-matching " << selLepton_genMatch.numGenMatchedJets_ << std::endl;
-      //int idxSelLepton_genMatch = selLepton_genMatch.idx_;
-      //assert(idxSelLepton_genMatch != kGen_LeptonUndefined1);
-
-      std::cout<<" basic                     "<<pass_3l<< " "<<pass_2lss<< " "<<pass_1l_2tau<< " "<<pass_2lss_1tau<< " "<<pass_2los_1tau << " " << selLepton_lead->cone_pt() <<std::endl;
 
       if (
         selLepton_lead->cone_pt() > minPt_lead &&
         ((apply_leptonGenMatching && selLepton_genMatch.numGenMatchedJets_ == 0) || ! apply_leptonGenMatching)
       )
       {
-        std::cout<<" leading lep pass pt cut "<<pass_3l<< " "<<pass_2lss<< " "<<pass_1l_2tau<< " "<<pass_2lss_1tau<< " "<<pass_2los_1tau << " " << selHadTaus.size() <<std::endl;
-
-        if (selHadTaus.size() >= 2)
+        if (tightHadTausFull.size() >= 2)
         {
-          const RecoHadTau* selHadTau_lead = selHadTaus[0];
-          const RecoHadTau* selHadTau_sublead = selHadTaus[1];
+          const RecoHadTau* selHadTau_lead = tightHadTausFull[0];
+          const RecoHadTau* selHadTau_sublead = tightHadTausFull[1];
           const hadTauGenMatchEntry& selHadTau_genMatch = getHadTauGenMatch(hadTauGenMatch_definitions, selHadTau_lead, selHadTau_sublead);
           if ( (apply_hadTauGenMatching && selHadTau_genMatch.numGenMatchedJets_ == 0) || ! apply_hadTauGenMatching)
           {
             const double minPt_hadTau_lead    = 30.;
             const double minPt_hadTau_sublead = 20.;
             if (selHadTau_lead->charge()*selHadTau_sublead->charge() > 0) {pass_1l_2tau = false;}
-            if ( !(selHadTau_lead->pt() > minPt_hadTau_lead) ) {pass_1l_2tau = false;}
-            if ( !(selHadTau_sublead->pt() > minPt_hadTau_sublead) ) {pass_1l_2tau = false;}
+            else if ( !(selHadTau_lead->pt() > minPt_hadTau_lead) ) {pass_1l_2tau = false;}
+            else if ( !(selHadTau_sublead->pt() > minPt_hadTau_sublead) ) {pass_1l_2tau = false;}
+            else if ( !(selHadTau_sublead->absEta() < maxAbsEta_lept) ) {pass_1l_2tau = false;}
+            else if ( !(selHadTau_lead->absEta() < maxAbsEta_lept) ) {pass_1l_2tau = false;}
           } else {pass_1l_2tau = false;}
 
           if ( (tightLeptonsFull.size() <= 1) && pass_1l_2tau)
@@ -976,8 +1009,6 @@ int main(int argc, char* argv[])
           }
 
         } else {pass_1l_2tau = false;} // add 2l2t
-
-        std::cout<<" passed 1l2tau         "<<pass_3l<< " "<<pass_2lss<< " "<<pass_1l_2tau<< " "<<pass_2lss_1tau<< " "<<pass_2los_1tau<<std::endl;
 
         if ( selLeptons.size() >= 2 )
         {
@@ -1004,6 +1035,7 @@ int main(int argc, char* argv[])
           }
           if ( failsTightChargeCut ){pass_2lss = false; pass_2lss_1tau = false;}
           std::cout<<" tight charge      "<<pass_3l<< " "<<pass_2lss<< " "<<pass_1l_2tau<< " "<<pass_2lss_1tau<< " "<<pass_2los_1tau<<std::endl;
+          if (pass_3l) pass_3l_2++;
 
           const RecoLepton* selLepton_sublead = selLeptons[1];
           const leptonGenMatchEntry& selLepton_sublead_genMatch = getLeptonGenMatch(leptonGenMatch_definitions, selLepton_sublead);
@@ -1015,43 +1047,36 @@ int main(int argc, char* argv[])
             pass_3l = false;
             pass_2lss = false;
             const double minPt_sublead_E_2l_1tau = 10.;
-            if (selHadTaus.size() >= 1)
+            if (looseHadTausFull.size() >= 1)
             {
               if (selLepton_sublead->is_electron()) { pass_2lss_1tau = false; pass_2los_1tau = false; }
               else if ( !(selLepton_sublead->cone_pt() > minPt_sublead_E_2l_1tau) ) { pass_2lss_1tau = false; pass_2los_1tau = false; }
-            }
+              if (looseHadTausFull[0]->charge()*selLepton_sublead->charge() > 0) pass_2lss_1tau = false;
+            } else { pass_2lss_1tau = false; pass_2los_1tau = false; }
+            if (tightHadTausFull.size() > 1) { pass_2lss_1tau = false; pass_2los_1tau = false; }
           }
 
           bool isLeptonCharge_OS = selLepton_lead->charge()*selLepton_sublead->charge() < 0;
           if ( isLeptonCharge_OS ) {pass_2lss = false; pass_2lss_1tau = false;}
           else pass_2los_1tau = false;
 
-          std::cout<<" pass charge OS/SS "<<pass_3l<< " "<<pass_2lss<< " "<<pass_1l_2tau<< " "<<pass_2lss_1tau<< " "<<pass_2los_1tau<<std::endl;
-          std::cout<<" testing nleptons "<< selLeptons.size() << std::endl;
           if ( selLeptons.size() != 2 ) pass_2lss = false;
-          std::cout<<" testing fakeable ntaus "<< fakeableHadTausFull.size() << std::endl;
-          if ( fakeableHadTausFull.size() > 0 ) {pass_2lss = false; pass_3l = false;}
-          else {pass_2los_1tau = false; pass_2lss_1tau = false;}
-          std::cout<<" testing ntaus "<< selHadTaus.size() << std::endl;
-          if (selHadTaus.size() > 1) {pass_2los_1tau = false; pass_2lss_1tau = false;}
+          if ( looseHadTausFull.size() > 0 ) {pass_2lss = false; pass_3l = false;}
+          if (pass_3l) pass_3l_3++;
+          //if (selHadTaus.size() > 1)  {pass_2los_1tau = false; pass_2lss_1tau = false;}
+          // not more than one medium -- to add
+
+
 
           //if (!(fakeableHadTausFull.size() >= 1)) {pass_2los_1tau = false; pass_2lss_1tau = false;}
           //if ( (selLeptons.size() >= 2) )
           //if ( !(selHadTaus.size() >= 1) )
 
           if ( !(tightLeptonsFull.size() <= 2) ) {pass_2lss = false; pass_2lss_1tau = false; pass_2los_1tau = false;}
-          //else {
-          //  // flip selection
-          //  double prob_chargeMisId_lead = prob_chargeMisId(getLeptonType(selLepton_lead->pdgId()), selLepton_lead->pt(), selLepton_lead->eta());
-          //  double prob_chargeMisId_sublead = prob_chargeMisId(getLeptonType(selLepton_sublead->pdgId()), selLepton_sublead->pt(), selLepton_sublead->eta());
-          //  if ( (prob_chargeMisId_lead + prob_chargeMisId_sublead) == 0. ) {pass_2lss = false; pass_2lss_1tau = false; pass_2los_1tau = false;}
-          //}
 
           if ( pass_2lss || pass_2lss_1tau || pass_2los_1tau )
           {
-            std::cout<<" testing met_LD "<< tightLeptonsFull.size() <<std::endl;
-            if (!(selLepton_lead->is_muon() || selLepton_sublead->is_muon() || met_LD >= 0.2)) {pass_2lss = false; pass_2lss_1tau = false; pass_2los_1tau = false;}
-            std::cout<<" pass met          "<<pass_3l<< " "<<pass_2lss<< " "<<pass_1l_2tau<< " "<<pass_2lss_1tau<< " "<<pass_2los_1tau<< " " << selLeptons.size() << std::endl;
+            if ((selLepton_lead->is_electron() && selLepton_sublead->is_electron()) && !(met_LD >= 0.2)) {pass_2lss = false; pass_2lss_1tau = false; pass_2los_1tau = false;}
 
             bool failsZbosonMassVeto = false;
             for ( std::vector<const RecoLepton*>::const_iterator lepton1 = preselLeptonsFull.begin();
@@ -1072,19 +1097,20 @@ int main(int argc, char* argv[])
           //if ( !(tightLeptonsFull.size() <= 3) ) pass_3l = false;
           if ( (selLeptons.size() == 3) && pass_3l)
           {
+            if (pass_3l) pass_3l_4++;
             // require exactly three leptons passing tight selection criteria, to avoid overlap with 4l channel
             const RecoLepton* selLepton_third = selLeptons[2];
             const leptonGenMatchEntry& selLepton_third_genMatch = getLeptonGenMatch(leptonGenMatch_definitions, selLepton_third);
             if (!((apply_leptonGenMatching && selLepton_third_genMatch.numGenMatchedJets_ == 0) || ! apply_leptonGenMatching)) {pass_3l = false;}
 
             double minPt_third = 10.;
-            if ( selLepton_third->cone_pt() > minPt_third ) pass_3l = false;
+            if ( !(selLepton_third->cone_pt() > minPt_third) ) pass_3l = false;
             else
             {
               int sumLeptonCharge = selLepton_lead->charge() + selLepton_sublead->charge() + selLepton_third->charge();
-              bool isCharge_SS = std::abs(sumLeptonCharge) >  1;
-              if ( isCharge_SS ) pass_3l = false;
+              if ( !(std::abs(sumLeptonCharge) == 1) ) pass_3l = false;
             }
+            if (pass_3l) pass_3l_5++;
 
             if (pass_3l)
             {
@@ -1102,7 +1128,7 @@ int main(int argc, char* argv[])
                 }
               }
               bool failsZbosonMassVeto = isSameFlavor_OS && std::fabs(massSameFlavor_OS - z_mass) < z_window;
-              if ( failsZbosonMassVeto ) pass_3l = false;
+              if ( failsZbosonMassVeto ) {pass_3l = false; if (pass_3l) pass_3l_6++;}
               else
               {
                 double met_LD_cut = 0.;
@@ -1110,10 +1136,11 @@ int main(int argc, char* argv[])
                 else if ( isSameFlavor_OS     ) met_LD_cut =  0.3;
                 else                            met_LD_cut =  0.2;
                 if ( met_LD_cut > 0 && met_LD < met_LD_cut ) pass_3l = false;
-                else if ( !(selLeptons[2]->cone_pt() > 10) ) pass_3l = false;
               }
             }
+            if (pass_3l) pass_3l_7++;
 
+            ///*
             bool failsHtoZZVeto = false;
             for ( std::vector<const RecoLepton*>::const_iterator lepton1 = preselLeptonsFull.begin();
             lepton1 != preselLeptonsFull.end(); ++lepton1 )
@@ -1142,8 +1169,7 @@ int main(int argc, char* argv[])
               }
             }
             if ( failsHtoZZVeto ) pass_3l = false;
-
-            std::cout<<" pass 3l met / pt / HZZ veto "<<pass_3l<< " "<<pass_2lss<< " "<<pass_1l_2tau<< " "<<pass_2lss_1tau<< " "<<pass_2los_1tau<<std::endl;
+            //*/
             } else pass_3l = false; // has 3l
 
         } else // close on two tight leptons
@@ -2066,6 +2092,20 @@ int main(int argc, char* argv[])
               << " analyzed = " << analyzedEntries << '\n'
               << " selected = " << selectedEntries << " (weighted = " << selectedEntries_weighted << ")\n\n"
               << '\n';
+
+    // Cut flow 3l = 542 427 405 374 248 0 0
+    // Cut flow 3l = 542 427 405 374 248 248 0 202
+    (*selEventsFile_summary) << "Cut flow 3l = "
+              << pass_3l_0
+              << " " << pass_3l_1
+              << " " << pass_3l_2
+              << " " << pass_3l_3
+              << " " << pass_3l_4
+              << " " << pass_3l_5
+              << " " << pass_3l_6
+              << " " << pass_3l_7
+              << '\n';
+
   }
   std::cout << "selEventsFileName_output_summary = " << selEventsFileName_output_summary << std::endl;
 
