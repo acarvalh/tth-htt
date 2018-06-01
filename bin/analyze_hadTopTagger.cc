@@ -133,6 +133,23 @@ const int hadTauSelection_antiMuon_lead = -1; // not applied
 const int hadTauSelection_antiElectron_sublead = -1; // not applied
 const int hadTauSelection_antiMuon_sublead = -1; // not applied
 
+/*
+// IHEP permutations
+typedef std::shared_ptr<BDT_EventReco_Top> eTopP;
+eTopP getTop(int i1, int i2, int i3){
+char _xc[3] = {(char)i1,(char)i2,(char)i3};
+std::sort(_xc,_xc+3);
+std::string _x(_xc,_xc+3);
+auto it = topcache.find(_x);
+if (it==topcache.end()){
+  auto o = std::make_shared<eTop>(getSum(i2,i3),getSum(i1,i2,i3),getJet(i1),getJet(i2),getJet(i3),i1,i2,i3,false,-99);
+  topcache[_x] = o;
+  return o;
+}
+else return (*it).second;
+};
+*/
+
 double square(double x)
 {
   return x*x;
@@ -567,7 +584,7 @@ int main(int argc, char* argv[])
       "fatjet_isGenMatched", "b_isGenMatched", "Wj1_isGenMatched", "Wj2_isGenMatched",
       "passJetSel","passJetMassSel",
       "passHadGenHadW",
-      "pass_3l", "pass_2lss", "pass_1l_2tau", "pass_2lss_1tau", "pass_2los_1tau"
+      "pass_3l", "pass_2lss", "pass_1l_2tau", "pass_2lss_1tau", "pass_2los_1tau", "highest_btagTriplet"
       //"b_isGenMatched", "Wj1_isGenMatched", "Wj2_isGenMatched",
       //"bWj1Wj2_isGenMatched"
     );
@@ -1041,7 +1058,8 @@ int main(int argc, char* argv[])
           const leptonGenMatchEntry& selLepton_sublead_genMatch = getLeptonGenMatch(leptonGenMatch_definitions, selLepton_sublead);
 
           if (!((apply_leptonGenMatching && selLepton_sublead_genMatch.numGenMatchedJets_ == 0) || ! apply_leptonGenMatching)) {pass_3l = false; pass_2lss = false; pass_2lss_1tau = false; pass_2los_1tau = false; }
-          else if (!(selLepton_sublead->cone_pt() > minPt_sublead))
+
+          if (!(selLepton_sublead->cone_pt() > minPt_sublead))
           {
             std::cout<<" not pass sub lep pt "<<pass_3l<< " "<<pass_2lss<< " "<<pass_1l_2tau<< " "<<pass_2lss_1tau<< " "<<pass_2los_1tau<< " " << selLepton_sublead->cone_pt() << std::endl;
             pass_3l = false;
@@ -1062,12 +1080,10 @@ int main(int argc, char* argv[])
 
           if ( selLeptons.size() != 2 ) pass_2lss = false;
           if ( looseHadTausFull.size() > 0 ) {pass_2lss = false; pass_3l = false;}
+          else { pass_2lss_1tau = false; pass_2los_1tau = false; }
           if (pass_3l) pass_3l_3++;
           //if (selHadTaus.size() > 1)  {pass_2los_1tau = false; pass_2lss_1tau = false;}
           // not more than one medium -- to add
-
-
-
           //if (!(fakeableHadTausFull.size() >= 1)) {pass_2los_1tau = false; pass_2lss_1tau = false;}
           //if ( (selLeptons.size() >= 2) )
           //if ( !(selHadTaus.size() >= 1) )
@@ -1332,6 +1348,71 @@ int main(int argc, char* argv[])
     int typeTop = -1; // 1 - FatTop; 2 - countFatAK8 ? countFatAK12; 3- countResolved;
     //if (inAK12) typeTop = getType(jet_ptrsHTTv2.size(), jet_ptrsAK12.size(), selJets.size());
     //else typeTop = getType(jet_ptrsHTTv2.size(), jet_ptrsAK8.size(), selJets.size());
+    // IHEP permutations
+    /*
+    eTopP best_permutation_httTT = nullptr;
+    uint n_tested_permutations = 0;
+    do {
+
+  do {
+
+    char _x[6];
+    for (int i=0; i<6; i++) _x[i] = (int(_permjet[i])<0) ? -1 : _permjet[i];
+
+      //
+      //hadTop: b-jet [0] + wjet1 [2] + wjet2 [3]
+      //lepTop: lep [1] + b-jet [1]
+      //Higgs : lep [0] + wjet [4] + wjet [5]
+      // does not test if just 2/3 or 4/5 are swapped
+      // top part depends only on lep[0], lep[1], jet[0], jet[1], jet[23]
+      // higgs part depends on lep[0], lep[1], jet[45]
+       //
+
+      float top_tag = -99;
+
+    if (algo==k_BDTv8_Hj) {
+    n_tested_permutations++;
+    std::vector<float> top = CalcHadTopTagger(_permlep,_x);
+    top_tag = top[0];
+    if (top[0] > best_permutation_hadTop[0]){
+      best_permutation_hadTop = top;
+    }
+        }
+        else if (algo==k_rTT_Hj) {
+
+    if ((int)(_x[0])<0 || (int)(_x[2])<0 || (int)(_x[3])<0) continue;
+    if (jets.at(_x[0])->deepcsv()<jets.at(_x[2])->deepcsv()) continue;
+    if (jets.at(_x[0])->deepcsv()<jets.at(_x[3])->deepcsv()) continue;
+    if (jets.at(_x[2])->pt()<jets.at(_x[3])->pt()) continue;
+
+    n_tested_permutations++;
+
+    auto topcand = cache->getTop(_x[0],_x[2],_x[3]);
+    if (fabs(topcand->p4->mass()-175.0)>80.0) continue;
+    float score = EvalScore(topcand);
+    top_tag = score;
+    if (!best_permutation_rTT || (score > best_permutation_rTT->score_rTT)) {
+      best_permutation_rTT = topcand;
+    }
+        }
+        else if (algo==k_httTT_Hj) {
+
+    if ((int)(_x[0])<0 || (int)(_x[2])<0 || (int)(_x[3])<0) continue;
+
+    n_tested_permutations++;
+
+    auto topcand = cache->getTop(_x[0],_x[2],_x[3]);
+    float score = EvalScore_httTT(topcand);
+    top_tag = score;
+    if (!best_permutation_httTT || (score > best_permutation_httTT->score_httTT)) {
+      best_permutation_httTT = topcand;
+    }
+        }
+
+      } while (go && std::next_permutation(_permjet,_permjet+njet));
+    } while (go && std::next_permutation(_permlep,_permlep+nlep));
+    */
+
     // start loops in jets
     //if (typeTop == 1) {
 
@@ -1546,6 +1627,7 @@ int main(int argc, char* argv[])
             ("pass_1l_2tau", pass_1l_2tau)
             ("pass_2lss_1tau", pass_2lss_1tau)
             ("pass_2los_1tau", pass_2los_1tau)
+            ("highest_btagTriplet", true)
                 .fill();
           }
         } // end typeTop == 1
@@ -1712,6 +1794,7 @@ int main(int argc, char* argv[])
                 ("pass_1l_2tau", pass_1l_2tau)
                 ("pass_2lss_1tau", pass_2lss_1tau)
                 ("pass_2los_1tau", pass_2los_1tau)
+                ("highest_btagTriplet", true)
                     .fill();
               }
             } else { std::cout<<" type2 akt12 did not had subjets "<<std::endl; continue;}
@@ -1862,6 +1945,7 @@ int main(int argc, char* argv[])
                   ("pass_1l_2tau", pass_1l_2tau)
                   ("pass_2lss_1tau", pass_2lss_1tau)
                   ("pass_2los_1tau", pass_2los_1tau)
+                  ("highest_btagTriplet", true)
                       .fill();
                 }
               } else { std::cout<<" type2 akt8 did not had subjets "<<std::endl; continue;}
@@ -1892,6 +1976,10 @@ int main(int argc, char* argv[])
                   selBJet = (*selJets[bjetCandidate]).p4();
                   selWJet1 = (*selWJet1Candidate)->p4();
                   selWJet2 = (*selWJet2Candidate)->p4();
+
+                  // add a flag to say if the b-cand is the highest DeepCSV of the triplet
+                  bool highest_btagTriplet = true;
+                  if ( ((*selJets[bjetCandidate]).BtagCSV() < (*selWJet1Candidate)->BtagCSV()) || ((*selJets[bjetCandidate]).BtagCSV() < (*selWJet2Candidate)->BtagCSV()) ) highest_btagTriplet = false;
 
                   std::map<int, bool> genMatchingTop = isGenMatchedJetTriplet(
                     selBJet, selWJet1, selWJet2,
@@ -2023,6 +2111,7 @@ int main(int argc, char* argv[])
                   ("pass_1l_2tau", pass_1l_2tau)
                   ("pass_2lss_1tau", pass_2lss_1tau)
                   ("pass_2los_1tau", pass_2los_1tau)
+                  ("highest_btagTriplet", highest_btagTriplet)
                       .fill();
                  }
               }
